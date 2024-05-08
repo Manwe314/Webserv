@@ -1,0 +1,37 @@
+server {
+    server_name kuxi
+    listen localhost:8000
+
+    root ./kuxmeister
+
+    index kuxexa.kux kuxiti.kuxi kakashka.kashka
+
+    location /trollface/flie
+    {
+        allow_methods PUT GET POST
+        root ./trollass
+    }
+
+    location ./smiledog {
+        index sexymazafaqa.se troll.html
+    }
+
+}
+
+server {
+    server_name giki
+    listen localhost:8001
+
+    root ./gikski
+
+    location {
+        allow_methods ADD
+        root ./kisstheskin
+        
+    }
+}
+
+server {
+    server_name briki
+    listen localhost:8002
+}

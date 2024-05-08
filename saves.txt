@@ -1,0 +1,279 @@
+std::string extractPath(std::string& location)
+{
+    int start_of_path;
+    //find location wirrten
+    int i = location.find("location");
+    //if not found return null string
+    if (i == std::string::npos)
+        return ("\0");
+    //check that before location only tabs and spaces are prestent
+    if (IsFirstAfterWhitespace(location, i))
+        return ("\0");
+    //jump to the index after the word location and check that there is at least one tab/space
+    i += 8;
+    if (location[i] != ' ' && location[i] != '  ')
+        return ("\0");
+    //jump over to the start of the path if there arte multiple spaces/tabs
+    while (location[i] == ' ' || location[i] == '   ')
+        i++;
+    //if everything went file i should be at the start of the path, we now count to the delim character (space, tab, new line or null).
+    start_of_path = i;
+    while (location[i] != ' ' && location[i] != '   ' && location[i] != '\0' && location[i] != '\n')
+        i++;
+    //with begining index and the end index we can get the size of the path part and take it out with substing
+    return (location.substr(start_of_path, i - start_of_path));
+}
+
+std::string extractRoot(std::vector<std::string>& rules)
+{
+    int start_index = 0;
+    int root;
+    int j;
+    for (int i = 0; i < rules.size(); i++)
+    {
+        //try to find "root" in every line of the '{}' block
+        start_index = rules[i].find("root");
+        //if its found and its not a part of somethign else (a name of file or anything) then break
+        if (start_index != std::string::npos)
+        {
+            //if only whate space is behind it and its isloated by at least one space/tab then it is a rule declaration
+            if (IsFirstAfterWhitespace(rules[i], start_index) == true && (rules[i][start_index + 4] == ' ' || rules[i][start_index + 4] == '    '))
+                break;            
+        }
+        root = i;
+    }
+    //if a legitamate root declaration was not found returnn a null string
+    if (root == rules.size())
+        return ("\0");
+    //get the start_index varibale to the start of the path as written after the root.
+    start_index = rules[root].find("root");
+    start_index += 4;
+    while (rules[root][start_index] == ' ' || rules[root][start_index] == ' ')
+        start_index++;
+    // count from the start index untill a delimination character is found.
+    j = start_index;
+    while (rules[root][j] != ' ' && rules[root][j] != ' ' && rules[root][j] != '\n' && rules[root][j] != '\0')
+        j++;
+    // return the substring from start index based on the length measured by j.
+    return (rules[root].substr(start_index, j - start_index));
+}
+
+
+
+
+
+
+
+    Server server;
+
+    try
+    {
+        server.SetUp();
+        server.Start();
+    }
+    catch(const SocketBindingError& e)
+    {
+        std::cout << e.what() << std::endl;
+        close(server.get_SocketFd());
+    }
+    catch(const SocketCreationError& e)
+    {
+        std::cout << e.what() << std::endl;
+        close(server.get_SocketFd());
+    }
+    catch(const ListeningError& e)
+    {
+        std::cout << e.what() << std::endl;
+        close(server.get_SocketFd());
+    }
+    catch(const ClientConnectionError& e)
+    {
+        std::cout << e.what() << std::endl;
+        close(server.get_SocketFd());
+    }
+    return 0;
+
+
+
+
+
+    //the same setup but with an argument for port to specify the port number instead of using default
+int Server::SetUp(int port = PORT)
+{
+    _socket_fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (_socket_fd == -1)
+        throw SocketCreationError();
+    this->SetAddress(port);
+    if (bind(_socket_fd, reinterpret_cast<struct sockaddr*>(&_server_address), sizeof(_server_address)) < 0)
+        throw SocketBindingError();
+    return (0);
+}
+
+
+_serverwide_config(initServerWideConfig(server_block)),
+
+
+
+
+
+
+OLD SERVER CLASS WORKING:
+
+Server::Server()
+{
+    //nothing to do here
+}
+
+//set up the server using default PORT as defined in Webserv.hpp
+int Server::SetUp(int port = PORT)
+{
+    //use socket to get an int (fd) associated with the socket
+    //AF_INET makes out socket use IPv4 | SOCK_STREAM makes the socket a two-way relible commuinicator (TCP) | last argument is for the protocol number since there is only one it's 0.
+    _socket_fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (_socket_fd == -1)
+        throw SocketCreationError();
+    //setup the server address variable which will be used to bind the socket to make it usable.
+    this->SetAddress(port);
+    //bind the socket with the socket fd, the address struct that was made in SetAddress (needs to be casted to match bind type) and the size of adress struct
+    if (bind(_socket_fd, reinterpret_cast<struct sockaddr*>(&_server_address), sizeof(_server_address)) < 0)
+        throw SocketBindingError();
+    return (0);
+}
+
+
+
+void Server::SetAddress(int port)
+{
+    //initilase the variable with 0's
+    std::memset(&_server_address, 0, sizeof(_server_address));
+    //set the family type to IPv4
+    _server_address.sin_family = AF_INET;
+    //set the IP adress (in this case to any ip adress thus it will listen to all avalible network interfaces)
+    _server_address.sin_addr.s_addr = INADDR_ANY;
+    //set the port and also convert it to network byte order
+    _server_address.sin_port = htons(port);
+}
+
+void Server::Start()
+{
+    //listen for data on the socket fd and have a maximum backlog of 10
+    if (listen(_socket_fd, 10) == -1)
+        throw ListeningError();
+    while(true)
+    {
+        int close_flag = 0;
+        //set up the client socket connection
+        sockaddr_in client_address;
+        socklen_t client_address_length =  sizeof(client_address);
+        int client_socket_fd = accept(_socket_fd, reinterpret_cast<struct sockaddr*>(&client_address), &client_address_length);
+        if (client_socket_fd == -1)
+            throw ClientConnectionError();
+            
+        //display IPv4 and Server::Server()
+{
+    //nothing to do here
+}
+
+//set up the server using default PORT as defined in Webserv.hpp
+int Server::SetUp(int port = PORT)
+{
+    //use socket to get an int (fd) associated with the socket
+    //AF_INET makes out socket use IPv4 | SOCK_STREAM makes the socket a two-way relible commuinicator (TCP) | last argument is for the protocol number since there is only one it's 0.
+    _socket_fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (_socket_fd == -1)
+        throw SocketCreationError();
+    //setup the server address variable which will be used to bind the socket to make it usable.
+    this->SetAddress(port);
+    //bind the socket with the socket fd, the address struct that was made in SetAddress (needs to be casted to match bind type) and the size of adress struct
+    if (bind(_socket_fd, reinterpret_cast<struct sockaddr*>(&_server_address), sizeof(_server_address)) < 0)
+        throw SocketBindingError();
+    return (0);
+}
+
+
+
+void Server::SetAddress(int port)
+{
+    //initilase the variable with 0's
+    std::memset(&_server_address, 0, sizeof(_server_address));
+    //set the family type to IPv4
+    _server_address.sin_family = AF_INET;
+    //set the IP adress (in this case to any ip adress thus it will listen to all avalible network interfaces)
+    _server_address.sin_addr.s_addr = INADDR_ANY;
+    //set the port and also convert it to network byte order
+    _server_address.sin_port = htons(port);
+}
+
+void Server::Start()
+{
+    //listen for data on the socket fd and have a maximum backlog of 10
+    if (listen(_socket_fd, 10) == -1)
+        throw ListeningError();
+    while(true)Port of the connected client;
+        std::cout << "Client connected: " << inet_ntoa(client_address.sin_addr) << ":" << ntohs(client_address.sin_port) <<std::endl;
+        
+        //set up a buffer to read into whatever the client sends.
+        char buffer[1024];
+        int bytes_read;
+
+        //use recv to read from the client connection and put the data into the buffer;
+        while ((bytes_read = recv(client_socket_fd, buffer, sizeof(buffer), 0)) > 0)
+        {
+            buffer[bytes_read] = '\0';
+            //display what was sent.
+            std::cout << "Recived: " << buffer << std::endl;
+            //echo back what ever was sent.
+            send(client_socket_fd, buffer, bytes_read, 0);
+            
+            if (strncmp(buffer, "close", 5) == 0)
+            {
+                std::cout << "the client requested the termination of this server";
+                close_flag = 1;
+                break;
+            }
+        }
+        if (bytes_read == -1)
+            std::cout << "Error while receiving data" << std::endl;
+        
+        close(client_socket_fd);
+        if (close_flag == 1)
+            break;
+    }
+    close(_socket_fd);
+}
+
+int Server::get_SocketFd()
+{
+    return (this->_socket_fd);
+}
+
+Server::~Server()
+{
+    
+}
+
+
+class Server
+{
+private:
+    int _socket_fd;
+    sockaddr_in _server_address;
+public:
+    Server();
+    int SetUp();
+    int SetUp(int port);
+    void SetAddress(int port);
+    void Start();
+    ~Server();
+    
+    int get_SocketFd();
+};
+
+
+
+
+
+            for (int i = 0; i < nfds  + 1; i++)
+            {
+                std::cout << "FD " << i << ": " << fds[i].fd << std::endl;
+            }
