@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 20:35:33 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/04/27 19:30:47 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/05/12 15:56:46 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,8 @@ public:
     ServerConfig();
     ServerConfig(std::vector<std::string> server_block);
     ~ServerConfig();
+    
+    ServerConfig& operator=(const ServerConfig& rhs);
 
     t_host_port getHostPortPair() const;
     std::string getName() const;

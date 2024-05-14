@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 14:44:27 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/05/03 16:06:43 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/05/12 18:28:17 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,9 +75,10 @@ void printMap(const std::map<Keytype, Valuetype>& map)
     for (it = map.begin(); it != map.end(); it++)
         std::cout << "Key: " << it->first << "Value: " << it->second << std::endl;
 }
-
-
-
+bool isValidHttpMethod(std::string method);
+bool isValidVersion(std::string version);
+bool isInvalidVersion(std::string version);
+bool isInvalidHttpMethod(std::string method);
 
 
 

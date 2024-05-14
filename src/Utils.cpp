@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 18:42:38 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/05/03 16:02:12 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/05/12 18:28:08 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,6 +129,44 @@ void eraseRange(std::vector<std::string>& array, int start, int end, int flag)
 
     if (flag == 0)
         array.erase(en);    
+}
+
+//this function returns true if the given string is a valid http method or false if it is anything else.
+bool isValidHttpMethod(std::string method)
+{
+    //ConfigBase's member variable _http_methods contains complete list of VALID http methods. check against it to veryfiy the argument.
+    for (std::vector<std::string>::const_iterator it = ConfigBase::_http_methods.begin(); it != ConfigBase::_http_methods.end(); it++)
+        if(method.compare(*it) == 0)
+            return (true);
+    return (false);
+}
+
+//this function returns true if the given string is an invalid (unsupported) http method, false if its anything else.
+bool isInvalidHttpMethod(std::string method)
+{
+    if (method.compare("OPTIONS") == 0 || method.compare("HEAD") == 0 || method.compare("PUT") == 0)
+        return (true);
+    if (method.compare("TRACE") == 0 || method.compare("CONNECT") == 0)
+        return (true);
+    return (false);
+}
+
+
+//this function returns true if the given string is a supported http version, or false if its anything else.
+bool isValidVersion(std::string version)
+{
+    if (version.compare("HTTP/1.0") == 0 || version.compare("HTTP/1.1") == 0)
+        return (true);
+    return (false);
+}
+
+//this function returns true if the given string is a non supported http version, or false if its anything else;
+bool isInvalidVersion(std::string version)
+{
+    if (version.compare("HTTP/0.9") == 0 || version.compare("HTTP/3.0") == 0 || version.compare("HTTP/2.0") == 0)
+        return (true);
+    return (false);
+    
 }
 
 //prints the string vecotr

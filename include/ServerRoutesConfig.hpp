@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 17:09:31 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/04/24 00:31:27 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/05/12 16:31:46 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,8 @@ public:
     ServerRoutesConfig();
     ServerRoutesConfig(std::vector<std::string> route_block, std::string location);
     ~ServerRoutesConfig();
+
+    ServerRoutesConfig& operator=(const ServerRoutesConfig& rhs); 
 
     std::string getRoot() const;
     std::string getLocation() const;
