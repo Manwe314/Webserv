@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/08 23:27:16 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/05/14 15:36:06 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/05/16 01:04:01 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,12 +20,17 @@
 
 Response::Response(std::string request, ServerConfig config)
 {
+    int i;
     if (request.empty())
         _status_code = 400;
     _server_config = config;
     //here need to split the request into 3 parts: request line, headers and body.
     //parse them individually with according rules.
-    
+    i = request.find("\r\n");
+    if (i == std::string::npos)
+        _status_code = 400;
+    else
+        parseRequestLine(request.substr(0, i));
 }
 
 //this function parses the request line of the message. by convection space, new line and carrage return
