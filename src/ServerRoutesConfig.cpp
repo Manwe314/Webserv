@@ -123,6 +123,7 @@ ServerRoutesConfig& ServerRoutesConfig::operator=(const ServerRoutesConfig& rhs)
    _location = rhs.getLocation();
    _index_files = rhs.getIndex();
    _allowed_methods = rhs.getMethods();
+	return *this;
 }
 
 std::string ServerRoutesConfig::getRoot() const

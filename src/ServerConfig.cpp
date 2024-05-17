@@ -204,7 +204,7 @@ ServerConfig& ServerConfig::operator=(const ServerConfig& rhs)
     _server_name = rhs.getName();
     _serverwide_config = rhs.getServerWideConfig();
     _route_configs = rhs.getRouteConfigs();
-    
+   return *this; 
 }
 
 t_host_port ServerConfig::getHostPortPair() const
