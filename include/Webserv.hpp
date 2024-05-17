@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 14:44:27 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/05/12 18:28:17 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/05/17 17:32:27 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@
 #include<sstream>
 #include<fstream>
 #include<utility>
+#include<cctype>
 
 //C++ Container includes
 #include<vector>
@@ -75,10 +76,12 @@ void printMap(const std::map<Keytype, Valuetype>& map)
     for (it = map.begin(); it != map.end(); it++)
         std::cout << "Key: " << it->first << "Value: " << it->second << std::endl;
 }
-bool isValidHttpMethod(std::string method);
+void toLowerCase(std::string &str);
 bool isValidVersion(std::string version);
 bool isInvalidVersion(std::string version);
+bool isValidHttpMethod(std::string method);
 bool isInvalidHttpMethod(std::string method);
+bool isValidHeader(std::string header);
 
 
 

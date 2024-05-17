@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/24 21:44:05 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/05/12 16:30:58 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/05/16 21:38:24 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -204,7 +204,7 @@ ServerConfig& ServerConfig::operator=(const ServerConfig& rhs)
     _server_name = rhs.getName();
     _serverwide_config = rhs.getServerWideConfig();
     _route_configs = rhs.getRouteConfigs();
-    
+    return (*this);
 }
 
 t_host_port ServerConfig::getHostPortPair() const

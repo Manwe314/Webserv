@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 18:42:38 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/05/12 18:28:08 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/05/17 18:24:43 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,6 +129,33 @@ void eraseRange(std::vector<std::string>& array, int start, int end, int flag)
 
     if (flag == 0)
         array.erase(en);    
+}
+
+//this function puts the given string to lowercase letters
+void toLowerCase(std::string &str)
+{
+    for (std::string::iterator it = str.begin(); it != str.end(); it++)
+    {
+        if (std::isalnum(*it))
+            *it = std::tolower(*it);
+    }
+}
+
+//this function returns true if a header line is formated correctly or false if its not.
+//only rule is that the string must start with a name that is between 33 and 126 asccii characters ending with a colon ":". after that its free game.
+bool isValidHeader(std::string header)
+{
+    int i;
+    
+    i = header.find(":");
+    if (i == std::string::npos)
+        return (false);
+    for (int j = 0; j < i; j++)
+    {
+        if (header[i] < 33 || header[i] > 126)
+            return (false);
+    }
+    return (true);
 }
 
 //this function returns true if the given string is a valid http method or false if it is anything else.

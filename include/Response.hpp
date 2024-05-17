@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/08 23:20:55 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/05/12 16:43:09 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/05/16 20:52:33 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,13 +21,15 @@
 class Response
 {
 private:
+    std::map<std::string, std::string> _headers;
     ServerConfig _server_config;
-    int _status_code;
-    std::string _method;
-    std::string _request_URI;
     std::string _http_version;
+    std::string _request_URI;
+    std::string _method;
+    int _status_code;
 
     void parseRequestLine(std::string request_line);
+    void parseMessageHeaders(std::string message_headers);
 public:
     Response(std::string request, ServerConfig config);
     ~Response();

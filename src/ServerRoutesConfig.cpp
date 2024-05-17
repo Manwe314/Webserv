@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 18:29:19 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/05/12 16:33:05 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/05/16 21:38:16 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,6 +123,7 @@ ServerRoutesConfig& ServerRoutesConfig::operator=(const ServerRoutesConfig& rhs)
    _location = rhs.getLocation();
    _index_files = rhs.getIndex();
    _allowed_methods = rhs.getMethods();
+   return (*this);
 }
 
 std::string ServerRoutesConfig::getRoot() const

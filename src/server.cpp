@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 16:12:04 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/05/09 17:36:24 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/05/16 21:45:23 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,7 +106,7 @@ void Server::receive(int client_fd)
             throw ClientConnectionError("Read error Connection closed in the servrver named: " + _name);
     }
     _requests[client_fd] += std::string(buffer);
-    std::cout << std::string(buffer) << std::endl;
+    //std::cout << std::string(buffer) << std::endl;
 }
 
 //so far the functionallity of this server is echoing back with extra text
