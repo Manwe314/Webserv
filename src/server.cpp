@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 16:12:04 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/05/16 21:45:23 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/05/18 20:31:21 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,6 +92,7 @@ int Server::accept()
 //the send function clears the matching _request value this is why we apend to it so a request can be built up through multiple calls.
 void Server::receive(int client_fd)
 {
+    //this function should take care of chunking and receiving of chunked data.
     char buffer[BUFFER_SIZE] = {0};
     int ret;
     

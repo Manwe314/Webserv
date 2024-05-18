@@ -3,4 +3,5 @@ To-Do:
     1. Finish the Response class. - Levan
     2. Figure out CGI. - Brett
     3. compleate the config file parsing and config class functionality.
-    4. figure out possible bugs (bind, config parseing, etc.). - Brett
+    4. Figure out possible bugs (bind, config parseing, etc.). - Brett
+    5. Handle chunked requests.

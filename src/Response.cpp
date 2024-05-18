@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/08 23:27:16 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/05/17 18:30:24 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/05/18 21:13:34 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 505 - HTTP version not supported
 */
 
-Response::Response(std::string request, ServerConfig config)
+Response::Response(std::string request, ServerConfig config) : _headers()
 {
     int i;
     _status_code = -1; //if the status code is -1 after this constructor finishes that means no errors were encountered.
@@ -35,10 +35,13 @@ Response::Response(std::string request, ServerConfig config)
     else
         parseRequestLine(request.substr(0, i)); // prepare everything that is in the request line of the request.
     //message headers are sandwitched between request line and empty line. if empty line does not exist set error status to 400.
-    if (request.find("\r\n\r\n") == std::string::npos)
+    if (i == std::string::npos || request.find("\r\n\r\n") == std::string::npos)
         _status_code = 400;
     else
         parseMessageHeaders(request.substr((i + 2), (request.find("\r\n\r\n") - (i + 2)))); // parse everything from the 2nd line I.E after the request line before the empty line.
+    i = request.find("\r\n\r\n");
+    if (i != std::string::npos && (i + 4) < request.size())
+        parseMessageBody(request.substr((i + 4)));
 }
 
 
@@ -95,6 +98,31 @@ static std::pair<std::string, std::string> makeHeaderPair(std::string header)
     //everything beyond ":" colon is feild-value which is returned in its form without extra parsing.
     value = header.substr((header.find(":") + 1));
     return (std::make_pair(name, value));
+}
+
+//this fucntion reads message body based on content length of the message.
+void Response::parseMessageBody(std::string message_body)
+{
+    int bytes_to_read = -1;
+    std::map<std::string, std::string>::iterator it;
+    
+    if (_status_code != 400) //unless we already had an error.
+    {
+        //find the content-length pair in out _headers map
+        it = _headers.find("content-length");
+        if (it != _headers.end()) //if found:
+        {
+            //get the value in an int.
+            bytes_to_read = std::atoi(it->second.c_str());
+            //if its under MAX_INT and non negative:
+            if (bytes_to_read >= 0)
+                _body = message_body.substr(0, bytes_to_read); //read that many bytes I.E characters.
+            else
+                _status_code = 400; //otherwise set error code to 400.
+        }
+        else
+            _body = message_body; //if we dont have content-length take eveything after the "empty line" I.E what was passed as argument.
+    }
 }
 
 //function to parse the headers part of the http request.
@@ -175,4 +203,58 @@ void Response::parseRequestLine(std::string request_line)
 Response::~Response()
 {
     
+}
+
+std::map<std::string, std::string> Response::getHeaders() const
+{
+    return (_headers);
+}
+ServerConfig Response::getServerConfig() const
+{
+    return (_server_config);
+}
+std::string Response::getHttpVersion() const
+{
+    return (_http_version);
+}
+std::string Response::getURI() const
+{
+    return (_request_URI);
+}
+std::string Response::getMethod() const
+{
+    return (_method);
+}
+std::string Response::getBody() const
+{
+    return (_body);   
+}
+int Response::getStatusCode() const
+{
+    return (_status_code);
+}
+
+std::ostream& operator<<(std::ostream& obj, Response const &response)
+{
+    std::map<std::string, std::string> map = response.getHeaders();
+    obj << "code: "; 
+    obj << response.getStatusCode();
+    obj << "method: "; 
+    obj << response.getMethod();
+    obj << "URI: ";
+    obj << response.getURI();
+    obj << "version: "; 
+    obj << response.getHttpVersion();
+    obj << "headers\n";
+    for (std::map<std::string, std::string>::iterator it = map.begin(); it != map.end(); it++)
+    {
+        obj << "key: "; 
+        obj << it->first;
+        obj << " value: "; 
+        obj << it->second;
+        obj << "\n";
+    }
+    obj << "body: "; 
+    obj << response.getBody();
+    return (obj);
 }
