@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/08 23:27:16 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/05/18 21:13:34 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/05/19 19:26:13 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 
 Response::Response(std::string request, ServerConfig config) : _headers()
 {
-    int i;
+    size_t i;
     _status_code = -1; //if the status code is -1 after this constructor finishes that means no errors were encountered.
     if (request.empty())
         _status_code = 400;
@@ -51,8 +51,8 @@ Response::Response(std::string request, ServerConfig config) : _headers()
 static void unfoldMessageHeaders(std::string &message_headers)
 {
     int replace_size = 0;
-    int i = 0;
-    int j;
+    size_t i = 0;
+    size_t j;
 
     while ((i = message_headers.find("\r\n", i)) != std::string::npos)
     {
@@ -239,13 +239,13 @@ std::ostream& operator<<(std::ostream& obj, Response const &response)
     std::map<std::string, std::string> map = response.getHeaders();
     obj << "code: "; 
     obj << response.getStatusCode();
-    obj << "method: "; 
+    obj << " method: "; 
     obj << response.getMethod();
-    obj << "URI: ";
+    obj << " URI: ";
     obj << response.getURI();
-    obj << "version: "; 
+    obj << " version: "; 
     obj << response.getHttpVersion();
-    obj << "headers\n";
+    obj << " headers\n";
     for (std::map<std::string, std::string>::iterator it = map.begin(); it != map.end(); it++)
     {
         obj << "key: "; 

@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 16:12:04 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/05/18 20:31:21 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/05/19 19:35:36 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,14 +16,16 @@
     cluster under construction.
 */
 #include "Server.hpp"
+#include "Response.hpp"
 
 //initialize the class memeber variables. including the requests map to an empty map.
-Server::Server(t_host_port pair, std::string name ,int fd) : _requests(), _responses()
+Server::Server(t_host_port pair, std::string name ,int fd, ServerConfig config) : _requests(), _responses()
 {
     _pair.host = pair.host;
     _pair.port = pair.port;
     _name = name;
     _fd = fd;
+    _config = config;
     //populate the server address struct
     this->setAddress();
 }
@@ -107,19 +109,24 @@ void Server::receive(int client_fd)
             throw ClientConnectionError("Read error Connection closed in the servrver named: " + _name);
     }
     _requests[client_fd] += std::string(buffer);
-    //std::cout << std::string(buffer) << std::endl;
+    std::cout << "~~~~~~~~~~~~~messgae~~~~~~~~~~~~~" << std::endl;
+    std::cout << std::string(buffer) << std::endl;
+    std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
 }
 
 //so far the functionallity of this server is echoing back with extra text
 void Server::process(int client_fd)
 {
-    std::string response;
+    Response response(_requests[client_fd], _config);
+    
+    std::cout << "THE RESPONSE:\n" << response << std::endl;
+    std::string responseio = "booya\n";
     
    /* response = _requests[client_fd];
     response += " -with love, the ";
     response += _name;
     response += " Server\n";*/
-    _responses.insert(std::make_pair(client_fd, response));
+    _responses.insert(std::make_pair(client_fd, responseio));
 }
 
 //send function send the processed data by matching client_fd to _responses map.

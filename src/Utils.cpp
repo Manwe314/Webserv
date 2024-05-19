@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 18:42:38 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/05/17 18:24:43 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/05/19 19:22:47 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -145,12 +145,12 @@ void toLowerCase(std::string &str)
 //only rule is that the string must start with a name that is between 33 and 126 asccii characters ending with a colon ":". after that its free game.
 bool isValidHeader(std::string header)
 {
-    int i;
+    size_t i;
     
     i = header.find(":");
     if (i == std::string::npos)
         return (false);
-    for (int j = 0; j < i; j++)
+    for (size_t j = 0; j < i; j++)
     {
         if (header[i] < 33 || header[i] > 126)
             return (false);

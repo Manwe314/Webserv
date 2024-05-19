@@ -1,0 +1,5 @@
+POST /uri/isgood/lel HTTP/1.1
+accept: mynama, jeff
+accept: sexymaza, faqer
+
+

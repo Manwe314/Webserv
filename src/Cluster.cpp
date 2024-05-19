@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/28 01:14:37 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/05/07 23:21:39 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/05/19 19:18:47 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,16 +18,16 @@
 Cluster::Cluster(Config conf)
 {
     //for Server constuctor we only need the host port pair and name, so we use a map with string and t_host_port key value pair.
-    std::map<std::string, t_host_port> servers;
+    std::vector<ServerConfig> servers;
 
     //config member function to return all succsessfuly configured servers name and t_host_pair.        
-    servers = conf.getAllPairs();
+    servers = conf.getServerConfigs();
 
     //we need to itterate over every element of this map and for each:
-    for (std::map<std::string, t_host_port>::iterator it = servers.begin(); it != servers.end(); it++)
+    for (std::vector<ServerConfig>::iterator it = servers.begin(); it != servers.end(); it++)
     {
         //call a server constuctor with t_host_port and name (fd set at -1, fd will be set by the setup() function of the server itself).
-        Server server(it->second, it->first, -1);
+        Server server((*it).getHostPortPair(), (*it).getName(), -1, (*it));
         try
         {
             //call setup() member function

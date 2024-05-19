@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 15:02:23 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/05/07 22:45:43 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/05/19 19:16:09 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 #define SERVER_HPP
 
 #include "Webserv.hpp"
+#include "Config.hpp"
 
 
 class Server
@@ -27,6 +28,8 @@ private:
     std::map<int, std::string> _responses;
     //socket address struct populated during constructor call
     struct sockaddr_in _server_address;
+    //this servers configuration.
+    ServerConfig _config;    
     //server socket is already an unique identifier but name is just for loging, making it more readable.
     std::string _name;
     //Ipv4:Port pair.
@@ -39,7 +42,7 @@ public:
     Server();
     //sets the hjost port pair and name, fd is extra, its just another way to make sure the setup() went smoothly since we call this constuctor with -1 for fd.
     //constructor calls setAddress() to populate _server_address.
-    Server(t_host_port pair,std::string name ,int fd);
+    Server(t_host_port pair,std::string name ,int fd, ServerConfig config);
     ~Server();
 
     //sets up the server, is not blocking.
