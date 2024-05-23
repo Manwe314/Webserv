@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Config.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 21:53:46 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/05/02 00:19:13 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/05/23 14:03:16 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,7 +112,7 @@ std::map<std::string, t_host_port> Config::getAllPairs() const
 Config::Config(std::string path_to_config) : _server_configurations(initServerConfigs(path_to_config))
 {
     if (TESTING)
-        std::cout << "Compleate Config Compleate" << std::endl;
+        std::cout << "Complete Config completed" << std::endl;
 }
 
 Config::~Config()
