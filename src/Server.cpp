@@ -1,30 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   server.cpp                                         :+:      :+:    :+:   */
+/*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 16:12:04 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/05/09 17:36:24 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/05/28 13:41:18 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-
 /*
-    for now the Server class is set up just so the i/o multiplexing works it has 0 http functionallity. (no testing done yet).
-    cluster under construction.
+    For now, the Server class is set up just so the i/o multiplexing works.
+	It has 0 http functionallity (no testing has been done yet).
+    Cluster under construction.
 */
 #include "Server.hpp"
 
-//initialize the class memeber variables. including the requests map to an empty map.
+//Initialize the class memeber variables, including the requests map to an empty map.
 Server::Server(t_host_port pair, std::string name ,int fd) : _requests(), _responses()
 {
     _pair.host = pair.host;
     _pair.port = pair.port;
     _name = name;
     _fd = fd;
-    //populate the server address struct
+    //Populate the server address struct
     this->setAddress();
 }
 
@@ -41,18 +41,20 @@ Server::Server()
 
 void Server::setAddress()
 {
-    //initialize the varibale with 0's
+    //Initialize the variable with '0's
     std::memset(&_server_address, 0, sizeof(_server_address));
-    //set the family type to IPv4
+    //Set the family type to IPv4
     _server_address.sin_family = AF_INET;
-    //set the IP address using h to n long on the host unsigned int
+    //Set the IP address using h to n long on the host unsigned int
     _server_address.sin_addr.s_addr = htonl(_pair.host);
-    //set the port using h to n short on the port int.
+    //Set the port using h to n short on the port int.
     _server_address.sin_port = htons(_pair.port);
 }
 
-
-//set up the server with creating a socket, binding its fd and calling the listen function to make the fd ready for connections.
+/*
+	Set up the server by creating a socket, binding its fd
+	and calling the listen function to make the fd ready for connections.
+*/
 void Server::setup()
 {
     //use socket to get an int (fd) associated with the socket
