@@ -3,59 +3,67 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 15:02:23 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/05/07 22:45:43 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/05/30 16:44:11 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
-
 
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
 #include "Webserv.hpp"
 
-
 class Server
 {
 private:
-    //requests are saved as a map because we already have a unique identifier for every client, the file descriptor. also all the data sent to us is a string thus a map<int, string>
+	/*
+    	Requests are saved as a map
+		because we already have a unique identifier for every client, the file descriptor.
+		Also, all the data sent to us is a string thus a map<int, string>
+	*/
     std::map<int, std::string> _requests;
-    //so far im assuming that all responses are strings, this probably is not true.
+    //So far, I'm assuming that all responses are strings. This probably is not true.
     std::map<int, std::string> _responses;
-    //socket address struct populated during constructor call
+    //Socket address struct populated during constructor call.
     struct sockaddr_in _server_address;
-    //server socket is already an unique identifier but name is just for loging, making it more readable.
+    /*
+		Server socket is already an unique identifier
+		but name is just for logging purposes, to make it more readable.
+	*/
     std::string _name;
     //Ipv4:Port pair.
     t_host_port _pair;
-    //server socket fd
+    //Server socket fd
     int _fd;
 
     void setAddress();
 public:
     Server();
-    //sets the hjost port pair and name, fd is extra, its just another way to make sure the setup() went smoothly since we call this constuctor with -1 for fd.
-    //constructor calls setAddress() to populate _server_address.
+    /*
+		Sets the host port pair and name, fd is extra.
+		It's just another way to make sure the setup() went smoothly
+		since we call this constuctor with -1 for fd.
+    	The constructor calls setAddress() to populate _server_address.
+	*/
     Server(t_host_port pair,std::string name ,int fd);
     ~Server();
 
-    //sets up the server, is not blocking.
+    //Sets up the server, it is non-blocking.
     void setup();
-    //accepts connections, is blocking.
+    //Accepts connections, it is blocking.
     int accept();
-    //receives client data, is blocking.
+    //Receives client data, it is blocking.
     void receive(int client_fd);
-    //process is like this because i assume that responsses are all strings. is not blocking.
+    //Process is like this because I assume that responses are all strings. It is non-blocking.
     void process(int client_fd);
-    //sends the processed client data, is blocking.
+    //Sends the processed client data, it is blocking.
     void send(int client_fd);
-    //closes the fd and deletes the coresponding request, is not blocking.
+    //Closes the fd and deletes the coresponding request, it is non-blocking.
     void close(int client_fd);
 
-    //checks if a response for a given client fd is ready, is not blocking
+    //Checks if a response for a given client fd is ready, it is non-blocking
     bool hasResponse(int client_fd);
     
     int getFD() const;

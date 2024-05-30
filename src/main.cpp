@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 14:52:28 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/05/02 18:25:05 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/05/30 09:52:12 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ int main(int argc, char *argv[])
     try
     {
         Config configuration(argv[1]);
+		printConfig(configuration);
         Cluster cluster(configuration);
         cluster.run();
     }

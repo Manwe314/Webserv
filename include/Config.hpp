@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Config.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 19:33:28 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/05/01 23:59:39 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/05/30 16:47:47 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,8 @@
 #include "Webserv.hpp"
 #include "ServerConfig.hpp" 
 /*
-    the config class holds a list(vector) of  server configs, they in turn hold a list(vector) of route configs
+    The config class holds a list(vector) of server configs,
+	they in turn hold a list(vector) of route configs.
 
     _________________________________________
     |                config                |

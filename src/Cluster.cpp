@@ -6,7 +6,7 @@
 /*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/28 01:14:37 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/05/28 13:33:35 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/05/30 13:30:31 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,11 +116,15 @@ void Cluster::run()
 		Second int [value] is server fd (since each server may service more than 1 client).
 	*/
     std::map<int, int> client_server;
-    //Dots to make "waiting for connection" animation fun :)
-    std::string dots[3] = {".", "..", "..."};
+    //Dots to make "waiting for connection" message animate :)
+    std::string wait_messages[4] = {
+		"Waiting for connection   ",
+		"Waiting for connection.  ",
+		"Waiting for connection.. ",
+		"Waiting for connection..."};
     //Poll timeout set by TIMEOUT_SEC defined.
-    int timeout_ms = TIMEOUT_SEC * 1000;
-    int dot_n = -1;
+    int timeout_ms = TIMEOUT_SEC * 500;
+    int index = 0;
     int client_fd;
     int nfds;
     int ret;
@@ -150,11 +154,8 @@ void Cluster::run()
 		*/
         else if (ret == 0)
         {
-            if (dot_n == 2)
-                dot_n = 0;
-            else
-                dot_n++;
-            std::cout << "Waiting for connection" << dots[dot_n] << std::endl;
+            std::cout << "\r" << wait_messages[index] << std::flush;
+			index = (index + 1) % 4;
         }
         else //In any other case at least 1 fd is ready to perform some action.
         {
@@ -168,7 +169,7 @@ void Cluster::run()
 				/*
 					If the revents varibale is set to POLLIN,
 					that means that there is data to read,
-					thus either an accept() or recv() is avalible to perform.
+					thus either an accept() or recv() is available to perform.
 				*/
                 if (fds[i].revents & POLLIN)
                 {
@@ -244,7 +245,12 @@ void Cluster::run()
                     }
                     
                 }
-                else if ((fds[i].revents & POLLOUT) && isClientSocket(client_server, fds[i].fd)) //if the revent is POLLOUT, and specifically on a client fd and not STDOUT that means we are ready to send() data.
+				/*
+					If the revent is POLLOUT,
+					specifically on a client fd and not STDOUT,
+					that means that we are ready to send() data.
+				*/
+                else if ((fds[i].revents & POLLOUT) && isClientSocket(client_server, fds[i].fd))
                 {
                     try
                     {

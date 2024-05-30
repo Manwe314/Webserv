@@ -6,7 +6,7 @@
 /*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 21:53:46 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/05/28 11:39:57 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/05/30 17:31:17 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,7 @@ std::vector<ServerConfig> Config::initServerConfigs(std::string path_to_config)
 //Function to read an entire file into a single string (including new line characters).
 std::string Config::readFile(std::string full_name)
 {
-    //Open file, make a string stream object and a string varibale to read lines into.
+    //Open file, make a string stream object and a string variable to read lines into.
     std::ifstream file(full_name.c_str());
     std::ostringstream string_stream;
     std::string line;

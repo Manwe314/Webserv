@@ -6,7 +6,7 @@
 /*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 18:29:19 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/05/28 11:57:54 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/05/30 10:50:33 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,13 +26,15 @@ enum Rule{
 
 bool ServerRoutesConfig::isRule(std::string input)
 {
-	for (std::vector<std::string>::const_iterator rule = ConfigBase::_rules.begin(); rule != ConfigBase::_rules.end(); rule++)
+	for (std::vector<std::string>::const_iterator rule = ConfigBase::_rules.begin(); \
+	rule != ConfigBase::_rules.end(); rule++)
     	if (input.compare(*rule) == 0)
         	return (true);
 	return (false);
 }
 
-void  ServerRoutesConfig::readRule(std::vector<std::string>::iterator input, std::vector<std::string>& route_block, std::vector<std::string>::const_iterator rule)
+void  ServerRoutesConfig::readRule(std::vector<std::string>::iterator input, \
+std::vector<std::string>& route_block, std::vector<std::string>::const_iterator rule)
 {
 	/*
 		Since the _rules vector of ConfigBase class is a constant pre defined vector,
@@ -63,7 +65,8 @@ void  ServerRoutesConfig::readRule(std::vector<std::string>::iterator input, std
 		{
 			input++;
 			http_rule_is_found = false;
-			for (std::vector<std::string>::const_iterator it = ConfigBase::_http_methods.begin(); it != ConfigBase::_http_methods.end(); it++)
+			for (std::vector<std::string>::const_iterator it = ConfigBase::_http_methods.begin(); \
+			it != ConfigBase::_http_methods.end(); it++)
 			{
 				if ((*input).compare(*it) == 0)
 				{
@@ -104,7 +107,8 @@ void  ServerRoutesConfig::readRule(std::vector<std::string>::iterator input, std
 	}
 }
 
-ServerRoutesConfig::ServerRoutesConfig(std::vector<std::string> route_block, std::string location) : _index_files(), _allowed_methods()
+ServerRoutesConfig::ServerRoutesConfig(std::vector<std::string> route_block, std::string location) \
+: _index_files(), _allowed_methods()
 {
 	/*
 		The config file is split with a charset (space tab newline).
@@ -122,7 +126,8 @@ ServerRoutesConfig::ServerRoutesConfig(std::vector<std::string> route_block, std
 		to fill in the member variables of the config server.   
 	*/
 	for (std::vector<std::string>::iterator input = route_block.begin(); input != route_block.end(); input++)
-		for (std::vector<std::string>::const_iterator rule = ConfigBase::_rules.begin(); rule != ConfigBase::_rules.end(); rule++)
+		for (std::vector<std::string>::const_iterator rule = ConfigBase::_rules.begin(); \
+		rule != ConfigBase::_rules.end(); rule++)
 			if ((*input).compare(*rule) == 0)
 				readRule(input, route_block, rule);
 	/*

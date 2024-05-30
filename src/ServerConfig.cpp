@@ -6,7 +6,7 @@
 /*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/24 21:44:05 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/05/28 11:36:17 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/05/30 09:51:29 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,8 +75,8 @@ t_host_port ServerConfig::initHostPort(std::vector<std::string> server_block)
         pair.host = host;
         pair.port = std::atoi(array[4].c_str());
     }
-    std::cout << BLUE << "HOST: " << DEFAULT << pair.host << BLUE << " PORT: " \
-	<< DEFAULT << pair.port << std::endl;
+    // std::cout << BLUE << "HOST: " << DEFAULT << pair.host << BLUE << " PORT: " \
+	// << DEFAULT << pair.port << std::endl;
     return (pair);
 }
 
@@ -99,9 +99,7 @@ std::string ServerConfig::initServerName(std::vector<std::string> server_block)
         server_name = "";
     else
         server_name = *(++it);
-    
-    std::cout << BLUE << "Server Name " << DEFAULT << server_name << std::endl;
-
+    // std::cout << BLUE << "Server Name " << DEFAULT << server_name << std::endl;
     return server_name;
 }
 

@@ -6,20 +6,12 @@
 /*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 20:35:33 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/05/28 11:38:17 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/05/30 10:04:52 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef SERVERCONFIG_HPP
 #define SERVERCONFIG_HPP
-
-#define DEFAULT "\033[0m"
-#define MAGENTA "\033[0;35m"
-#define GREEN "\033[0;32m"
-#define BLUE "\033[38;5;117m"
-#define CYAN "\033[0;36m"
-#define YELLOW "\033[0;33m"
-#define LAVENDER "\033[38;5;183m"
 
 #include "Webserv.hpp"
 #include "ServerRoutesConfig.hpp"
