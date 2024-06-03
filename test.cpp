@@ -10,7 +10,6 @@ int main()
         if (*it1 == a)
             std::cout << "found " << *it1 << " the index as by distance: " << std::distance(vec.begin(), it1) << std::endl;        
     }
-    
 
     return 0;
 }

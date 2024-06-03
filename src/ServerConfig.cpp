@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerConfig.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: brettleclerc <brettleclerc@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/24 21:44:05 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/05/30 09:51:29 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/06/03 08:10:26 by brettlecler      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,8 +129,9 @@ ServerRoutesConfig ServerConfig::initServerWideConfig(std::vector<std::string> s
         	If thats the case that means brackets are missmatched,
 			therefore, the BracketPairMissMatch will be thrown later on.
 		*/
-        if (brackets.second != -1)
+        if (brackets.second != -1) {
             eraseRange(server_block, brackets.first, brackets.second);
+		}
         else
             break;
     }
@@ -204,7 +205,6 @@ std::vector<ServerRoutesConfig> ServerConfig::initRouteConfigs(std::vector<std::
         else
             offset = std::distance(server_block.begin(), ++it);
     }
-
     return (route_configs);
 }
 

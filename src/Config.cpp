@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Config.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: brettleclerc <brettleclerc@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 21:53:46 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/05/30 17:31:17 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/06/02 20:39:49 by brettlecler      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,6 @@ std::vector<ServerConfig> Config::initServerConfigs(std::string path_to_config)
 
         if (it == split_file.end())
             break;
-        
         brackets = encapsule(split_file, "{", "}", std::distance(split_file.begin(), it));
 
         if (brackets.second != -1)

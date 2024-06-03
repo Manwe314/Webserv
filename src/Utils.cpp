@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: brettleclerc <brettleclerc@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 18:42:38 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/05/30 17:28:49 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/06/03 08:25:55 by brettlecler      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -144,16 +144,20 @@ std::pair<int, int> encapsule(std::vector<std::string> array, std::string a, std
 */
 void eraseRange(std::vector<std::string>& array, int start, int end, int flag)
 {
+    if (start >= (int)array.size() || end >= (int)array.size())
+        return ;
+
     std::vector<std::string>::iterator st = array.begin() + start;
     std::vector<std::string>::iterator en = array.begin() + end;
 
-    if (start >= (int)array.size() || end >= (int)array.size())
-        return ;
-    
     array.erase(st, en);
 
-    if (flag == 0)
-        array.erase(en);    
+    if (flag == 0) {
+		// Update the 'en' iterator after the range erase operation
+		en = array.begin() + start; // After erasing, the new 'en' is at the original 'start' position
+		if (en != array.end())
+        	array.erase(en);
+	}
 }
 
 /*
