@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 17:09:31 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/05/12 16:31:46 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/03 15:35:43 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,8 @@ private:
     std::vector<std::string> _index_files;
     //a list of all http methods that are allowed.
     std::vector<std::string> _allowed_methods;
-    //will need a way to store an unpredictable amount of child routes.
+    //a list of all the first level sub routes for this subroute.
+    std::vector<ServerRoutesConfig> _sub_routes;
 
     //a function that helps with initilization
     void readRule(std::vector<std::string>::iterator input, std::vector<std::string>& route_block, std::vector<std::string>::const_iterator rule);
@@ -44,6 +45,7 @@ public:
     std::string getLocation() const;
     std::vector<std::string> getIndex() const;
     std::vector<std::string> getMethods() const;
+    std::vector<ServerRoutesConfig> getSubRoutes() const;
 };
 
 class InvalidGetCall : public std::exception

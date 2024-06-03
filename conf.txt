@@ -10,6 +10,51 @@ server {
     {
         allow_methods GET POST
         root ./trollass
+        
+        location /second-file 
+        {
+            root babaganush
+            allow_methods POST
+            location /thrid-file
+            {
+                index heywhatsup
+            }
+            location /secret-second
+            {
+                allow_methods GET
+                location /hell
+                {
+                    index quite quite wellboy
+                }
+
+            }
+        }
+
+        location /one
+        {
+            root buba
+            location /piece 
+            {
+                index is-real
+            }
+            location /piece2
+            { 
+                index is-unreal
+            }
+            location /zozo
+            {
+                index error404
+                location /zaza 
+                {
+                    allow_methods GET
+                    index timetosmoke
+                    location /hot
+                    {
+                        index box to-much
+                    }
+                }
+            }
+        }
     }
 
     location ./smiledog {

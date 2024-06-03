@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 18:42:38 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/05/19 19:22:47 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/03 16:51:02 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,7 +128,11 @@ void eraseRange(std::vector<std::string>& array, int start, int end, int flag)
     array.erase(st, en);
 
     if (flag == 0)
-        array.erase(en);    
+    {   
+        en = array.begin() + start;
+        if (en != array.end())
+            array.erase(en);    
+    }
 }
 
 //this function puts the given string to lowercase letters
@@ -207,6 +211,43 @@ void printVector(std::vector<std::string> arr)
     std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
 }
 
+static void printRouteConfig(std::vector<ServerRoutesConfig> routes)
+{
+    if (!routes.empty())
+        {
+            for (std::vector<ServerRoutesConfig>::iterator i4 = routes.begin(); i4 != routes.end(); i4++)
+            {
+                std::cout << "--ROUTE--" << std::endl;
+                std::cout << "Root: " << (*i4).getRoot() << std::endl;
+                std::cout << "Location: " << (*i4).getLocation() << std::endl;
+                std::cout << "Index Files:";
+                std::vector<std::string> vec2 = (*i4).getIndex();
+                if (!vec2.empty())
+                {
+                    for (std::vector<std::string>::iterator i5 = vec2.begin(); i5 != vec2.end(); i5++)
+                        std::cout << " " << *i5 << ",";
+                }
+                std::cout << std::endl;
+                std::cout << "Allowed methods:";
+                std::vector<std::string> vect2 = (*i4).getMethods();
+                if (!vect2.empty())
+                {
+                    for (std::vector<std::string>::iterator i6 = vect2.begin(); i6 != vect2.end(); i6++)
+                        std::cout << " " << *i6 << ",";
+                }
+                std::cout << std::endl;
+                std::vector<ServerRoutesConfig> sub = (*i4).getSubRoutes();
+                if (!sub.empty())
+                {
+                    std::cout << "+SUB+" << std::endl;
+                    printRouteConfig(sub);
+                    std::cout << "+++++" << std::endl;
+                }
+                std::cout << "---------" << std::endl;
+            }
+        } 
+}
+
 
 
 //this clusterfuck of a function prints the contents of the config object so all the configuration taken from the config file (it is currantly up to date with functionalty).
@@ -248,33 +289,8 @@ void printConfig(Config conf)
         std::cout << std::endl;
         std::cout << "#########################" << std::endl;
         std::vector<ServerRoutesConfig> routes = (*i).getRouteConfigs();
-        if (!routes.empty())
-        {
-            for (std::vector<ServerRoutesConfig>::iterator i4 = routes.begin(); i4 != routes.end(); i4++)
-            {
-                std::cout << "--ROUTE--" << std::endl;
-                std::cout << "Root: " << (*i4).getRoot() << std::endl;
-                std::cout << "Location: " << (*i4).getLocation() << std::endl;
-                std::cout << "Index Files:";
-                std::vector<std::string> vec2 = (*i4).getIndex();
-                if (!vec2.empty())
-                {
-                    for (std::vector<std::string>::iterator i5 = vec2.begin(); i5 != vec2.end(); i5++)
-                        std::cout << " " << *i5 << ",";
-                }
-                std::cout << std::endl;
-                std::cout << "Allowed methods:";
-                std::vector<std::string> vect2 = (*i4).getMethods();
-                if (!vect2.empty())
-                {
-                    for (std::vector<std::string>::iterator i6 = vect2.begin(); i6 != vect2.end(); i6++)
-                        std::cout << " " << *i6 << ",";
-                }
-                std::cout << std::endl;
-                std::cout << "---------" << std::endl;
-            }
-        } 
+        printRouteConfig(routes);
+        std::cout << "_____________________________________________" << std::endl;
     } 
     std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
-    std::cout << "_____________________________________________" << std::endl;
 }

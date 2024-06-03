@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 18:29:19 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/05/16 21:38:16 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/03 17:27:59 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,14 +36,23 @@ void  ServerRoutesConfig::readRule(std::vector<std::string>::iterator input, std
 {
    //since the _rules vector of ConfigBase class is a constant pre defined vector we can just get the index of the rule we have found
    int rule_id = std::distance(ConfigBase::_rules.begin(), rule);
+   std::pair<int, int> brackets;
+   std::vector<std::string> buffer;
    bool http_rule_is_found;
    
    // using a switch statment (making it readable with enums) we can carry out each necaserry operation
    switch (rule_id)
    {
-   //sub routes are under construction right now
+   //constructing sub routes is verry similar to serverconfig constructin subroutes. (see details in ServerConfig.cpp line 132)
    case LOCATION:
-      std::cout << "under construction" << std::endl;
+      brackets = encapsule(route_block, "{", "}", std::distance(route_block.begin(), input));
+      if (brackets.second != -1)
+      {
+         buffer.clear();
+         for (int i = brackets.first; i <= brackets.second; i++)
+            buffer.push_back(route_block[i]);
+         _sub_routes.push_back(ServerRoutesConfig(buffer, *(++input)));
+      }
       break;
    //to do http methods we iterate over the following elements of the input vecotr and match each with a http methods pre defined in the ConfigBase class
    //we stop getting the allowed methods when an element matches none of the methods.
@@ -88,18 +97,30 @@ void  ServerRoutesConfig::readRule(std::vector<std::string>::iterator input, std
    
 }
 
-ServerRoutesConfig::ServerRoutesConfig(std::vector<std::string> route_block, std::string location) : _index_files(), _allowed_methods()
+ServerRoutesConfig::ServerRoutesConfig(std::vector<std::string> route_block, std::string location) : _index_files(), _allowed_methods(), _sub_routes()
 {
    //the config file is split with a charset (space tab newline). must read info out from a vector like that here.
    //route block is whatever is inside "{ }" after the location is defined.
    //location is the path that is defined after the key word location and before the "{ }" block.
    _location = location;
+   std::pair<int, int> brackets;
 
    //iterate over all elements of the route block and for each check against the predefined set of rules, if its a match use the readRule function to fill in the member varibles of the config server.   
    for (std::vector<std::string>::iterator input = route_block.begin(); input != route_block.end(); input++)
       for (std::vector<std::string>::const_iterator rule = ConfigBase::_rules.begin(); rule != ConfigBase::_rules.end(); rule++)
+      {
          if ((*input).compare(*rule) == 0)
+         {
             readRule(input, route_block, rule);
+            //to avoid double stacking some subroute configurations whnever a subroute is encoutered it is skipped after evaluateing it with readRule();
+            if ((*input).compare("location") == 0)
+            {
+               brackets = encapsule(route_block, "location", "}", std::distance(route_block.begin(), input));
+               if (brackets.second != -1)
+                  input += (brackets.second - brackets.first);
+            }
+         }
+      }
    //this way if the same rules are declared multiple times the last one will override previous ones which is true to nginx's implementation
 }
 
@@ -144,4 +165,9 @@ std::vector<std::string> ServerRoutesConfig::getIndex() const
 std::vector<std::string> ServerRoutesConfig::getMethods() const
 {
    return (_allowed_methods);
+}
+
+std::vector<ServerRoutesConfig> ServerRoutesConfig::getSubRoutes() const
+{
+   return (_sub_routes);
 }
