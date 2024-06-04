@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Webserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 14:44:27 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/05/17 17:32:27 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/04 14:22:49 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,14 @@
 #define MAX_EVENTS 1000
 #define TIMEOUT_SEC 2
 
+//Colours for readbility
+#define DEFAULT "\033[0m"
+#define MAGENTA "\033[0;35m"
+#define GREEN "\033[0;32m"
+#define BLUE "\033[38;5;117m"
+#define CYAN "\033[0;36m"
+#define YELLOW "\033[0;33m"
+#define LAVENDER "\033[38;5;183m"
 
 //Structurtes
 typedef struct s_host_port

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigBase.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/17 19:00:39 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/05/16 15:16:12 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/04 14:20:42 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,9 +15,17 @@
 
 #include "Webserv.hpp"
 
-//this class contains all the possible declaration that can be found in the config file along with all the possible http methods that can be allowed.
-//this class is to be used for comparison to check weather a given string is a "rule" or not from the config file.
-//the arctiecture of the config file will be pressumed therefore any text that should be a rule but dosent match anything in this class is discarded.
+/*
+	This class contains all the possible declarations that can be found
+	in the config file along with all the possible http methods that can be allowed.
+	
+	This class is to be used for comparison
+	to check weather a given string is a "rule" or not from the config file.
+	
+	The architecture of the config file will be presumed.
+	Therefore, any text that should be a rule but doesn't match anything
+	in this class is discarded.
+*/
 class ConfigBase
 {
 public:
@@ -29,7 +37,5 @@ public:
     ConfigBase();
     ~ConfigBase();
 };
-
-
 
 #endif

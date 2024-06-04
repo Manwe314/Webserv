@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerRoutesConfig.hpp                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 17:09:31 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/03 15:35:43 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/04 14:31:56 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,18 +19,17 @@
 class ServerRoutesConfig
 {
 private:
-    //root path
+    //Root path
     std::string _root;
-    //location path
+    //Location path
     std::string _location;
-    //a list of file names to be looked for and served in case of a directory url request
+    //A list of file names to be looked for and served in case of a directory url request
     std::vector<std::string> _index_files;
-    //a list of all http methods that are allowed.
+    //A list of all http methods that are allowed.
     std::vector<std::string> _allowed_methods;
     //a list of all the first level sub routes for this subroute.
     std::vector<ServerRoutesConfig> _sub_routes;
-
-    //a function that helps with initilization
+    //A function that helps with initilization
     void readRule(std::vector<std::string>::iterator input, std::vector<std::string>& route_block, std::vector<std::string>::const_iterator rule);
     bool isRule(std::string input);
     

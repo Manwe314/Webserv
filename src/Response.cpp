@@ -3,19 +3,19 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/08 23:27:16 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/05/19 19:26:13 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/04 14:25:17 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Response.hpp"
 
 /*
-400 - Bad request
-501 - Not Implemented
-505 - HTTP version not supported
+	400 - Bad request
+	501 - Not Implemented
+	505 - HTTP version not supported
 */
 
 Response::Response(std::string request, ServerConfig config) : _headers()
@@ -25,9 +25,10 @@ Response::Response(std::string request, ServerConfig config) : _headers()
     if (request.empty())
         _status_code = 400;
     _server_config = config;
-    //here need to split the request into 3 parts: request line, headers and body.
-    //parse them individually with according rules.
-    //find the first occurance of CRLF (\r\n). everything before it is the request line.
+    /*
+		Here we need to split the request into 3 parts: request line, headers and body
+    	and parse them individually according to the rules.
+	*/
     i = request.find("\r\n");
     //if no CRLF was found set error status to 400.
     if (i == std::string::npos)
@@ -163,34 +164,56 @@ void Response::parseMessageHeaders(std::string message_headers)
     }   
 }
 
-//this function parses the request line of the message. by convection space, new line and carrage return
-// should never be present in the request URI, method or http version. therefore we can split the string on these chars.
-//the result in a valid request has 3 elements: method, URI and HTTP version.
+/*
+	This function parses the request line of the message
+	by convection space, new line and carrage return
+	It should never be present in the request URI, method or http version.
+	Therefore, we can split the string on these chars.
+	The result from a valid request has 3 elements: method, URI and HTTP version.
+*/
 void Response::parseRequestLine(std::string request_line)
 {
     std::vector<std::string> split_request_line = split(request_line, " \n\r");
 
-    if (split_request_line.size() != 3) //if the number of elements is not 3, the request is invalid.
+	/*
+		If the number of elements is not 3, the request is invalid.
+	*/
+    if (split_request_line.size() != 3)
     {
         _status_code = 400;
         return ;
     }
-    if (!isValidHttpMethod(split_request_line[0]) && !isInvalidHttpMethod(split_request_line[0])) //if the first part of the string is not an http method, the rtequest is invalid.
+	/*
+		If the first part of the string is not an http method, the request is invalid.
+	*/
+	if (!isValidHttpMethod(split_request_line[0]) && !isInvalidHttpMethod(split_request_line[0]))
     {
         _status_code = 400;
         return ;
     }
-    if (isInvalidHttpMethod(split_request_line[0])) // if the first element is an http method but its not supported, the request is invalid with 501 (not 400).
+	/*
+		If the first element is an http method but it isn't supported,
+		the request is invalid with 501 (not 400).
+	*/
+    if (isInvalidHttpMethod(split_request_line[0]))
     {
         _status_code = 501;
         return ;
     }
-    if (!isValidVersion(split_request_line[2]) && !isInvalidVersion(split_request_line[2]))//if the version is not one of valid (supported) or invalid (not supported), the request is invalid.
+	/*
+		If the version is not one of valid (supported) or invalid (not supported),
+		the request is invalid.
+	*/
+    if (!isValidVersion(split_request_line[2]) && !isInvalidVersion(split_request_line[2]))
     {
         _status_code = 400;
         return ;
     }
-    if(isInvalidVersion(split_request_line[2])) //if the request is one of invalid (unsupported) versions, the request is invalid with 505 (not 400).
+	/*
+		If the request is one of invalid (unsupported) versions,
+		the request is invalid with 505 (not 400).
+	*/
+    if(isInvalidVersion(split_request_line[2]))
     {
         _status_code = 505;
         return ;

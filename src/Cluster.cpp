@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Cluster.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/28 01:14:37 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/05/19 19:18:47 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/04 14:24:24 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 #include "Webserv.hpp"
 
 
-//cluster config that makes the servers and makes them ready for run().
+//Cluster config that creates the servers and prepares them for run().
 Cluster::Cluster(Config conf)
 {
     //for Server constuctor we only need the host port pair and name, so we use a map with string and t_host_port key value pair.
@@ -30,9 +30,9 @@ Cluster::Cluster(Config conf)
         Server server((*it).getHostPortPair(), (*it).getName(), -1, (*it));
         try
         {
-            //call setup() member function
+            //Call setup() member function
             server.setup();
-            //make a pair of fd and server and insert it to _servers varibale
+            //Make a pair of fd and server and insert it to _servers variable
             _servers.insert(std::make_pair(server.getFD(), server));
         }
         catch (const  ListeningError& e)
@@ -47,7 +47,10 @@ Cluster::Cluster(Config conf)
     //printMap<int, Server>(_servers);
 }
 
-//initializer for pollfd struct. the struct is passed by referance and is populated by already setup server fds.
+/*
+	Initializer for pollfd struct.
+	The struct is passed by reference and is populated by server fds already set up.
+*/
 int Cluster::initPollFds(struct pollfd (&fds)[MAX_EVENTS]) 
 {
     int index = 0;
@@ -56,10 +59,11 @@ int Cluster::initPollFds(struct pollfd (&fds)[MAX_EVENTS])
         if (index > MAX_EVENTS)
             break;
         fds[index].fd = (*it).first;
-        fds[index].events = POLLIN; //only accept() is used on server sockets so POLLIN (data ready to read) is enough.
+        fds[index].events = POLLIN;
+		//Only accept() is used on server sockets so POLLIN (data ready to read) is enough.
         index++;
     }
-    //return the number of fds.
+    //Return the number of fds.
     return (index);
 }
 
@@ -73,7 +77,10 @@ bool Cluster::isServerSocket(int fd)
     return (false);
 }
 
-//uses the client fd [key], server fd[value] pair map to check if a given fd is a client fd or a server fd.
+/*
+	Uses the client fd [key],
+	server fd[value] pair map to check if a given fd is a client fd or a server fd.
+*/
 static bool isClientSocket(std::map<int, int> map, int fd)
 {
     std::map<int, int>::iterator it = map.find(fd);
@@ -82,7 +89,7 @@ static bool isClientSocket(std::map<int, int> map, int fd)
     return (false);
 }
 
-//map eraseing fucntion using an int key.
+//Map erasing function using an int key.
 static void mapErase(std::map<int, int> &map, int key)
 {
     std::map<int, int>::iterator it = map.find(key);
@@ -93,58 +100,93 @@ static void mapErase(std::map<int, int> &map, int key)
 void Cluster::run()
 {
     struct pollfd fds[MAX_EVENTS];
-    //map to save server ownership to always know wich client fds are serviced by which servers. 
-    //first int [key] is client fd (since each client is unique fd for ALL the servers) 
-    //second int [value] is server fd (since each server may service more than 1 client).
+	/*
+		Map to save server ownership.
+		This way, we will always know which client fds are serviced by which servers. 
+		First int [key] is client fd (since each client is unique fd for ALL the servers). 
+		Second int [value] is server fd (since each server may service more than 1 client).
+	*/
     std::map<int, int> client_server;
-    //dots to make fun "waiting for connection" animation.
-    std::string dots[3] = {".", "..", "..."};
-    //poll timeout set by TIMEOUT_SEC define.
-    int timeout_ms = TIMEOUT_SEC * 1000;
-    int dot_n = -1;
+    //Dots to make "waiting for connection" message animate :)
+    std::string wait_messages[4] = {
+		"Waiting for connection   ",
+		"Waiting for connection.  ",
+		"Waiting for connection.. ",
+		"Waiting for connection..."};
+    //Poll timeout set by TIMEOUT_SEC defined.
+    int timeout_ms = TIMEOUT_SEC * 500;
+    int index = 0;
     int client_fd;
     int nfds;
     int ret;
 
-    // get the number of fds for poll by initializing the struct with server socket fds.
+    //Get the number of fds for poll by initializing the struct with server socket fds.
     nfds = initPollFds(fds);
     
-    //the runtime loop where all the cluster functionality happens
+    //The runtime loop where all the cluster work happens.
     while (true)
     {
-        //poll checks the fds in its struct and returns the number fds that are ready to perfor an operation (read or write, in our case recv, send or accept).
+        /*
+			Poll checks the fds in its struct and returns the number fds
+			that are ready to perfor an operation
+			(read or write, or in our case, recv, send or accept).
+		*/
         ret = poll(fds, nfds, timeout_ms);
 
-        
-        if (ret == -1) // if ret is negative, poll failed so we quit.
+        if (ret == -1) //If ret is negative, poll failed so we quit.
         {
             std::cout << "POLL FAILED" << std::endl;
             return ;
         }
-        else if (ret == 0) //if ret is 0 the timeout time has passed, that means we have nothing happening, we are waiting for client connections
+		/*
+			If ret is 0 the timeout time has passed,
+			which means that we have nothing happening
+			and that we are simply waiting for client connections.
+		*/
+        else if (ret == 0)
         {
-            if (dot_n == 2)
-                dot_n = 0;
-            else
-                dot_n++;
-            std::cout << "Waiting for connection" << dots[dot_n] << std::endl;
+            std::cout << "\r" << wait_messages[index] << std::flush;
+			index = (index + 1) % 4;
         }
-        else //in any other case at least 1 fd is ready to perform some action.
+        else //In any other case at least 1 fd is ready to perform some action.
         {
-            //loop over each pollfd array member. in its struct the revents variable is set to the appropriate action on the appropriate fd.
+			/*
+            	Loop over each pollfd array member.
+				In its struct, the revents variable is set to the appropriate action
+				on the appropriate fd.
+			*/
             for (int i = 0; i < nfds; i++)
             {
-                if (fds[i].revents & POLLIN) //if the revents varibale is set to POLLIN that means there is data to read, thus eaither an accept() or recv() is avalible to perform.
+				/*
+					If the revents varibale is set to POLLIN,
+					that means that there is data to read,
+					thus either an accept() or recv() is available to perform.
+				*/
+                if (fds[i].revents & POLLIN)
                 {
-                    //to distingush between accept() and recv() we can just check if the fd (the file descritor whose revents is set to POLLIN) is server socket fd or not
-                    if (isServerSocket(fds[i].fd)) //if the fd is a server fd accept() is ready to perform.
+					/*
+                    	To distingush between accept() and recv(),
+						we can just check if the fd (the fd whose revents is set to POLLIN)
+						is a server socket fd or not.
+					*/
+					/*
+						If the fd is a server fd accept() is ready to perform.
+					*/
+                    if (isServerSocket(fds[i].fd))
                     {
                         try
                         {
-                            //try to accept on the server identified by its [key] A.K.A fd.
+                            //Try to accept on the server identified by its [key] A.K.A fd.
                             client_fd = _servers[fds[i].fd].accept();
-                            //if accept fails an exception will be thrown and everything below wont happen.
-                            //if accept did not fail, add the new client to the client_server map and add that fd in the pollfd struct to track now.
+							/*
+                            	If accept fails an exception will be thrown
+								and everything below wont happen.
+							*/
+							/*
+                            	If accept does not fail,
+								add the new client to the client_server map
+								and add that fd in the pollfd struct to track now.
+							*/
                             client_server.insert(std::make_pair(client_fd, fds[i].fd));
                             fds[nfds].fd = client_fd;
                             fds[nfds].events = POLLIN | POLLOUT;
@@ -154,20 +196,37 @@ void Cluster::run()
                         {
                             std::cerr << e.what() << std::endl;
                         }
-                        //this break is paramount, without it an timing issue comes up where accept() makes the newly made client fd readty for read() even when there is no data to read().
+						/*
+                        	This break is paramount,
+							without it an timing issue comes up
+							where accept() makes the newly made client fd ready for read()
+							even when there is no data to read().
+						*/
                         break;
                     }
-                    else //if it was not a server socket, then it was a client socket, for that we read the data sent to us and process it.
+					/*
+						If it isn't a server socket, then it is a client socket.
+						For that we read the data sent to us and process it.
+					*/
+                    else
                     {
                         try
                         {
-                            //try to recive data, if it fails recieve will throw an error and process wont happen.
+							/*
+                            	Try to receive data.
+								If it fails, receive will throw an error
+								and the process wont happen.
+							*/
                             _servers[client_server[fds[i].fd]].receive(fds[i].fd);
                             _servers[client_server[fds[i].fd]].process(fds[i].fd);
                         }
                         catch(const ClientConnectionError& e)
                         {
-                            //if recive throws an error it will close the client fd, we need to erase it from our client_server map and from pollfds struct.
+							/*
+                            	If receive throws an error, it will close the client fd.
+								We need to erase it from our client_server map
+								and from pollfds struct.
+							*/
                             mapErase(client_server, fds[i].fd);
                             for (int j = i; j < nfds - 1; j++)
                                 fds[j] = fds[j + 1];
@@ -177,16 +236,25 @@ void Cluster::run()
                     }
                     
                 }
-                else if ((fds[i].revents & POLLOUT) && isClientSocket(client_server, fds[i].fd)) //if the revent is POLLOUT, and specifically on a client fd and not STDOUT that means we are ready to send() data.
+				/*
+					If the revent is POLLOUT,
+					specifically on a client fd and not STDOUT,
+					that means that we are ready to send() data.
+				*/
+                else if ((fds[i].revents & POLLOUT) && isClientSocket(client_server, fds[i].fd))
                 {
                     try
                     {
-                        //try to send data.
+                        //Try to send data.
                         _servers[client_server[fds[i].fd]].send(fds[i].fd);
                     }
                     catch(const ClientConnectionError& e)
                     {
-                        //if send fails it will close the client fd, so we need to erase it from our client_Server map and from pollfds struct.
+						/*
+                        	If send fails, it will close the client fd.
+							We need to erase it from our client_Server map
+							and from pollfds struct.
+						*/
                         mapErase(client_server, fds[i].fd);
                         for (int j = i; j < nfds - 1; j++)
                             fds[j] = fds[j + 1];

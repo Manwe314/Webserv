@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerRoutesConfig.cpp                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 18:29:19 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/03 17:27:59 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/04 14:28:21 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,25 +14,27 @@
 
 const char * InvalidGetCall::what() const throw()
 {
-   return (msg.c_str());
+	return (msg.c_str());
 }
 
 enum Rule{
-   LOCATION,
-   ALLOW_METHODS,
-   ROOT,
-   INDEX
+	LOCATION,
+	ALLOW_METHODS,
+	ROOT,
+	INDEX
 };
 
 bool ServerRoutesConfig::isRule(std::string input)
 {
-   for (std::vector<std::string>::const_iterator rule = ConfigBase::_rules.begin(); rule != ConfigBase::_rules.end(); rule++)
-      if (input.compare(*rule) == 0)
-         return (true);
-   return (false);
+	for (std::vector<std::string>::const_iterator rule = ConfigBase::_rules.begin(); \
+	rule != ConfigBase::_rules.end(); rule++)
+    	if (input.compare(*rule) == 0)
+        	return (true);
+	return (false);
 }
 
-void  ServerRoutesConfig::readRule(std::vector<std::string>::iterator input, std::vector<std::string>& route_block, std::vector<std::string>::const_iterator rule)
+void  ServerRoutesConfig::readRule(std::vector<std::string>::iterator input, \
+std::vector<std::string>& route_block, std::vector<std::string>::const_iterator rule)
 {
    //since the _rules vector of ConfigBase class is a constant pre defined vector we can just get the index of the rule we have found
    int rule_id = std::distance(ConfigBase::_rules.begin(), rule);
@@ -124,18 +126,18 @@ ServerRoutesConfig::ServerRoutesConfig(std::vector<std::string> route_block, std
    //this way if the same rules are declared multiple times the last one will override previous ones which is true to nginx's implementation
 }
 
-//could come up with some usual default values to use.
+//Could come up with some usual default values to use.
 ServerRoutesConfig::ServerRoutesConfig()
 {
-   _root = "";
-   _location = "";
-   _index_files.push_back("index.html");
-   _allowed_methods.push_back("ADD");  
+	_root = "";
+	_location = "";
+	_index_files.push_back("index.html");
+	_allowed_methods.push_back("ADD");  
 }
 
 ServerRoutesConfig::~ServerRoutesConfig()
 {
-   
+  
 }
 
 ServerRoutesConfig& ServerRoutesConfig::operator=(const ServerRoutesConfig& rhs)
@@ -149,17 +151,17 @@ ServerRoutesConfig& ServerRoutesConfig::operator=(const ServerRoutesConfig& rhs)
 
 std::string ServerRoutesConfig::getRoot() const
 {
-   return (_root);
+	return (_root);
 }
 
 std::string ServerRoutesConfig::getLocation() const
 {
-   return (_location);
+	return (_location);
 }
 
 std::vector<std::string> ServerRoutesConfig::getIndex() const
 {
-   return (_index_files);   
+	return (_index_files);   
 }
 
 std::vector<std::string> ServerRoutesConfig::getMethods() const

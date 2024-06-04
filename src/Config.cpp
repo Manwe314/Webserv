@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Config.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
+/*   By: brettleclerc <brettleclerc@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 21:53:46 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/05/02 00:19:13 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/02 20:39:49 by brettlecler      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,10 @@ const char * CouldNotOpenFile::what() const throw()
     return ("Could not open the config file");
 }
 
-//this function makes a vector of server configs based on servers described in the config file
+/*
+	This function creates a vector of server configs
+	based on servers described in the config file
+*/
 std::vector<ServerConfig> Config::initServerConfigs(std::string path_to_config)
 {
     std::pair<int, int> brackets;
@@ -34,15 +37,16 @@ std::vector<ServerConfig> Config::initServerConfigs(std::string path_to_config)
 
     //split it on a charset of space, tab and newline.
     split_file = split(entire_file, " \n\t");
-
-    //this while loop is basically identical to ServerConfig's initRouteConfigs() function. further description is there (ServerConfig.cpp line 126)
-    while (true)
+    /*
+		This while loop is identical to ServerConfig's initRouteConfigs() function.
+		Further description can be found there (ServerConfig.cpp line 126)
+    */
+	while (true)
     {
         it = std::find(split_file.begin() + offset, split_file.end(), "server");
 
         if (it == split_file.end())
             break;
-        
         brackets = encapsule(split_file, "{", "}", std::distance(split_file.begin(), it));
 
         if (brackets.second != -1)
@@ -62,25 +66,27 @@ std::vector<ServerConfig> Config::initServerConfigs(std::string path_to_config)
     return (server_configs);
 }
 
-//function to read an entire file into a single string (including new line characters).
+//Function to read an entire file into a single string (including new line characters).
 std::string Config::readFile(std::string full_name)
 {
-    //open file, make a string stream object and a string varibale to read lines into.
+    //Open file, make a string stream object and a string variable to read lines into.
     std::ifstream file(full_name.c_str());
     std::ostringstream string_stream;
     std::string line;
     
-    //if the file cant be opened throw an exception.
+    //If the file cant be opened throw an exception.
     if (!file.is_open())
         throw CouldNotOpenFile();
-    
-    //read while there are lines to read and build up the string stream object line by line making sure to add newline characters
+    /*
+    	Read while there are lines to read and build up the string stream object
+		line by line making sure to add newline characters
+	*/
     while (std::getline(file, line))
         string_stream << line << '\n';
-    //close the file    
+    //Close the file    
     file.close();
 
-    //trun the object into a string and return it.
+    //Trunc the object into a string and return it.
     return (string_stream.str());
 }
 
@@ -93,7 +99,8 @@ ServerConfig Config::getServerConfigByName(std::string name) const
 {
     if (_server_configurations.empty())
         throw InvalidGetCall("There are no Server Configurations Present");
-    for (std::vector<ServerConfig>::const_iterator i = _server_configurations.begin(); i != _server_configurations.end(); i++)
+    for (std::vector<ServerConfig>::const_iterator i = _server_configurations.begin(); \
+	i != _server_configurations.end(); i++)
         if ((*i).getName() == name)
             return (*i);
     throw InvalidGetCall("There are no Servers with a matching name to " + name);
@@ -104,7 +111,8 @@ std::map<std::string, t_host_port> Config::getAllPairs() const
 {
     std::map<std::string, t_host_port> servers;
     
-    for (std::vector<ServerConfig>::const_iterator it = _server_configurations.begin(); it != _server_configurations.end(); it++)
+    for (std::vector<ServerConfig>::const_iterator it = _server_configurations.begin(); \
+	it != _server_configurations.end(); it++)
         servers.insert(std::make_pair((*it).getName(), (*it).getHostPortPair()));
     return (servers);
 }
@@ -112,7 +120,7 @@ std::map<std::string, t_host_port> Config::getAllPairs() const
 Config::Config(std::string path_to_config) : _server_configurations(initServerConfigs(path_to_config))
 {
     if (TESTING)
-        std::cout << "Compleate Config Compleate" << std::endl;
+        std::cout << "Config completed without any issues" << std::endl;
 }
 
 Config::~Config()

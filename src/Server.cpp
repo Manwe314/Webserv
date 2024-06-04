@@ -1,19 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   server.cpp                                         :+:      :+:    :+:   */
+/*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 16:12:04 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/05/19 19:35:36 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/04 14:26:59 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-
 /*
-    for now the Server class is set up just so the i/o multiplexing works it has 0 http functionallity. (no testing done yet).
-    cluster under construction.
+    For now, the Server class is set up just so the i/o multiplexing works.
+	It has 0 http functionallity (no testing has been done yet).
+    Cluster under construction.
 */
 #include "Server.hpp"
 #include "Response.hpp"
@@ -43,28 +43,38 @@ Server::Server()
 
 void Server::setAddress()
 {
-    //initialize the varibale with 0's
+    //Initialize the variable with '0's
     std::memset(&_server_address, 0, sizeof(_server_address));
-    //set the family type to IPv4
+    //Set the family type to IPv4
     _server_address.sin_family = AF_INET;
-    //set the IP address using h to n long on the host unsigned int
+    //Set the IP address using h to n long on the host unsigned int
     _server_address.sin_addr.s_addr = htonl(_pair.host);
-    //set the port using h to n short on the port int.
+    //Set the port using h to n short on the port int.
     _server_address.sin_port = htons(_pair.port);
 }
 
-
-//set up the server with creating a socket, binding its fd and calling the listen function to make the fd ready for connections.
+/*
+	Set up the server by creating a socket, binding its fd
+	and calling the listen function to make the fd ready for connections.
+*/
 void Server::setup()
 {
-    //use socket to get an int (fd) associated with the socket
-    //AF_INET makes out socket use IPv4 | SOCK_STREAM makes the socket a two-way relible commuinicator (TCP) | last argument is for the protocol number since there is only one it's 0.
+	/*
+    	Use the socket to get an int (fd) associated with the socket.
+    	AF_INET makes the socket use IPv4
+		SOCK_STREAM makes the socket a two-way relible commuinicator (TCP)
+		Last argument is for the protocol number. Since there is only one, it's set at 0.
+	*/
     _fd = socket(AF_INET, SOCK_STREAM, 0);
     if (_fd == -1)
         throw SocketCreationError("Error in " + _name + " Server. Could not create a socket");
     //std::cout << "DEBUG: " << _name << " Socket is: " << _fd << std::endl;
     //fcntl(_fd, F_SETFL, O_NONBLOCK);
-    //bind the socket with the socket fd, the address struct that was made in setAddress (needs to be casted to match bind type) and the size of adress struct
+    /*
+		Bind the socket with the socket fd
+		with the address struct that was created in setAddress
+		(needs to be casted to match bind type) and the size of address struct
+	*/
     if (bind(_fd, reinterpret_cast<struct sockaddr*>(&_server_address), sizeof(_server_address)) == -1)
         throw SocketBindingError("Error in " + _name + " Server. Could not bind a socket");
     if (listen(_fd, REQUEST_MAX) == -1)
@@ -75,23 +85,37 @@ int Server::accept()
 {
     int client_socket;
 
-    //accept a client connection. we only care about the fd of this conecction thus the 2nd and 3rd arguments are NULL.
+	/*
+    	Accepts a client connection.
+		We only care about the fd of this connection.
+		Thus the 2nd and 3rd arguments are NULL.
+	*/
     client_socket = ::accept(_fd, NULL, NULL);
     
     if (client_socket == -1)
         throw ClientConnectionError("Error in " + _name + " Server. Could not accept client connection");
     else
     {
-        //make this fd non blocking fd. this helps the one poll() to run smoother.
+        //Make this fd a non-blocking fd. This helps the one poll() to run smoother.
         fcntl(client_socket, F_SETFL, O_NONBLOCK);
-        //save this fd in the requests map, the string I.E the request sent from the client will be populated from the receive function
+        /*
+			Save this fd in the requests map.
+			The string I.E the request sent from the client will be populated
+			in the receive function
+		*/
         _requests.insert(std::make_pair(client_socket, ""));
     }
     return (client_socket);
 }
 
-//recive funtion will read into the buffer. buffer wil be turned into std::string and be appended to the _requests string value of the matching client_fd.
-//the send function clears the matching _request value this is why we apend to it so a request can be built up through multiple calls.
+/*
+	The receive function will read into the buffer.
+	The buffer will be turned into std::string
+	and be appended to the _requests string value of the matching client_fd.
+	
+	The send function clears the matching _request value.
+	This is why we append to it so a request can be built up through multiple calls.
+*/
 void Server::receive(int client_fd)
 {
     //this function should take care of chunking and receiving of chunked data.
@@ -106,15 +130,15 @@ void Server::receive(int client_fd)
         if (ret == 0)
             throw ClientConnectionError("Connection was closed by the client, in " + _name);
         else
-            throw ClientConnectionError("Read error Connection closed in the servrver named: " + _name);
+            throw ClientConnectionError("Read error: Connection closed in the server named: " + _name);
     }
     _requests[client_fd] += std::string(buffer);
-    std::cout << "~~~~~~~~~~~~~messgae~~~~~~~~~~~~~" << std::endl;
+    std::cout << "~~~~~~~~~~~~~message~~~~~~~~~~~~~" << std::endl;
     std::cout << std::string(buffer) << std::endl;
     std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
 }
 
-//so far the functionallity of this server is echoing back with extra text
+//So far the functionality of this server simply echos back with extra text
 void Server::process(int client_fd)
 {
     Response response(_requests[client_fd], _config);
@@ -129,7 +153,7 @@ void Server::process(int client_fd)
     _responses.insert(std::make_pair(client_fd, responseio));
 }
 
-//send function send the processed data by matching client_fd to _responses map.
+//The send function sends the processed data by matching client_fd to _responses map.
 void Server::send(int client_fd)
 {
     std::string to_send;
@@ -155,10 +179,14 @@ void Server::close(int client_fd)
 {
     if (client_fd > 0)
         ::close(client_fd);
-    _requests.erase(client_fd); // always erase the _request matching the closing fd. server must not think there is a request from an fd that is closed.
+	/*
+		Always erase the _request matching the closing fd.
+		The server must not think there is a request from an fd that has been closed.
+	*/
+    _requests.erase(client_fd);
 }
 
-//Has Response returns true if there is a response for a given fd.
+//The Has Response returns true if there is a response for a given fd.
 bool Server::hasResponse(int client_fd)
 {
     std::map<int, std::string>::iterator it;
@@ -217,4 +245,3 @@ const char * ClientConnectionError::what() const throw()
 {
     return (msg.c_str());
 }
-    

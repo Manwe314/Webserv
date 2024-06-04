@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerConfig.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 20:35:33 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/05/12 15:56:46 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/05/30 10:04:52 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,16 +16,16 @@
 #include "Webserv.hpp"
 #include "ServerRoutesConfig.hpp"
 
-//this class hold all the configuration for a single server.
+//This class hold all the configuration for a single server.
 class ServerConfig
 {
 private:
     //host:port pair where host is stored as uint and port as int.
     t_host_port _pair;
     std::string _server_name;
-    //global setting for this server outisde any "location" block but inside the "server" block
+    //Global settings for this server outside any "location" block but inside the "server" block
     ServerRoutesConfig _serverwide_config;
-    //a list of all settings for each route/location block in the config file
+    //A list of all settings for each route/location block in the config file
     std::vector<ServerRoutesConfig> _route_configs;
 
     t_host_port initHostPort(std::vector<std::string> server_block);
