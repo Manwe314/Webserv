@@ -94,6 +94,7 @@ static bool	executeScript( std::string & file, std::string & result, int extensi
 	if (extension == 1) // PHP script
 	{
 		interpreter = retrievePhpCgiInterpreter(envp);
+		//std::cout << interpreter << std::endl;
 		if (interpreter.empty())
         {
             std::cerr << "Error: php-cgi not found" << std::endl;
