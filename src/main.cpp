@@ -6,7 +6,7 @@
 /*   By: brettleclerc <brettleclerc@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 14:52:28 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/03 08:26:47 by brettlecler      ###   ########.fr       */
+/*   Updated: 2024/06/03 14:24:49 by brettlecler      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,8 +37,6 @@ int main(int argc, char *argv[])
     {
         std::cerr << e.what() << std::endl;
     }
-
-
 
     return 0;
     
