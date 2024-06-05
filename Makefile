@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+         #
+#    By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/06/23 16:24:43 by lkukhale          #+#    #+#              #
-#    Updated: 2024/06/04 14:36:53 by bleclerc         ###   ########.fr        #
+#    Updated: 2024/06/05 17:24:35 by lkukhale         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,7 +15,7 @@
 NAME = webserv
 
 SRC = ${addsuffix .cpp, ./src/main ./src/Server ./src/Utils ./src/Config ./src/ConfigBase ./src/ServerConfig \
-						./src/ServerRoutesConfig ./src/Cluster ./src/Response}
+						./src/ServerRoutesConfig ./src/Cluster ./src/Response ./src/Response-Process}
 HEADERS = -I ./include/
 CC = c++
 RM = rm -f

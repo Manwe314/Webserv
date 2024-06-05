@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/08 23:20:55 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/04 14:21:40 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/06/05 18:39:01 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,9 +35,12 @@ private:
     void parseRequestLine(std::string request_line);
     void parseMessageHeaders(std::string message_headers);
     void parseMessageBody(std::string message_body);
+
+    std::string handleErrorResponse();
 public:
     Response(std::string request, ServerConfig config);
     ~Response();
+    std::string process();
 
     std::map<std::string, std::string> getHeaders() const;
     ServerConfig getServerConfig() const;

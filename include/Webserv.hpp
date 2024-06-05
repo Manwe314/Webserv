@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Webserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 14:44:27 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/04 14:22:49 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/06/05 19:28:42 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,7 @@
 #define REQUEST_MAX 1000
 #define MAX_EVENTS 1000
 #define TIMEOUT_SEC 2
+#define DEFAULT_ERROR "/home/manwe/42/commonCoreS2/webserv/error_pages"
 
 //Colours for readbility
 #define DEFAULT "\033[0m"
