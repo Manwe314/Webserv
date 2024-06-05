@@ -6,7 +6,7 @@
 /*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/30 09:47:34 by bleclerc          #+#    #+#             */
-/*   Updated: 2024/05/30 17:11:32 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/06/05 15:36:36 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,14 +17,32 @@
 class Cgi
 {
 	public:
-	Cgi();
+	Cgi( std::string & file, char **envp );
 	virtual ~Cgi();
-	bool	addRelativePath( void );
-	bool	executeScript( void );
+	 
+	int	determineExtension( std::string const & file ) const;
+	std::string	retrievePhpCgiInterpreter( char ** envp );
+	std::vector<std::string>	extractEnvPath( char ** envp );
+	bool	readfile(int read_fd);
+	void	executeScript( std::string const & file, char **envp);
+	std::string	getCgiResult( void ) const;
+
+	class CgiExecutionError : std::exception
+	{
+    private:
+        std::string msg;
+    public:
+        CgiExecutionError(const std::string& msg) : msg(msg) {}
+        virtual const char * what() const throw();
+        virtual ~CgiExecutionError() throw() {}
+	};
 
 	private:	
+	Cgi();
 	Cgi( Cgi const & src );
 	Cgi &	operator=( Cgi const & rhs );
-	
-	std::string	_script;
+
+	int	_extension;
+	std::string const &	_file;
+	std::string _result;
 };

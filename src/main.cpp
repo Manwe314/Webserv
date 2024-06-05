@@ -6,7 +6,7 @@
 /*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 14:52:28 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/04 14:24:43 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/06/05 16:40:09 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 #include "Cluster.hpp"
 void printConfig(Config conf);
 
-int main(int argc, char *argv[])
+int main(int argc, char *argv[], char **envp)
 {
     ConfigBase base;
 
@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
     {
         Config configuration(argv[1]);
 		printConfig(configuration);
-        Cluster cluster(configuration);
+        Cluster cluster(configuration, envp);
         cluster.run();
     }
     catch(const std::exception& e)

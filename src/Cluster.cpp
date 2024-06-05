@@ -6,7 +6,7 @@
 /*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/28 01:14:37 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/04 14:24:24 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/06/05 16:39:58 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 
 
 //Cluster config that creates the servers and prepares them for run().
-Cluster::Cluster(Config conf)
+Cluster::Cluster(Config conf, char **envp) : _envp(envp)
 {
     //for Server constuctor we only need the host port pair and name, so we use a map with string and t_host_port key value pair.
     std::vector<ServerConfig> servers;

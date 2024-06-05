@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Config.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: brettleclerc <brettleclerc@student.42.f    +#+  +:+       +#+        */
+/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 21:53:46 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/02 20:39:49 by brettlecler      ###   ########.fr       */
+/*   Updated: 2024/06/05 16:41:31 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,8 +34,10 @@ std::vector<ServerConfig> Config::initServerConfigs(std::string path_to_config)
 
     //read the entire file into a single string
     entire_file = readFile(path_to_config);
-
-    //split it on a charset of space, tab and newline.
+	
+	//add rm comment fn
+    
+	//split it on a charset of space, tab and newline.
     split_file = split(entire_file, " \n\t");
     /*
 		This while loop is identical to ServerConfig's initRouteConfigs() function.
@@ -83,7 +85,7 @@ std::string Config::readFile(std::string full_name)
 	*/
     while (std::getline(file, line))
         string_stream << line << '\n';
-    //Close the file    
+    //Close the file
     file.close();
 
     //Trunc the object into a string and return it.

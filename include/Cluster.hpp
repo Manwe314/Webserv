@@ -6,7 +6,7 @@
 /*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/26 16:59:06 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/05/30 16:27:26 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/06/05 16:40:35 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,12 +35,15 @@ private:
 		and false if its not.
 	*/
     bool isServerSocket(int fd);
+	
+	//Stocks the system's environment required for php-cgi
+	char **_envp;
 public:
 	/*
     	Constructor that takes in config
 		and sets up all the servers in _servers map.
 	*/
-    Cluster(Config conf);
+    Cluster(Config conf, char **envp);
     ~Cluster();
 
     //Main function of the cluster that runs everything.

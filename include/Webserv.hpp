@@ -6,7 +6,7 @@
 /*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 14:44:27 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/04 14:22:49 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/06/05 17:00:47 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@
 #include<fstream>
 #include<utility>
 #include<cctype>
+#include <sys/wait.h>
 
 //C++ Container includes
 #include<vector>
@@ -90,7 +91,7 @@ bool isInvalidVersion(std::string version);
 bool isValidHttpMethod(std::string method);
 bool isInvalidHttpMethod(std::string method);
 bool isValidHeader(std::string header);
-
+bool isValidCgiFile( std::string const & file );
 
 
 #endif
