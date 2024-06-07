@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 18:42:38 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/04 14:31:00 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/06/07 02:35:15 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -239,6 +239,26 @@ bool isInvalidVersion(std::string version)
         return (true);
     return (false);
     
+}
+
+int countMatchingChars(std::string first, std::string second, int pos)
+{
+    int count;
+    int min_size;
+
+    count = 0;
+    min_size = std::min(first.size(), second.size());
+    
+    if (pos > min_size)
+        return (-1);
+    for (int i = pos; i < min_size; i++)
+    {
+        if (first[i] == second[i])
+            count++;
+        else
+            break;
+    }
+    return (count);
 }
 
 //Prints a string vector

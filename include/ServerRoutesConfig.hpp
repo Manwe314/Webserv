@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerRoutesConfig.hpp                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 17:09:31 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/04 14:31:56 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/06/07 03:44:01 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 #include "Webserv.hpp"
 #include "ConfigBase.hpp"
+
 
 class ServerRoutesConfig
 {
@@ -38,6 +39,10 @@ public:
     ServerRoutesConfig(std::vector<std::string> route_block, std::string location);
     ~ServerRoutesConfig();
 
+    void inherit(ServerRoutesConfig parent);
+    
+    t_route_match findRouteMatch(std::string uri);
+
     ServerRoutesConfig& operator=(const ServerRoutesConfig& rhs); 
 
     std::string getRoot() const;
@@ -56,5 +61,11 @@ class InvalidGetCall : public std::exception
         virtual const char* what() const throw();
         virtual ~InvalidGetCall() throw() {}
 };
+
+typedef struct s_route_match
+{
+    int match_length;
+    ServerRoutesConfig* route;
+}   t_route_match;
 
 #endif

@@ -6,15 +6,39 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 16:59:31 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/05 19:43:33 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/07 04:36:03 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Response.hpp"
 
+ServerRoutesConfig Response::matchSubRoute(std::string uri)
+{
+    std::string location;
+    ServerConfig match;
+    std::vector<ServerRoutesConfig> routes;
+
+    routes = _server_config.getRouteConfigs();
+    
+    for (std::vector<ServerRoutesConfig>::iterator it = routes.begin(); it < routes.end(); it++)
+    {
+        location = (*it).getLocation();
+        if (location != "")
+        {
+            //use the ServerRoutesConfig's findRouteMatch member function. to get the t_route_match struct.
+            
+        }
+        
+    }
+    
+    
+    
+}
+
 std::string Response::handleErrorResponse()
 {
     std::string error_response;
+    ServerRoutesConfig config;
     
     if (_status_code / 100 != 4 || _status_code / 100 != 5)
         return (std::string(""));
@@ -43,6 +67,8 @@ std::string Response::handleErrorResponse()
 
         adding an empty line CRLFCRLF at the end of headers compleates the error response. 
     */
+   if (!_request_URI.empty())
+    config = matchSubRoute(_request_URI);
 }
 
 std::string Response::process()

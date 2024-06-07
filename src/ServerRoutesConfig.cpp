@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerRoutesConfig.cpp                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 18:29:19 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/04 14:28:21 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/06/07 04:34:21 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,13 +126,80 @@ ServerRoutesConfig::ServerRoutesConfig(std::vector<std::string> route_block, std
    //this way if the same rules are declared multiple times the last one will override previous ones which is true to nginx's implementation
 }
 
+//this function inherits from the "parent" route that is passed as an argument.
+//this only happens if this route itself dosent aready have these values set.
+void ServerRoutesConfig::inherit(ServerRoutesConfig parent)
+{
+   if (_root.empty())
+      _root = parent.getRoot();
+   if (_index_files.empty());
+      _index_files = parent.getIndex();
+   if (_allowed_methods.empty())
+      _allowed_methods = parent.getMethods();
+   
+}
+
+//this function returns a struct that has an int and a pointer. the int represents the amount of characters that matched between uri and location.
+// pointer is a pointer to the ServerRouteConfig that this match has happened in.
+//this function will evaluate itself and all of its sub routes and return the BEST match I.E struct with the highest "int". (note that -1 means a compleate match which is considered as a higher number than any positive integer).
+t_route_match ServerRoutesConfig::findRouteMatch(std::string uri)
+{
+   //match is evaluating iteslf
+   t_route_match match;
+   //vector of structs is for arbitrary amount of sub routes it may have.
+   std::vector<t_route_match> sub_matches;
+
+   //startint from the begining count how many chars match betwen location and uri before first missmatch.
+   match.match_length = countMatchingChars(_location, uri);
+   match.route = this;
+   //if the matching length is same as the entire uri this means a compleate match. in this case no further searching is required since we cant find a better match.
+   if (match.match_length == uri.size())
+   {
+      match.match_length = -1;
+      return (match);
+   }
+   
+   //loop over every subroute and use the same function for them to evaluate their best match.
+   for (std::vector<ServerRoutesConfig>::iterator it = _sub_routes.begin(); it != _sub_routes.end(); it++)
+   {
+      //if this routes location is the begining of the subroutes location that means its a proper nesting. (for example: /banana/one nested under /potato is invalid, but /potato/one is valid)
+      //in the case of inproper nesting the subroute just does not inherit from parent but regardless is evaluated for matching purposes. it is considered to be outside of the parent route block.
+      if (countMatchingChars(_location, (*it).getLocation()) == _location.size())
+         (*it).inherit(*this);
+      //use this same member function such that each sub route will return the struct with best match among THEIR subroutes. this will reqursively search every nested route.
+      sub_matches.push_back((*it).findRouteMatch(uri));
+   }
+   
+   //lastly find the best match among the sub routes and this route. 
+   for (std::vector<t_route_match>::iterator it = sub_matches.begin(); it != sub_matches.end(); it++)
+   {
+      //if any subroute has found a perfect match. return it immediatly since a better match cant be found.
+      if ((*it).match_length == -1)
+      {
+         match.match_length = -1;
+         match.route = (*it).route;
+         break;   
+      }
+      //in the if statement greater than is purposely used since if sub routes best match and this routes best match are the same we want to take the firs I.E patent route.
+      if ((*it).match_length > match.match_length)
+      {
+         match.match_length = (*it).match_length;
+         match.route = (*it).route;
+      }
+   }
+   
+   
+   
+   return (match);
+}
+
 //Could come up with some usual default values to use.
 ServerRoutesConfig::ServerRoutesConfig()
 {
 	_root = "";
 	_location = "";
 	_index_files.push_back("index.html");
-	_allowed_methods.push_back("ADD");  
+	_allowed_methods.push_back("GET");  
 }
 
 ServerRoutesConfig::~ServerRoutesConfig()
@@ -146,6 +213,7 @@ ServerRoutesConfig& ServerRoutesConfig::operator=(const ServerRoutesConfig& rhs)
    _location = rhs.getLocation();
    _index_files = rhs.getIndex();
    _allowed_methods = rhs.getMethods();
+   _sub_routes = rhs.getSubRoutes();
    return (*this);
 }
 

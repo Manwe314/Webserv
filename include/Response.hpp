@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/08 23:20:55 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/05 18:39:01 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/06 17:38:40 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@ public:
     Response(std::string request, ServerConfig config);
     ~Response();
     std::string process();
+    ServerRoutesConfig matchSubRoute(std::string uri);
 
     std::map<std::string, std::string> getHeaders() const;
     ServerConfig getServerConfig() const;

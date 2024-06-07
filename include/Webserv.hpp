@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 14:44:27 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/05 19:28:42 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/07 02:31:50 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,8 +69,6 @@ typedef struct s_host_port
 
 
 
-
-
 //Utility function declarations
 std::vector<std::string> split(std::string string, char delim);
 std::vector<std::string> split(std::string string, std::string delim);
@@ -78,6 +76,7 @@ bool IsFirstAfterWhitespace(std::string string, int pos);
 std::pair<int, int> encapsule(std::vector<std::string> array, std::string a, std::string b, int pos = 0);
 void eraseRange(std::vector<std::string>& array, int start, int end, int flag = 0);
 void printVector(std::vector<std::string> arr);
+int countMatchingChars(std::string first, std::string second, int pos = 0);
 template <typename Keytype, typename Valuetype>
 void printMap(const std::map<Keytype, Valuetype>& map)
 {
