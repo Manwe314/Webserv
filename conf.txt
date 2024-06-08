@@ -17,6 +17,10 @@ server {
             allow_methods POST
             location /thrid-file
             {
+                location / 
+                {
+                    root kuxiSALAMI
+                }
                 index heywhatsup
             }
             location /secret-second
@@ -33,22 +37,22 @@ server {
         location /one
         {
             root buba
-            location /piece 
+            location /one/piece 
             {
                 index is-real
             }
             location /piece2
-            { 
+            {
                 index is-unreal
             }
-            location /zozo
+            location /one/zozo
             {
                 index error404
-                location /zaza 
+                location /one/zozo/zaza 
                 {
                     allow_methods GET
                     index timetosmoke
-                    location /hot
+                    location /one/zozo/zaza/hot
                     {
                         index box to-much
                     }
@@ -57,15 +61,20 @@ server {
         }
     }
 
-    location ./smiledog {
+    location /smiledog {
         index sexymazafaqa.se troll.html
+    }
+    
+    location /
+    {
+        root /tmp/www
     }
 
 }
 
 server {
     server_name giki
-    listen localhost:8000
+    listen localhost:8001
 
     root ./gikski
 
@@ -74,9 +83,17 @@ server {
         root ./kisstheskin
         
     }
+    location / 
+    {
+        root gikiSALAMI
+    }
 }
 
 server {
     server_name briki
     listen localhost:8002
+    location /not/root
+    {
+        root trollfacer
+    }
 }

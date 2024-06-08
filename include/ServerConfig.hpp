@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 20:35:33 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/06 17:39:07 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/07 17:49:21 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,8 @@ public:
     ServerConfig(std::vector<std::string> server_block);
     ~ServerConfig();
     
+    ServerRoutesConfig* findRootSubRoute();
+
     ServerConfig& operator=(const ServerConfig& rhs);
 
     t_host_port getHostPortPair() const;

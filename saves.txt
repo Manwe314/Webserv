@@ -277,3 +277,66 @@ public:
             {
                 std::cout << "FD " << i << ": " << fds[i].fd << std::endl;
             }
+
+
+ServerRoutesConfig* ServerConfig::findRootSubRoute()
+{
+    typedef std::vector<ServerRoutesConfig>::iterator iter;
+    std::stack<iter> stack;
+    std::stack<iter> visited;
+    iter traverse;
+    iter helper;
+    std::vector<ServerRoutesConfig*> saves;
+    std::vector<ServerRoutesConfig> temp;
+
+    if (_route_configs.empty())
+        return (NULL);
+
+    for (iter it = _route_configs.begin(); it != _route_configs.end(); it++)
+    {
+        traverse = it;
+        
+        while (true)
+        {
+            if (!visited.empty() && traverse == visited.top())
+            {
+                saves.push_back(&(*visited.top()));
+                visited.pop();
+                if (!stack.empty())
+                    stack.pop();
+            }
+            else if ((!visited.empty() && traverse != visited.top()) || stack.empty())
+            {
+                visited.push(traverse);
+                temp = (*traverse).getSubRoutes();
+                if (!temp.empty())
+                {
+                    helper = temp.begin();
+                    while (helper != temp.end())
+                    {
+                        if ((*helper).getSubRoutes().empty())
+                            saves.push_back(&(*helper));
+                        else
+                            stack.push(helper);
+                        helper++;
+                    }
+                }
+            }
+            if (stack.empty() && visited.size() == 1)
+            {
+                saves.push_back(&(*visited.top()));
+                visited.pop();
+                break;
+            }
+            else if (!stack.empty())
+                traverse = stack.top();
+        }
+    }
+    
+    for (std::vector<ServerRoutesConfig*>::iterator it = saves.begin(); it < saves.end(); it++)
+    {
+        if ((*(*it)).getLocation() == "/")
+            return (*it);
+    }
+    return (NULL);    
+}

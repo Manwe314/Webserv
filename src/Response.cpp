@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/08 23:27:16 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/05 17:46:31 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/08 02:33:25 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -257,6 +257,11 @@ int Response::getStatusCode() const
     return (_status_code);
 }
 
+const char * NoMatchFound::what() const throw()
+{
+	return (msg.c_str());
+}
+
 std::ostream& operator<<(std::ostream& obj, Response const &response)
 {
     std::map<std::string, std::string> map = response.getHeaders();
@@ -268,7 +273,7 @@ std::ostream& operator<<(std::ostream& obj, Response const &response)
     obj << response.getURI();
     obj << " version: "; 
     obj << response.getHttpVersion();
-    obj << " headers\n";
+    obj << "\nheaders:\n";
     for (std::map<std::string, std::string>::iterator it = map.begin(); it != map.end(); it++)
     {
         obj << "key: "; 

@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 18:42:38 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/07 02:35:15 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/07 23:06:18 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -278,7 +278,7 @@ static void printRouteConfig(std::vector<ServerRoutesConfig> routes)
         {
             for (std::vector<ServerRoutesConfig>::iterator i4 = routes.begin(); i4 != routes.end(); i4++)
             {
-                std::cout << "--ROUTE--" << std::endl;
+                std::cout << MAGENTA << "--ROUTE--" << DEFAULT << std::endl;
                 std::cout << "Root: " << (*i4).getRoot() << std::endl;
                 std::cout << "Location: " << (*i4).getLocation() << std::endl;
                 std::cout << "Index Files:";
@@ -300,11 +300,11 @@ static void printRouteConfig(std::vector<ServerRoutesConfig> routes)
                 std::vector<ServerRoutesConfig> sub = (*i4).getSubRoutes();
                 if (!sub.empty())
                 {
-                    std::cout << "+SUB+" << std::endl;
+                    std::cout << LAVENDER << "+SUB+" << DEFAULT << std::endl;
                     printRouteConfig(sub);
-                    std::cout << "+++++" << std::endl;
+                    std::cout << LAVENDER << "+++++" << DEFAULT << std::endl;
                 }
-                std::cout << "---------" << std::endl;
+                std::cout << MAGENTA << "---------" << DEFAULT << std::endl;
             }
         } 
 }

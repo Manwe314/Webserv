@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 14:52:28 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/04 14:24:43 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/06/08 02:28:37 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@ void printConfig(Config conf);
 int main(int argc, char *argv[])
 {
     ConfigBase base;
+    std::vector<ServerConfig> servers;
 
     if (argc != 2)
     {
@@ -29,7 +30,8 @@ int main(int argc, char *argv[])
     try
     {
         Config configuration(argv[1]);
-		printConfig(configuration);
+        servers = configuration.getServerConfigs();
+		//printConfig(configuration);
         Cluster cluster(configuration);
         cluster.run();
     }

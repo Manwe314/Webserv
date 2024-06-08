@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 14:44:27 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/07 02:31:50 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/07 17:48:11 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@
 #include<vector>
 #include<list>
 #include<map>
+#include<stack>
 
 
 //C includes

@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 17:09:31 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/07 03:44:01 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/07 23:12:41 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,13 @@
 #include "Webserv.hpp"
 #include "ConfigBase.hpp"
 
+class ServerRoutesConfig;
+
+typedef struct s_route_match
+{
+    int match_length;
+    ServerRoutesConfig* route;
+}   t_route_match;
 
 class ServerRoutesConfig
 {
@@ -42,6 +49,7 @@ public:
     void inherit(ServerRoutesConfig parent);
     
     t_route_match findRouteMatch(std::string uri);
+    ServerRoutesConfig* findRootRoute();
 
     ServerRoutesConfig& operator=(const ServerRoutesConfig& rhs); 
 
@@ -51,6 +59,7 @@ public:
     std::vector<std::string> getMethods() const;
     std::vector<ServerRoutesConfig> getSubRoutes() const;
 };
+std::ostream& operator<<(std::ostream& obj, ServerRoutesConfig const &conf);
 
 class InvalidGetCall : public std::exception
 {
@@ -62,10 +71,5 @@ class InvalidGetCall : public std::exception
         virtual ~InvalidGetCall() throw() {}
 };
 
-typedef struct s_route_match
-{
-    int match_length;
-    ServerRoutesConfig* route;
-}   t_route_match;
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/08 23:20:55 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/06 17:38:40 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/07 17:17:43 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,16 @@ public:
     std::string getMethod() const;
     std::string getBody() const;
     int getStatusCode() const;
+};
+
+class NoMatchFound : public std::exception
+{
+    private:
+        std::string msg;
+    public:
+        NoMatchFound(const std::string& msg) : msg(msg) {}
+        virtual const char* what() const throw();
+        virtual ~NoMatchFound() throw() {}
 };
 
 std::ostream& operator<<(std::ostream& obj, Response const &response);

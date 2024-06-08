@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 18:29:19 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/07 04:34:21 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/08 03:10:27 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,7 +132,7 @@ void ServerRoutesConfig::inherit(ServerRoutesConfig parent)
 {
    if (_root.empty())
       _root = parent.getRoot();
-   if (_index_files.empty());
+   if (_index_files.empty())
       _index_files = parent.getIndex();
    if (_allowed_methods.empty())
       _allowed_methods = parent.getMethods();
@@ -150,21 +150,25 @@ t_route_match ServerRoutesConfig::findRouteMatch(std::string uri)
    std::vector<t_route_match> sub_matches;
 
    //startint from the begining count how many chars match betwen location and uri before first missmatch.
-   match.match_length = countMatchingChars(_location, uri);
+   match.match_length = countMatchingChars(_location, uri); // ----> need to at logic for counting with slashes "/"  in mind <-----
    match.route = this;
-   //if the matching length is same as the entire uri this means a compleate match. in this case no further searching is required since we cant find a better match.
-   if (match.match_length == uri.size())
+   //if the matching length is same as the entire uri AND location path, then it is a compleate match. in this case no further searching is required since we cant find a better match.
+   if (match.match_length == (int)uri.size() && match.match_length == (int)_location.size())
    {
       match.match_length = -1;
       return (match);
    }
+
+   //if the route has NO nested subroutes then just return its own match.
+   if (_sub_routes.empty())
+      return (match);
    
    //loop over every subroute and use the same function for them to evaluate their best match.
    for (std::vector<ServerRoutesConfig>::iterator it = _sub_routes.begin(); it != _sub_routes.end(); it++)
    {
       //if this routes location is the begining of the subroutes location that means its a proper nesting. (for example: /banana/one nested under /potato is invalid, but /potato/one is valid)
       //in the case of inproper nesting the subroute just does not inherit from parent but regardless is evaluated for matching purposes. it is considered to be outside of the parent route block.
-      if (countMatchingChars(_location, (*it).getLocation()) == _location.size())
+      if (countMatchingChars(_location, (*it).getLocation()) == (int)_location.size())
          (*it).inherit(*this);
       //use this same member function such that each sub route will return the struct with best match among THEIR subroutes. this will reqursively search every nested route.
       sub_matches.push_back((*it).findRouteMatch(uri));
@@ -187,10 +191,27 @@ t_route_match ServerRoutesConfig::findRouteMatch(std::string uri)
          match.route = (*it).route;
       }
    }
-   
-   
-   
    return (match);
+}
+
+//this function searches for root location route in its nested routes. this function is used by ServerConfig to find a root route of a server.
+ServerRoutesConfig* ServerRoutesConfig::findRootRoute()
+{
+   ServerRoutesConfig* root;
+   //if this route is root return this
+   if (_location == "/")
+      return this;  
+   else if (!_sub_routes.empty()) //if this route has children
+   {
+      for (std::vector<ServerRoutesConfig>::iterator it = _sub_routes.begin(); it != _sub_routes.end(); it++)
+      {
+         root = (*it).findRootRoute(); //call this function of every child that will check their own children
+         if (root != NULL) // a non null means that root route was found
+            return (root);
+      }
+   }
+   //if the for loop never returned then this means that root route is not nested in this route.
+   return (NULL);
 }
 
 //Could come up with some usual default values to use.
@@ -240,4 +261,47 @@ std::vector<std::string> ServerRoutesConfig::getMethods() const
 std::vector<ServerRoutesConfig> ServerRoutesConfig::getSubRoutes() const
 {
    return (_sub_routes);
+}
+
+
+std::ostream& operator<<(std::ostream& obj, ServerRoutesConfig const &conf)
+{
+   std::vector<std::string> help;
+   std::vector<ServerRoutesConfig> aid;
+   
+   obj << "Location: ";
+   obj << conf.getLocation();
+   obj << " root: ";
+   obj << conf.getRoot();
+   obj << "\n";
+   help = conf.getIndex();
+   if (!help.empty())
+   {
+      obj << "Index: ";  
+      for (std::vector<std::string>::iterator i = help.begin(); i != help.end(); i++)
+      {
+         obj << *i;
+         obj <<" ";
+      }
+      obj << "\n";
+   }
+   help = conf.getMethods();
+   if (!help.empty())
+   {
+      obj << "Allowed Methods: ";  
+      for (std::vector<std::string>::iterator i = help.begin(); i != help.end(); i++)
+      {
+         obj << *i;
+         obj <<" ";
+      }
+      obj << "\n";
+   }
+   aid = conf.getSubRoutes();
+   if (!aid.empty())
+   {
+      obj << "Amount of Sub Routes: ";
+      obj << aid.size();
+      obj << "\n";
+   }
+   return (obj);
 }
