@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 18:29:19 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/08 03:10:27 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/08 21:45:41 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,8 @@ enum Rule{
 	LOCATION,
 	ALLOW_METHODS,
 	ROOT,
-	INDEX
+	INDEX,
+   ERROR_PAGE
 };
 
 bool ServerRoutesConfig::isRule(std::string input)
@@ -38,16 +39,15 @@ std::vector<std::string>& route_block, std::vector<std::string>::const_iterator 
 {
    //since the _rules vector of ConfigBase class is a constant pre defined vector we can just get the index of the rule we have found
    int rule_id = std::distance(ConfigBase::_rules.begin(), rule);
-   std::pair<int, int> brackets;
    std::vector<std::string> buffer;
-   bool http_rule_is_found;
-   
+   std::vector<int> status_codes;
+
    // using a switch statment (making it readable with enums) we can carry out each necaserry operation
    switch (rule_id)
    {
    //constructing sub routes is verry similar to serverconfig constructin subroutes. (see details in ServerConfig.cpp line 132)
    case LOCATION:
-      brackets = encapsule(route_block, "{", "}", std::distance(route_block.begin(), input));
+      std::pair<int, int> brackets = encapsule(route_block, "{", "}", std::distance(route_block.begin(), input));
       if (brackets.second != -1)
       {
          buffer.clear();
@@ -60,6 +60,7 @@ std::vector<std::string>& route_block, std::vector<std::string>::const_iterator 
    //we stop getting the allowed methods when an element matches none of the methods.
    //the only problem with this approach is that if an incorect method is typed all correct methods after it will be discarded, also this approach does not enforce the allowed_methods to be on the same line.
    case ALLOW_METHODS:
+      bool http_rule_is_found;
       while (true)
       {
          input++;
@@ -92,6 +93,21 @@ std::vector<std::string>& route_block, std::vector<std::string>::const_iterator 
          input++;
       }
       break;
+
+   case ERROR_PAGE:
+      input++;
+      while ((*input).compare("}") != 0 && !isRule(*input) &&  input != route_block.end())
+      {
+         if ((*input).find('/') == std::string::npos)
+            status_codes.push_back(std::atoi((*input).c_str()));
+         else
+            break;
+         input++;
+      }
+      if (!status_codes.empty())
+         for (std::vector<int>::iterator it = status_codes.begin(); it != status_codes.end(); it++)
+            _error_pages.insert(std::make_pair((*it), (*input)));
+      break;
    
    default:
       break;
@@ -99,7 +115,7 @@ std::vector<std::string>& route_block, std::vector<std::string>::const_iterator 
    
 }
 
-ServerRoutesConfig::ServerRoutesConfig(std::vector<std::string> route_block, std::string location) : _index_files(), _allowed_methods(), _sub_routes()
+ServerRoutesConfig::ServerRoutesConfig(std::vector<std::string> route_block, std::string location) : _index_files(), _allowed_methods(), _sub_routes(), _error_pages()
 {
    //the config file is split with a charset (space tab newline). must read info out from a vector like that here.
    //route block is whatever is inside "{ }" after the location is defined.
@@ -136,6 +152,8 @@ void ServerRoutesConfig::inherit(ServerRoutesConfig parent)
       _index_files = parent.getIndex();
    if (_allowed_methods.empty())
       _allowed_methods = parent.getMethods();
+   if (_error_pages.empty())
+      _error_pages = parent.getErrorPages();
    
 }
 
@@ -235,6 +253,7 @@ ServerRoutesConfig& ServerRoutesConfig::operator=(const ServerRoutesConfig& rhs)
    _index_files = rhs.getIndex();
    _allowed_methods = rhs.getMethods();
    _sub_routes = rhs.getSubRoutes();
+   _error_pages = rhs.getErrorPages();
    return (*this);
 }
 
@@ -263,11 +282,17 @@ std::vector<ServerRoutesConfig> ServerRoutesConfig::getSubRoutes() const
    return (_sub_routes);
 }
 
+std::map<int, std::string> ServerRoutesConfig::getErrorPages() const
+{
+   return (_error_pages);  
+}
+
 
 std::ostream& operator<<(std::ostream& obj, ServerRoutesConfig const &conf)
 {
    std::vector<std::string> help;
    std::vector<ServerRoutesConfig> aid;
+   std::map<int, std::string> companion;
    
    obj << "Location: ";
    obj << conf.getLocation();
@@ -301,6 +326,20 @@ std::ostream& operator<<(std::ostream& obj, ServerRoutesConfig const &conf)
    {
       obj << "Amount of Sub Routes: ";
       obj << aid.size();
+      obj << "\n";
+   }
+   companion = conf.getErrorPages();
+   if (!companion.empty())
+   {
+      obj << "Error Pages: ";
+      obj << "\n";
+      for (std::map<int, std::string>::iterator i = companion.begin(); i != companion.end(); i++)
+      {
+         obj << (*i).first;
+         obj << " - ";
+         obj << (*i).second;
+         obj << " ";
+      }
       obj << "\n";
    }
    return (obj);

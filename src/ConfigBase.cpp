@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/17 19:02:50 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/05/16 21:35:59 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/08 20:46:09 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@ static std::vector<std::string> init_rules()
     rules.push_back("allow_methods");
     rules.push_back("root");
     rules.push_back("index");
+    rules.push_back("error_page");
     
     return (rules);
 }
