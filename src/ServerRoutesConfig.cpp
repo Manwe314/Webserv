@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 18:29:19 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/08 21:45:41 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/10 21:50:24 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,13 +41,14 @@ std::vector<std::string>& route_block, std::vector<std::string>::const_iterator 
    int rule_id = std::distance(ConfigBase::_rules.begin(), rule);
    std::vector<std::string> buffer;
    std::vector<int> status_codes;
+   std::pair<int, int> brackets;
 
    // using a switch statment (making it readable with enums) we can carry out each necaserry operation
    switch (rule_id)
    {
    //constructing sub routes is verry similar to serverconfig constructin subroutes. (see details in ServerConfig.cpp line 132)
    case LOCATION:
-      std::pair<int, int> brackets = encapsule(route_block, "{", "}", std::distance(route_block.begin(), input));
+      brackets = encapsule(route_block, "{", "}", std::distance(route_block.begin(), input));
       if (brackets.second != -1)
       {
          buffer.clear();
@@ -230,6 +231,31 @@ ServerRoutesConfig* ServerRoutesConfig::findRootRoute()
    }
    //if the for loop never returned then this means that root route is not nested in this route.
    return (NULL);
+}
+
+std::string ServerRoutesConfig::serveCustomError(int status)
+{
+   std::string path;
+   std::map<int, std::string>::iterator it;
+
+   if (!_error_pages.empty() && !_root.empty())
+   {
+      path = _root;
+      if (path[(path.size() - 1)] == '/')
+         path.erase(path.size() - 1, 1);
+      it = _error_pages.find(status);
+      if (it != _error_pages.end())
+      {
+         path += (*it).second;
+         if (isValidFile(path))
+            return (path);
+      }
+   }
+   path = DEFAULT_ERROR;
+   path += "/";
+   path += intToString(status);
+   path += "_err.html";
+   return (path);
 }
 
 //Could come up with some usual default values to use.

@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 14:44:27 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/07 17:48:11 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/10 18:51:27 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,11 +73,22 @@ typedef struct s_host_port
 //Utility function declarations
 std::vector<std::string> split(std::string string, char delim);
 std::vector<std::string> split(std::string string, std::string delim);
-bool IsFirstAfterWhitespace(std::string string, int pos);
 std::pair<int, int> encapsule(std::vector<std::string> array, std::string a, std::string b, int pos = 0);
 void eraseRange(std::vector<std::string>& array, int start, int end, int flag = 0);
-void printVector(std::vector<std::string> arr);
 int countMatchingChars(std::string first, std::string second, int pos = 0);
+std::string readFile(std::string full_name);
+std::string intToString(int num);
+void toLowerCase(std::string &str);
+
+
+template <typename T>
+void printVector(const std::vector<T>& arr)
+{
+    typename std::vector<T>::const_iterator it;
+    for (it = arr.begin(); it != arr.end(); it++)
+        std::cout << MAGENTA << *it << DEFAULT << std::endl;
+}
+
 template <typename Keytype, typename Valuetype>
 void printMap(const std::map<Keytype, Valuetype>& map)
 {
@@ -85,12 +96,13 @@ void printMap(const std::map<Keytype, Valuetype>& map)
     for (it = map.begin(); it != map.end(); it++)
         std::cout << "Key: " << it->first << "Value: " << it->second << std::endl;
 }
-void toLowerCase(std::string &str);
+
 bool isValidVersion(std::string version);
 bool isInvalidVersion(std::string version);
 bool isValidHttpMethod(std::string method);
 bool isInvalidHttpMethod(std::string method);
 bool isValidHeader(std::string header);
+bool isValidFile(std::string file_path);
 
 
 

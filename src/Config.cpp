@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Config.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: brettleclerc <brettleclerc@student.42.f    +#+  +:+       +#+        */
+/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 21:53:46 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/02 20:39:49 by brettlecler      ###   ########.fr       */
+/*   Updated: 2024/06/10 15:35:19 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,29 +66,7 @@ std::vector<ServerConfig> Config::initServerConfigs(std::string path_to_config)
     return (server_configs);
 }
 
-//Function to read an entire file into a single string (including new line characters).
-std::string Config::readFile(std::string full_name)
-{
-    //Open file, make a string stream object and a string variable to read lines into.
-    std::ifstream file(full_name.c_str());
-    std::ostringstream string_stream;
-    std::string line;
-    
-    //If the file cant be opened throw an exception.
-    if (!file.is_open())
-        throw CouldNotOpenFile();
-    /*
-    	Read while there are lines to read and build up the string stream object
-		line by line making sure to add newline characters
-	*/
-    while (std::getline(file, line))
-        string_stream << line << '\n';
-    //Close the file    
-    file.close();
 
-    //Trunc the object into a string and return it.
-    return (string_stream.str());
-}
 
 std::vector<ServerConfig> Config::getServerConfigs() const
 {

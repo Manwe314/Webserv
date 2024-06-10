@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 17:09:31 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/08 22:58:38 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/10 18:32:08 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,6 +66,7 @@ public:
     
     t_route_match findRouteMatch(std::string uri);
     ServerRoutesConfig* findRootRoute();
+    std::string serveCustomError(int status);
 
     ServerRoutesConfig& operator=(const ServerRoutesConfig& rhs); 
 

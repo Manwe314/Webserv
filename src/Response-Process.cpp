@@ -6,12 +6,29 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 16:59:31 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/08 03:23:09 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/10 21:46:14 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 
 #include "Response.hpp"
+
+std::string Response::statusLineProcess()
+{
+    std::string status_line;
+    std::map<int, std::string>::const_iterator it;
+
+    it = ConfigBase::_reason_phrases.find(_status_code);
+    if (it == ConfigBase::_reason_phrases.end())
+        throw NoMatchFound("500");
+
+    status_line = "HTTP/1.1 ";
+    status_line += intToString(_status_code);
+    status_line += " ";
+    status_line += (*it).second;
+    status_line += " \r\n";
+    return (status_line);
+}
 
 //this fucntion takes in the URI and returns a ServerRoutesConfig object with all the relevant directives.
 ServerRoutesConfig Response::matchSubRoute(std::string uri)
@@ -21,6 +38,9 @@ ServerRoutesConfig Response::matchSubRoute(std::string uri)
     t_route_match temp;
     t_route_match save;
     std::vector<ServerRoutesConfig> routes;
+
+    if (uri.empty())
+        throw NoMatchFound("400");
 
     routes = _server_config.getRouteConfigs();
     save.match_length = 0;
@@ -75,6 +95,10 @@ ServerRoutesConfig Response::matchSubRoute(std::string uri)
 std::string Response::handleErrorResponse()
 {
     std::string error_response;
+    std::string status_line;
+    std::string headers;
+    std::string body;
+    std::string default_error = DEFAULT_ERROR;
     ServerRoutesConfig config;
     
     if (_status_code / 100 != 4 && _status_code / 100 != 5)
@@ -84,12 +108,9 @@ std::string Response::handleErrorResponse()
         DEFULT_ERROR + "/400_err.html" file. 
 
         next case would be an error with a valid URI so match it to a location.
-        locations nested add their paths. correct location is one that matches THE MOST. use its root or any root defined above it. 
+        correct location is one that matches THE MOST. use its root or any root defined above it. 
         
         try to make location matching as uneversal as possible to reuse it multiple times. 
-
-        need to add error_page handling in the config parsing part to get custom set error pages if needed.
-        it is possible for user to set a custom error page that then is not found in that case the response turns into a new 404 not found error
         
         if there is no custom error page set use a defualt one. if that is also not found default to 404 again.
         this 404 willl be hard coded as a string in code so at the very least it will always be avalable to show.
@@ -108,28 +129,33 @@ std::string Response::handleErrorResponse()
     try
     {
         /*
+        EM 931 WB
             so far matching is working. currantly i know of 2 issues that need fixing.
             1. when matching uri to location we just count how many chars match. this is not correct since if location is /HEYBOB 
                 and the uri is /HEYALICE the uri would match the location up to 4 chars, yet this is not correct since its just the 
                 begining of the 2 folders names that match. 
             2. when searching through the tree of nested subroutes. we need to inherit the rules of correctly nested routes like:
                 /one/two beeing under /one and NOT /three/four beeing under /one. both nested routes should end up inheriting from serverwide directives
-                but, in the case of inccorect nesting the nested route is considered to be highest level, so that one should just inherit from
+                but, in the case of inccorect nesting the nested route is considered to be highest level, so that one should just directly inherit from
                 serverwide. correctly nested route should inherit from its parent that has inherited from serverwide. this is important since
-                if the parent and the serverwide have smae directives but the child doesnt the child should get its parents version and not the serverwide one.
+                if the parent and the serverwide have same directives but the child doesnt the child should get its parents version and not the serverwide one.
         */
-        if (!_request_URI.empty())
-            config = matchSubRoute(_request_URI);
+        config = matchSubRoute(_request_URI);
+        status_line = statusLineProcess();
     }
     catch(const NoMatchFound& e)
     {
-        std::cout << e.what() << std::endl;
-        /*
-        if (e.what() == "400")
-          do deafult error page stuff here
-        if (e.what() == "404")
-            do default error page stuff here;  
-        */
+        config = _server_config.getServerWideConfig();
+        try
+        {
+            _status_code = std::atoi(e.what());
+            status_line = statusLineProcess();
+            body = readFile(config.serveCustomError(std::atoi(e.what())));
+        }
+        catch(const CouldNotOpenFile& e)
+        {
+            body = "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n<title>404 Not Found</title>\n<style>\nbody { font-family: Arial, sans-serif; text-align: center; padding: 50px; }\nh1 { font-size: 50px; }\np { font-size: 20px; }\n</style>\n</head>\n<body>\n<h1>404 Not Found</h1>\n<p>The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.</p>\n</body>\n</html>";
+        }
     }
     error_response = "boobya\n";
     return error_response;
