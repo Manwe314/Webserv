@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 18:29:19 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/10 21:50:24 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/11 22:03:19 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -233,6 +233,8 @@ ServerRoutesConfig* ServerRoutesConfig::findRootRoute()
    return (NULL);
 }
 
+//this function will try to serve the path to a valid file using the error_page and root directives.
+//if any problems are encountered (no error_page, no root or their combination does not point to a valid file) default error page will be used.
 std::string ServerRoutesConfig::serveCustomError(int status)
 {
    std::string path;

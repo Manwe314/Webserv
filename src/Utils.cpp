@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 18:42:38 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/10 18:54:09 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/11 20:23:22 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -207,6 +207,17 @@ std::string readFile(std::string full_name)
 
 //this fucntion converts an int to a string
 std::string intToString(int num)
+{
+    std::ostringstream oss;
+
+    oss << num;
+
+    return (oss.str());
+}
+
+//this fucntion converts an size_T to a string
+//i know about templates, but i dont want random data types causing problems here.
+std::string sizetToString(size_t num)
 {
     std::ostringstream oss;
 

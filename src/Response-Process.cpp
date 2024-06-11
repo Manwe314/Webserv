@@ -6,12 +6,36 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 16:59:31 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/10 21:46:14 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/11 23:04:19 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 
 #include "Response.hpp"
+#include "HeaderUtil.hpp"
+
+std::string Response::default404()
+{
+    std::string response;
+
+    response = "HTTP/1.1 404 Not Found \r\nServer: webserv/1.0.0 \r\nContent-Type: text/html \r\nContent-Length: 470 \r\nConnection: Keep-Alive \r\n";
+    response += getDateHeader();
+    response += "\r\n";
+    response += "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n<title>404 Not Found</title>\n<style>\nbody { font-family: Arial, sans-serif; text-align: center; padding: 50px; }\nh1 { font-size: 50px; }\np { font-size: 20px; }\n</style>\n</head>\n<body>\n<h1>404 Not Found</h1>\n<p>The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.</p>\n</body>\n</html>";
+    return (response);
+}
+
+std::string Response::headersProcess(std::string body, std::string path)
+{
+    std::string headers;
+    
+    headers += getServerHeader();
+    headers += getDateHeader();
+    headers += getRetryHeader(_status_code, TIMEOUT_SEC);
+    headers += getConnectionHeader();
+    headers += getContentHeaders(body.size(), path);
+    return (headers);
+}
 
 std::string Response::statusLineProcess()
 {
@@ -129,7 +153,6 @@ std::string Response::handleErrorResponse()
     try
     {
         /*
-        EM 931 WB
             so far matching is working. currantly i know of 2 issues that need fixing.
             1. when matching uri to location we just count how many chars match. this is not correct since if location is /HEYBOB 
                 and the uri is /HEYALICE the uri would match the location up to 4 chars, yet this is not correct since its just the 
@@ -142,6 +165,9 @@ std::string Response::handleErrorResponse()
         */
         config = matchSubRoute(_request_URI);
         status_line = statusLineProcess();
+        body = readFile(config.serveCustomError(_status_code));
+        headers = headersProcess(body, config.serveCustomError(_status_code));
+        error_response = status_line + headers + "\r\n" + body;
     }
     catch(const NoMatchFound& e)
     {
@@ -151,13 +177,18 @@ std::string Response::handleErrorResponse()
             _status_code = std::atoi(e.what());
             status_line = statusLineProcess();
             body = readFile(config.serveCustomError(std::atoi(e.what())));
+            headers = headersProcess(body, config.serveCustomError(std::atoi(e.what())));
+            error_response = status_line + headers + "\r\n" + body;
         }
         catch(const CouldNotOpenFile& e)
         {
-            body = "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n<title>404 Not Found</title>\n<style>\nbody { font-family: Arial, sans-serif; text-align: center; padding: 50px; }\nh1 { font-size: 50px; }\np { font-size: 20px; }\n</style>\n</head>\n<body>\n<h1>404 Not Found</h1>\n<p>The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.</p>\n</body>\n</html>";
+            error_response = default404();
         }
     }
-    error_response = "boobya\n";
+    catch(const CouldNotOpenFile& e)
+    {
+        error_response = default404();
+    }
     return error_response;
 }
 
@@ -165,10 +196,10 @@ std::string Response::process()
 {
     std::string response;
     
-    if (_status_code != -1)
+    if (_status_code == -1)
     {
-        response = handleErrorResponse();
+        _status_code = 404;
     }
-    response = "booya\n";
+    response = handleErrorResponse();
     return response;
 }

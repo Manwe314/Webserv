@@ -6,7 +6,7 @@
 #    By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/06/23 16:24:43 by lkukhale          #+#    #+#              #
-#    Updated: 2024/06/05 17:24:35 by lkukhale         ###   ########.fr        #
+#    Updated: 2024/06/11 20:58:27 by lkukhale         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,7 +15,7 @@
 NAME = webserv
 
 SRC = ${addsuffix .cpp, ./src/main ./src/Server ./src/Utils ./src/Config ./src/ConfigBase ./src/ServerConfig \
-						./src/ServerRoutesConfig ./src/Cluster ./src/Response ./src/Response-Process}
+						./src/ServerRoutesConfig ./src/Cluster ./src/Response ./src/Response-Process ./src/HeaderUtil}
 HEADERS = -I ./include/
 CC = c++
 RM = rm -f

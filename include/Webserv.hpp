@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 14:44:27 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/10 18:51:27 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/11 20:49:56 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,7 @@
 #include<unistd.h>
 #include<fcntl.h>
 #include<poll.h>
+#include<ctime>
 
 
 //C Network includes
@@ -78,6 +79,7 @@ void eraseRange(std::vector<std::string>& array, int start, int end, int flag = 
 int countMatchingChars(std::string first, std::string second, int pos = 0);
 std::string readFile(std::string full_name);
 std::string intToString(int num);
+std::string sizetToString(size_t num);
 void toLowerCase(std::string &str);
 
 

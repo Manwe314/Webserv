@@ -2,72 +2,12 @@ server {
     server_name kuxi
     listen localhost:8000
 
-    root ./kuxmeister
-
-    index kuxexa.kux kuxiti.kuxi kakashka.kashka
-
-    location /trollface/flie
-    {
-        allow_methods GET POST
-        root ./trollass
-        
-        location /second-file 
-        {
-            root babaganush
-            allow_methods POST
-            location /thrid-file
-            {
-                location / 
-                {
-                    root kuxiSALAMI
-                }
-                index heywhatsup
-            }
-            location /secret-second
-            {
-                allow_methods GET
-                location /hell
-                {
-                    index quite quite wellboy
-                }
-
-            }
-        }
-
-        location /one
-        {
-            root buba
-            location /one/piece 
-            {
-                index is-real
-            }
-            location /piece2
-            {
-                index is-unreal
-            }
-            location /one/zozo
-            {
-                index error404
-                location /one/zozo/zaza 
-                {
-                    allow_methods GET
-                    index timetosmoke
-                    location /one/zozo/zaza/hot
-                    {
-                        index box to-much
-                    }
-                }
-            }
-        }
-    }
-
-    location /smiledog {
-        index sexymazafaqa.se troll.html
-    }
-    
     location /
     {
-        root /tmp/www
+        root ./custom_err
+        error_page 400 /400.html
+        error_page 404 /404.html
+        index index.html
     }
 
 }
@@ -76,24 +16,23 @@ server {
     server_name giki
     listen localhost:8001
 
-    root ./gikski
-
-    location {
-        allow_methods POST
-        root ./kisstheskin
-        
-    }
-    location / 
+    location /
     {
-        root gikiSALAMI
+        root ./custom_err
+        error_page 400 /400.html
+        error_page 404 /404.html
+        index index.html
     }
 }
 
 server {
     server_name briki
     listen localhost:8002
-    location /not/root
+    location /
     {
-        root trollfacer
+        root ./custom_err
+        error_page 404 /404.html
+        error_page 400 /400.html
+        index index.html
     }
 }
