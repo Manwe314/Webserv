@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/08 23:20:55 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/11 21:03:25 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/12 22:29:45 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,22 +30,27 @@ private:
     std::string _request_URI;
     std::string _method;
     std::string _body;
+    std::string _path;
     int _status_code;
 
     void parseRequestLine(std::string request_line);
     void parseMessageHeaders(std::string message_headers);
     void parseMessageBody(std::string message_body);
+    
 
+    std::string processGET();
+    std::string statusLineProcess();
     std::string handleErrorResponse();
+    std::string headersProcess(std::string body, std::string path);
+    std::string serviceGetResource(ServerRoutesConfig config, std::string uri);
 public:
     Response(std::string request, ServerConfig config);
     ~Response();
     
     std::string process();
-    std::string statusLineProcess();
-    std::string headersProcess(std::string body, std::string path);
     std::string default404();
     ServerRoutesConfig matchSubRoute(std::string uri);
+    std::string makeFullPath(ServerRoutesConfig config, std::string uri);
 
     std::map<std::string, std::string> getHeaders() const;
     ServerConfig getServerConfig() const;

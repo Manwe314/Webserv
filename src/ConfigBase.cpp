@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/17 19:02:50 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/10 21:49:15 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/12 22:33:13 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,9 @@ static std::map<int, std::string> init_reason_phrases()
 {
     std::map<int, std::string> reason_phrases;
 
+    reason_phrases.insert(std::make_pair(200, "OK"));
     reason_phrases.insert(std::make_pair(400, "Bad Request"));
+    reason_phrases.insert(std::make_pair(403, "Forbidden"));
     reason_phrases.insert(std::make_pair(404, "Not Found"));
     reason_phrases.insert(std::make_pair(501, "Not Implemented"));
     reason_phrases.insert(std::make_pair(505, "HTTP Version Not Supported"));

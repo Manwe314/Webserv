@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 17:09:31 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/10 18:32:08 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/12 21:08:57 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,8 @@
         5. add a getter for all newly added member variables for this new rule.
         6. in the "<<" operator overload function add the necasarry functionality for the new member variables
         7. in the "=" operator overload function add the necasarry functionality for the new member variables
-        8. in the inherit function if theis new rule adds data that must be inherited by child routes add the required functinality.
+        8. in the inherit function if this new rule adds data that must be inherited by child routes add the required functinality.
+        9. in the Response class add all the functionality that is relevant to this new rule.
 */
 
 class ServerRoutesConfig;

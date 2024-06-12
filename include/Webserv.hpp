@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 14:44:27 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/11 20:49:56 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/12 22:19:10 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@
 #include<fcntl.h>
 #include<poll.h>
 #include<ctime>
+#include<sys/stat.h>
 
 
 //C Network includes
@@ -72,15 +73,16 @@ typedef struct s_host_port
 
 
 //Utility function declarations
+std::string intToString(int num);
+void toLowerCase(std::string &str);
+std::string sizetToString(size_t num);
+std::string readFile(std::string full_name);
+std::string readBinaryFile(const std::string &path);
 std::vector<std::string> split(std::string string, char delim);
 std::vector<std::string> split(std::string string, std::string delim);
-std::pair<int, int> encapsule(std::vector<std::string> array, std::string a, std::string b, int pos = 0);
-void eraseRange(std::vector<std::string>& array, int start, int end, int flag = 0);
 int countMatchingChars(std::string first, std::string second, int pos = 0);
-std::string readFile(std::string full_name);
-std::string intToString(int num);
-std::string sizetToString(size_t num);
-void toLowerCase(std::string &str);
+void eraseRange(std::vector<std::string>& array, int start, int end, int flag = 0);
+std::pair<int, int> encapsule(std::vector<std::string> array, std::string a, std::string b, int pos = 0);
 
 
 template <typename T>
@@ -99,13 +101,14 @@ void printMap(const std::map<Keytype, Valuetype>& map)
         std::cout << "Key: " << it->first << "Value: " << it->second << std::endl;
 }
 
-bool isValidVersion(std::string version);
-bool isInvalidVersion(std::string version);
-bool isValidHttpMethod(std::string method);
-bool isInvalidHttpMethod(std::string method);
-bool isValidHeader(std::string header);
-bool isValidFile(std::string file_path);
-
+bool isFile(const std::string& path);
+bool isValidHeader(std::string& header);
+bool isValidFile(std::string& file_path);
+bool isValidVersion(std::string& version);
+bool isDirectory(const std::string& path);
+bool isInvalidVersion(std::string& version);
+bool isValidHttpMethod(std::string& method);
+bool isInvalidHttpMethod(std::string& method);
 
 
 #endif

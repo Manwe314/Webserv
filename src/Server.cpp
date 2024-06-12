@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 16:12:04 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/11 21:23:58 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/12 22:46:05 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -150,7 +150,7 @@ void Server::process(int client_fd)
     response += " -with love, the ";
     response += _name;
     response += " Server\n";*/
-    std::cout << CYAN << "THE RESPONSE msg:\n" << responseio << DEFAULT << std::endl;
+    //std::cout << CYAN << "THE RESPONSE msg:\n" << responseio << DEFAULT << std::endl;
     _responses.insert(std::make_pair(client_fd, responseio));
 }
 

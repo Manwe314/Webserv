@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 18:42:38 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/11 20:23:22 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/12 22:18:55 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -226,10 +226,25 @@ std::string sizetToString(size_t num)
     return (oss.str());
 }
 
+std::string readBinaryFile(const std::string &path)
+{
+    std::string data;
+    std::ifstream file(path.c_str(), std::ios::binary);
+
+    if (!file.is_open())
+        throw CouldNotOpenFile();
+    
+    file.seekg(0, std::ios::end);
+    data.resize(file.tellg());
+    file.seekg(0, std::ios::beg);
+    file.read(&data[0], data.size());
+    return (data);
+}
+
 
 //this function returns true if a header line is formated correctly or false if its not.
 //only rule is that the string must start with a name that is between 33 and 126 asccii characters ending with a colon ":". after that its free game.
-bool isValidHeader(std::string header)
+bool isValidHeader(std::string& header)
 {
     size_t i;
     
@@ -248,7 +263,7 @@ bool isValidHeader(std::string header)
 	This function returns true if the given string is a valid http method
 	or false if it is anything else.
 */
-bool isValidHttpMethod(std::string method)
+bool isValidHttpMethod(std::string& method)
 {
 	/*
     	ConfigBase's member variable _http_methods
@@ -265,7 +280,7 @@ bool isValidHttpMethod(std::string method)
 	This function returns true if the given string is an invalid (unsupported) http method,
 	false if it's anything else.
 */
-bool isInvalidHttpMethod(std::string method)
+bool isInvalidHttpMethod(std::string& method)
 {
     if (method.compare("OPTIONS") == 0 || method.compare("HEAD") == 0 || method.compare("PUT") == 0)
         return (true);
@@ -279,7 +294,7 @@ bool isInvalidHttpMethod(std::string method)
 	This function returns true if the given string is a supported http version,
 	or false if it's anything else.
 */
-bool isValidVersion(std::string version)
+bool isValidVersion(std::string& version)
 {
     if (version.compare("HTTP/1.0") == 0 || version.compare("HTTP/1.1") == 0)
         return (true);
@@ -290,7 +305,7 @@ bool isValidVersion(std::string version)
 	This function returns true if the given string is a non supported http version,
 	or false if it's anything else;
 */
-bool isInvalidVersion(std::string version)
+bool isInvalidVersion(std::string& version)
 {
     if (version.compare("HTTP/0.9") == 0 || version.compare("HTTP/3.0") == 0 || version.compare("HTTP/2.0") == 0)
         return (true);
@@ -301,12 +316,35 @@ bool isInvalidVersion(std::string version)
     this function returns true if the given file path points to a valid, readable file
     or false if it dosent.
 */
-bool isValidFile(std::string file_path)
+bool isValidFile(std::string& file_path)
 {
     std::ifstream file(file_path.c_str());
     return file.is_open();
 }
 
+/*
+    this function returns true if a given path point to a directory
+    or false if it doesnt or if path is invalid.
+*/
+bool isDirectory(const std::string& path)
+{
+    struct stat stat_buffer;
+    if (stat(path.c_str(), &stat_buffer) != 0)
+        return (false);
+    return (S_ISDIR(stat_buffer.st_mode));
+}
+
+/*
+    this function returns true if a given path points to a file
+    or false if it doesnt or if path is invalid
+*/
+bool isFile(const std::string& path)
+{
+    struct stat stat_buffer;
+    if (stat(path.c_str(), &stat_buffer) != 0)
+        return (false);
+    return (S_ISREG(stat_buffer.st_mode));
+}
 
 
 static void printRouteConfig(std::vector<ServerRoutesConfig> routes)

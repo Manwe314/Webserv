@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 16:59:31 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/11 23:04:19 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/12 22:41:43 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 #include "Response.hpp"
 #include "HeaderUtil.hpp"
 
+//the most default 404 http response that is hard coded so if everything else fails there is at leas something to respond with.
 std::string Response::default404()
 {
     std::string response;
@@ -25,6 +26,7 @@ std::string Response::default404()
     return (response);
 }
 
+//this function builds and returns the headers feild of a http response
 std::string Response::headersProcess(std::string body, std::string path)
 {
     std::string headers;
@@ -37,6 +39,7 @@ std::string Response::headersProcess(std::string body, std::string path)
     return (headers);
 }
 
+//this function builds and returns the status line of a http response
 std::string Response::statusLineProcess()
 {
     std::string status_line;
@@ -116,42 +119,30 @@ ServerRoutesConfig Response::matchSubRoute(std::string uri)
     return (*match);
 }
 
+std::string Response::makeFullPath(ServerRoutesConfig config, std::string uri)
+{
+    std::string path;
+    
+    path = config.getRoot();
+    
+    if (path.empty())
+        throw NoMatchFound("404");
+    if (uri[0] != '/')
+        throw NoMatchFound("400");
+    if (path[(path.size() - 1)] == '/')
+        path.erase(path.size() - 1, 1);
+    path += uri;
+    return (path);
+}
+
+//this function returns the std::string response according to error code, or an empty string if the status cod eis not an error (4XX or 5XX)
 std::string Response::handleErrorResponse()
 {
     std::string error_response;
     std::string status_line;
     std::string headers;
     std::string body;
-    std::string default_error = DEFAULT_ERROR;
     ServerRoutesConfig config;
-    
-    if (_status_code / 100 != 4 && _status_code / 100 != 5)
-        return (std::string(""));
-        /*
-        if the request URI is intangable use default error pages path defined by DEFAULT_ERROR. and in this case its always 400 so its 
-        DEFULT_ERROR + "/400_err.html" file. 
-
-        next case would be an error with a valid URI so match it to a location.
-        correct location is one that matches THE MOST. use its root or any root defined above it. 
-        
-        try to make location matching as uneversal as possible to reuse it multiple times. 
-        
-        if there is no custom error page set use a defualt one. if that is also not found default to 404 again.
-        this 404 willl be hard coded as a string in code so at the very least it will always be avalable to show.
-
-        after the apropriate file is found we will also need to make the appopriate headers:
-
-        date:, server:, content-type:, content-lenght, connection, retry-after:. 
-
-        after all the headers are made we need to make the status line which is: HTTP vesrion sp code sp text CRLF
-
-        to make text easy we can use CONFIGBASE class since there is a preset amount of code we can get and their text is predefined. 
-
-        adding an empty line CRLFCRLF at the end of headers compleates the error response. 
-        */
-
-    try
-    {
         /*
             so far matching is working. currantly i know of 2 issues that need fixing.
             1. when matching uri to location we just count how many chars match. this is not correct since if location is /HEYBOB 
@@ -163,6 +154,19 @@ std::string Response::handleErrorResponse()
                 serverwide. correctly nested route should inherit from its parent that has inherited from serverwide. this is important since
                 if the parent and the serverwide have same directives but the child doesnt the child should get its parents version and not the serverwide one.
         */
+    
+    if (_status_code / 100 != 4 && _status_code / 100 != 5)
+        return (std::string(""));
+    try
+    {
+        /*
+            1. get the relevand config by matching the URI with a route
+            2. get the Status line (http version SP code SP reason phrase CRLF)
+            3. get the relevant body I.E html page. the ServerRoutesConfig's member function serveCustomError(int)
+                will return the custom error page filepath if there is one or default error page if there is no custom error.
+            4. get the headers (key: value CRLF);
+            5. build the response by stiching status line and headers, adding an empty line and then the body.
+        */
         config = matchSubRoute(_request_URI);
         status_line = statusLineProcess();
         body = readFile(config.serveCustomError(_status_code));
@@ -171,9 +175,11 @@ std::string Response::handleErrorResponse()
     }
     catch(const NoMatchFound& e)
     {
+        //if a matching route cant be found use serverwide configuration.
         config = _server_config.getServerWideConfig();
         try
         {
+            //route matching's failure results in eaither 404 or 400. e.what() equals one of these values in string form. (if status line fails it equals 500)
             _status_code = std::atoi(e.what());
             status_line = statusLineProcess();
             body = readFile(config.serveCustomError(std::atoi(e.what())));
@@ -182,6 +188,7 @@ std::string Response::handleErrorResponse()
         }
         catch(const CouldNotOpenFile& e)
         {
+            //if the error file cant be opened use a hard coded 404 message.
             error_response = default404();
         }
     }
@@ -192,14 +199,97 @@ std::string Response::handleErrorResponse()
     return error_response;
 }
 
+std::string Response::serviceGetResource(ServerRoutesConfig config, std::string uri)
+{
+    std::string body;
+    std::string path;
+    std::string type;
+    std::vector<std::string> index;
+
+    path = uri;
+    
+    if (isDirectory(uri)) // autoindex should be considered here
+    {
+        if (uri[uri.size() - 1] != '/')
+            uri += "/";
+        index = config.getIndex();
+        if (!index.empty())
+        {
+            for (std::vector<std::string>::iterator it = index.begin(); it != index.end(); it++)
+            {
+                path = uri + (*it);
+                if (isValidFile(path))
+                    break;
+            }
+        }
+        else
+            throw NoMatchFound("403"); //some auto index stuff here. 
+    }
+
+    if (!isValidFile(path) && isDirectory(uri))
+         throw NoMatchFound("404"); //some auto index stuff here 2
+    if (!isValidFile(path) && !isDirectory(uri))
+        throw NoMatchFound("404");
+    type = path.substr(path.rfind(".") + 1);
+    try
+    {
+        if (type == "jpeg" || type == "jpg" || type == "png" || type == "bmp" || type == "svg")
+        {
+            body = readBinaryFile(path);
+        }
+        else
+        {
+            body = readFile(path);
+        }
+        _path = path;
+    }
+    catch(const CouldNotOpenFile& e)
+    {
+        throw NoMatchFound("404");
+    }
+    return (body);
+}
+
+std::string Response::processGET()
+{
+    ServerRoutesConfig config;
+    std::string response;
+    std::string status_line;
+    std::string headers;
+    std::string body;
+    
+    try
+    {
+        config = matchSubRoute(_request_URI);
+        body = serviceGetResource(config, makeFullPath(config, _request_URI));
+        _status_code = 200;
+        headers = headersProcess(body, _path);
+        status_line = statusLineProcess();
+        response = status_line + headers + "\r\n" + body;
+    }
+    catch(const NoMatchFound& e)
+    {
+        _status_code = std::atoi(e.what());
+        response = handleErrorResponse();
+    }
+    return (response);
+}
+
 std::string Response::process()
 {
     std::string response;
     
-    if (_status_code == -1)
+    if (_status_code != -1)
     {
-        _status_code = 404;
+        response = handleErrorResponse();
+        return response;
     }
-    response = handleErrorResponse();
+    if (_method == "GET")
+        response = processGET();
+    else
+    {
+        std::cout << YELLOW << "\n(NOT A GET REQUEST)" << DEFAULT << std::endl;
+        response = default404();
+    }
     return response;
 }

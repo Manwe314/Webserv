@@ -4,9 +4,10 @@ server {
 
     location /
     {
-        root ./custom_err
+        root ./wsite
         error_page 400 /400.html
         error_page 404 /404.html
+        error_page 403 /403.html
         index index.html
     }
 
@@ -18,9 +19,10 @@ server {
 
     location /
     {
-        root ./custom_err
+        root ./wsite
         error_page 400 /400.html
         error_page 404 /404.html
+        error_page 403 /403.html
         index index.html
     }
 }
@@ -30,9 +32,10 @@ server {
     listen localhost:8002
     location /
     {
-        root ./custom_err
-        error_page 404 /404.html
+        root ./wsite
         error_page 400 /400.html
+        error_page 404 /404.html
+        error_page 403 /403.html
         index index.html
     }
 }
