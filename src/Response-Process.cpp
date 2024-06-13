@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 16:59:31 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/12 22:41:43 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/14 01:21:37 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,8 @@ std::string Response::headersProcess(std::string body, std::string path)
     headers += getDateHeader();
     headers += getRetryHeader(_status_code, TIMEOUT_SEC);
     headers += getConnectionHeader();
-    headers += getContentHeaders(body.size(), path);
+    if (body != "")
+        headers += getContentHeaders(body.size(), path);
     return (headers);
 }
 
@@ -261,11 +262,60 @@ std::string Response::processGET()
     try
     {
         config = matchSubRoute(_request_URI);
+        if (!isAllowed(config.getMethods() ,_method))
+        {
+            _status_code = 405;
+            return (handleErrorResponse());
+        }
         body = serviceGetResource(config, makeFullPath(config, _request_URI));
         _status_code = 200;
         headers = headersProcess(body, _path);
         status_line = statusLineProcess();
         response = status_line + headers + "\r\n" + body;
+    }
+    catch(const NoMatchFound& e)
+    {
+        _status_code = std::atoi(e.what());
+        response = handleErrorResponse();
+    }
+    return (response);
+}
+
+std::string Response::processDELETE()
+{
+    ServerRoutesConfig config;
+    std::string response;
+    std::string status_line;
+    std::string headers;
+    std::string body;
+
+    try
+    {
+        config = matchSubRoute(_request_URI);
+        if (!isAllowed(config.getMethods(), _method))
+        {
+            _status_code = 405;
+            return (handleErrorResponse());
+        }
+        if (isFile(makeFullPath(config, _request_URI)))
+        {
+            if (remove(makeFullPath(config, _request_URI).c_str()) == 0)
+                _status_code = 204;
+            else
+            {
+                _status_code = 403;
+                return (handleErrorResponse());
+            }
+        }
+        else
+        {
+            _status_code = 404;
+            return (handleErrorResponse());
+        }
+        body = "";
+        status_line = statusLineProcess();
+        headers = headersProcess(body, _request_URI);
+        response = status_line + headers + "\r\n";
     }
     catch(const NoMatchFound& e)
     {
@@ -286,6 +336,8 @@ std::string Response::process()
     }
     if (_method == "GET")
         response = processGET();
+    else if (_method == "DELETE")
+        response = processDELETE();
     else
     {
         std::cout << YELLOW << "\n(NOT A GET REQUEST)" << DEFAULT << std::endl;

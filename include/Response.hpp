@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/08 23:20:55 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/12 22:29:45 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/14 01:06:22 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@ private:
     
 
     std::string processGET();
+    std::string processDELETE();
     std::string statusLineProcess();
     std::string handleErrorResponse();
     std::string headersProcess(std::string body, std::string path);

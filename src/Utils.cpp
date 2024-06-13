@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 18:42:38 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/12 22:18:55 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/13 18:34:12 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -344,6 +344,20 @@ bool isFile(const std::string& path)
     if (stat(path.c_str(), &stat_buffer) != 0)
         return (false);
     return (S_ISREG(stat_buffer.st_mode));
+}
+
+/*
+    this function returns true if the method string is in the allow_methods vector (return true if vector is empty)
+    or false if it isnt.
+*/
+bool isAllowed(const std::vector<std::string>& allowed_methods, std::string &method)
+{
+    if (allowed_methods.empty())
+        return (true);
+    for (std::vector<std::string>::const_iterator i = allowed_methods.begin(); i != allowed_methods.end(); i++)
+        if ((*i).compare(method) == 0)
+            return (true);
+    return (false);
 }
 
 

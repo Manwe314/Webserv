@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 14:44:27 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/12 22:19:10 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/14 01:12:38 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,11 +34,12 @@
 
 
 //C includes
+#include<sys/stat.h>
 #include<unistd.h>
 #include<fcntl.h>
 #include<poll.h>
+#include<cstdio>
 #include<ctime>
-#include<sys/stat.h>
 
 
 //C Network includes
@@ -109,6 +110,7 @@ bool isDirectory(const std::string& path);
 bool isInvalidVersion(std::string& version);
 bool isValidHttpMethod(std::string& method);
 bool isInvalidHttpMethod(std::string& method);
+bool isAllowed(const std::vector<std::string>& allowed_methods, std::string &method);
 
 
 #endif
