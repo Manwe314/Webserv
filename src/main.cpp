@@ -6,7 +6,7 @@
 /*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 14:52:28 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/17 17:28:09 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/06/17 17:38:09 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,6 @@ void printConfig(Config conf);
 int main(int argc, char *argv[], char **envp)
 {
     ConfigBase base;
-    std::vector<ServerConfig> servers;
 
     if (argc != 2)
     {
@@ -30,9 +29,8 @@ int main(int argc, char *argv[], char **envp)
     try
     {
         Config configuration(argv[1]);
-        servers = configuration.getServerConfigs();
-		//printConfig(configuration);
-        Cluster cluster(configuration);
+		printConfig(configuration);
+        Cluster cluster(configuration, envp);
         cluster.run();
     }
     catch(const std::exception& e)
