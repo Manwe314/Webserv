@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 18:42:38 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/04 14:31:00 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/06/13 18:34:12 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,17 +56,6 @@ std::vector<std::string> split(std::string string, std::string delim)
         tokens.push_back(token);
     }
     return (tokens);
-}
-
-bool IsFirstAfterWhitespace(std::string string, int pos)
-{
-    for (int i = 0; i < pos; i++)
-    {
-        if (string[i] != ' ' && string[i] != 9 && string[i] != '\n')
-            return (false);
-    }
-    return (true);
-    
 }
 
 /*
@@ -170,9 +159,92 @@ void toLowerCase(std::string &str)
     }
 }
 
+
+//this function count how many characters match until it doesnt starting from pos (default 0), between first and second strings.
+int countMatchingChars(std::string first, std::string second, int pos)
+{
+    int count;
+    int min_size;
+
+    count = 0;
+    min_size = std::min(first.size(), second.size());
+    
+    if (pos > min_size)
+        return (-1);
+    for (int i = pos; i < min_size; i++)
+    {
+        if (first[i] == second[i])
+            count++;
+        else
+            break;
+    }
+    return (count);
+}
+
+//Function to read an entire file into a single string (including new line characters).
+std::string readFile(std::string full_name)
+{
+    //Open file, make a string stream object and a string variable to read lines into.
+    std::ifstream file(full_name.c_str());
+    std::ostringstream string_stream;
+    std::string line;
+    
+    //If the file cant be opened throw an exception.
+    if (!file.is_open())
+        throw CouldNotOpenFile();
+    /*
+    	Read while there are lines to read and build up the string stream object
+		line by line making sure to add newline characters
+	*/
+    while (std::getline(file, line))
+        string_stream << line << '\n';
+    //Close the file    
+    file.close();
+
+    //Trunc the object into a string and return it.
+    return (string_stream.str());
+}
+
+//this fucntion converts an int to a string
+std::string intToString(int num)
+{
+    std::ostringstream oss;
+
+    oss << num;
+
+    return (oss.str());
+}
+
+//this fucntion converts an size_T to a string
+//i know about templates, but i dont want random data types causing problems here.
+std::string sizetToString(size_t num)
+{
+    std::ostringstream oss;
+
+    oss << num;
+
+    return (oss.str());
+}
+
+std::string readBinaryFile(const std::string &path)
+{
+    std::string data;
+    std::ifstream file(path.c_str(), std::ios::binary);
+
+    if (!file.is_open())
+        throw CouldNotOpenFile();
+    
+    file.seekg(0, std::ios::end);
+    data.resize(file.tellg());
+    file.seekg(0, std::ios::beg);
+    file.read(&data[0], data.size());
+    return (data);
+}
+
+
 //this function returns true if a header line is formated correctly or false if its not.
 //only rule is that the string must start with a name that is between 33 and 126 asccii characters ending with a colon ":". after that its free game.
-bool isValidHeader(std::string header)
+bool isValidHeader(std::string& header)
 {
     size_t i;
     
@@ -191,7 +263,7 @@ bool isValidHeader(std::string header)
 	This function returns true if the given string is a valid http method
 	or false if it is anything else.
 */
-bool isValidHttpMethod(std::string method)
+bool isValidHttpMethod(std::string& method)
 {
 	/*
     	ConfigBase's member variable _http_methods
@@ -208,7 +280,7 @@ bool isValidHttpMethod(std::string method)
 	This function returns true if the given string is an invalid (unsupported) http method,
 	false if it's anything else.
 */
-bool isInvalidHttpMethod(std::string method)
+bool isInvalidHttpMethod(std::string& method)
 {
     if (method.compare("OPTIONS") == 0 || method.compare("HEAD") == 0 || method.compare("PUT") == 0)
         return (true);
@@ -222,7 +294,7 @@ bool isInvalidHttpMethod(std::string method)
 	This function returns true if the given string is a supported http version,
 	or false if it's anything else.
 */
-bool isValidVersion(std::string version)
+bool isValidVersion(std::string& version)
 {
     if (version.compare("HTTP/1.0") == 0 || version.compare("HTTP/1.1") == 0)
         return (true);
@@ -233,24 +305,61 @@ bool isValidVersion(std::string version)
 	This function returns true if the given string is a non supported http version,
 	or false if it's anything else;
 */
-bool isInvalidVersion(std::string version)
+bool isInvalidVersion(std::string& version)
 {
     if (version.compare("HTTP/0.9") == 0 || version.compare("HTTP/3.0") == 0 || version.compare("HTTP/2.0") == 0)
         return (true);
     return (false);
-    
 }
 
-//Prints a string vector
-void printVector(std::vector<std::string> arr)
+/*
+    this function returns true if the given file path points to a valid, readable file
+    or false if it dosent.
+*/
+bool isValidFile(std::string& file_path)
 {
-    std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
-    for (std::vector<std::string>::iterator i = arr.begin(); i != arr.end(); i++)
-    {
-        std::cout << *i << std::endl;
-    }
-    std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
+    std::ifstream file(file_path.c_str());
+    return file.is_open();
 }
+
+/*
+    this function returns true if a given path point to a directory
+    or false if it doesnt or if path is invalid.
+*/
+bool isDirectory(const std::string& path)
+{
+    struct stat stat_buffer;
+    if (stat(path.c_str(), &stat_buffer) != 0)
+        return (false);
+    return (S_ISDIR(stat_buffer.st_mode));
+}
+
+/*
+    this function returns true if a given path points to a file
+    or false if it doesnt or if path is invalid
+*/
+bool isFile(const std::string& path)
+{
+    struct stat stat_buffer;
+    if (stat(path.c_str(), &stat_buffer) != 0)
+        return (false);
+    return (S_ISREG(stat_buffer.st_mode));
+}
+
+/*
+    this function returns true if the method string is in the allow_methods vector (return true if vector is empty)
+    or false if it isnt.
+*/
+bool isAllowed(const std::vector<std::string>& allowed_methods, std::string &method)
+{
+    if (allowed_methods.empty())
+        return (true);
+    for (std::vector<std::string>::const_iterator i = allowed_methods.begin(); i != allowed_methods.end(); i++)
+        if ((*i).compare(method) == 0)
+            return (true);
+    return (false);
+}
+
 
 static void printRouteConfig(std::vector<ServerRoutesConfig> routes)
 {
@@ -258,7 +367,7 @@ static void printRouteConfig(std::vector<ServerRoutesConfig> routes)
         {
             for (std::vector<ServerRoutesConfig>::iterator i4 = routes.begin(); i4 != routes.end(); i4++)
             {
-                std::cout << "--ROUTE--" << std::endl;
+                std::cout << MAGENTA << "--ROUTE--" << DEFAULT << std::endl;
                 std::cout << "Root: " << (*i4).getRoot() << std::endl;
                 std::cout << "Location: " << (*i4).getLocation() << std::endl;
                 std::cout << "Index Files:";
@@ -280,11 +389,11 @@ static void printRouteConfig(std::vector<ServerRoutesConfig> routes)
                 std::vector<ServerRoutesConfig> sub = (*i4).getSubRoutes();
                 if (!sub.empty())
                 {
-                    std::cout << "+SUB+" << std::endl;
+                    std::cout << LAVENDER << "+SUB+" << DEFAULT << std::endl;
                     printRouteConfig(sub);
-                    std::cout << "+++++" << std::endl;
+                    std::cout << LAVENDER << "+++++" << DEFAULT << std::endl;
                 }
-                std::cout << "---------" << std::endl;
+                std::cout << MAGENTA << "---------" << DEFAULT << std::endl;
             }
         } 
 }

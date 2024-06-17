@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 16:12:04 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/04 14:26:59 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/06/12 22:46:05 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -133,9 +133,9 @@ void Server::receive(int client_fd)
             throw ClientConnectionError("Read error: Connection closed in the server named: " + _name);
     }
     _requests[client_fd] += std::string(buffer);
-    std::cout << "~~~~~~~~~~~~~message~~~~~~~~~~~~~" << std::endl;
+    std::cout << YELLOW << "\n~~~~~~~~~~~~~message~~~~~~~~~~~~~" << DEFAULT <<std::endl;
     std::cout << std::string(buffer) << std::endl;
-    std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
+    std::cout << YELLOW << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << DEFAULT << std::endl;
 }
 
 //So far the functionality of this server simply echos back with extra text
@@ -143,13 +143,14 @@ void Server::process(int client_fd)
 {
     Response response(_requests[client_fd], _config);
     
-    std::cout << "THE RESPONSE:\n" << response << std::endl;
-    std::string responseio = "booya\n";
+    std::cout << MAGENTA << "THE RESPONSE object:\n" << response << DEFAULT << std::endl;
+    std::string responseio = response.process();
     
    /* response = _requests[client_fd];
     response += " -with love, the ";
     response += _name;
     response += " Server\n";*/
+    //std::cout << CYAN << "THE RESPONSE msg:\n" << responseio << DEFAULT << std::endl;
     _responses.insert(std::make_pair(client_fd, responseio));
 }
 

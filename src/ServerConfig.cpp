@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerConfig.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/24 21:44:05 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/04 14:27:48 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/06/08 03:05:25 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,7 @@ t_host_port ServerConfig::initHostPort(std::vector<std::string> server_block)
         pair.host = host;
         pair.port = std::atoi(array[4].c_str());
     }
-    // std::cout << BLUE << "HOST: " << DEFAULT << pair.host << BLUE << " PORT: " \
+    // std::cout << BLUE << "HOST: " << DEFAULT << pair.host << BLUE << " PORT: "
 	// << DEFAULT << pair.port << std::endl;
     return (pair);
 }
@@ -230,6 +230,26 @@ ServerConfig::ServerConfig()
 ServerConfig::~ServerConfig()
 {
     
+}
+
+
+//this function searches through the routes declared in a server and finds the firs instance of root route that is location followed by "/".
+ServerRoutesConfig* ServerConfig::findRootSubRoute()
+{
+    ServerRoutesConfig* root;
+
+    //if the server has no route block there is no root route.
+    if (_route_configs.empty())
+        return (NULL);
+    //check each route in the server with their memeber function that also check ALL of their children.
+    for (std::vector<ServerRoutesConfig>::iterator it = _route_configs.begin(); it != _route_configs.end(); it++)
+    {
+        //since we loop over from the begining and since each route also checks their children in order first non null pointer returned will be the first root  route declared.
+        root = (*it).findRootRoute();
+        if (root != NULL)
+            return (root);
+    }
+    return (NULL);
 }
 
 ServerConfig& ServerConfig::operator=(const ServerConfig& rhs)

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/08 23:20:55 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/04 14:21:40 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/06/14 01:06:22 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,14 +30,28 @@ private:
     std::string _request_URI;
     std::string _method;
     std::string _body;
+    std::string _path;
     int _status_code;
 
     void parseRequestLine(std::string request_line);
     void parseMessageHeaders(std::string message_headers);
     void parseMessageBody(std::string message_body);
+    
+
+    std::string processGET();
+    std::string processDELETE();
+    std::string statusLineProcess();
+    std::string handleErrorResponse();
+    std::string headersProcess(std::string body, std::string path);
+    std::string serviceGetResource(ServerRoutesConfig config, std::string uri);
 public:
     Response(std::string request, ServerConfig config);
     ~Response();
+    
+    std::string process();
+    std::string default404();
+    ServerRoutesConfig matchSubRoute(std::string uri);
+    std::string makeFullPath(ServerRoutesConfig config, std::string uri);
 
     std::map<std::string, std::string> getHeaders() const;
     ServerConfig getServerConfig() const;
@@ -46,6 +60,16 @@ public:
     std::string getMethod() const;
     std::string getBody() const;
     int getStatusCode() const;
+};
+
+class NoMatchFound : public std::exception
+{
+    private:
+        std::string msg;
+    public:
+        NoMatchFound(const std::string& msg) : msg(msg) {}
+        virtual const char* what() const throw();
+        virtual ~NoMatchFound() throw() {}
 };
 
 std::ostream& operator<<(std::ostream& obj, Response const &response);

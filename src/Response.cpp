@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/08 23:27:16 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/04 14:25:17 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/06/08 02:33:25 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -183,6 +183,9 @@ void Response::parseRequestLine(std::string request_line)
         _status_code = 400;
         return ;
     }
+    _method = split_request_line[0];
+    _request_URI = split_request_line[1];
+    _http_version = split_request_line[2];
 	/*
 		If the first part of the string is not an http method, the request is invalid.
 	*/
@@ -218,9 +221,6 @@ void Response::parseRequestLine(std::string request_line)
         _status_code = 505;
         return ;
     }
-    _method = split_request_line[0];
-    _request_URI = split_request_line[1];
-    _http_version = split_request_line[2];
 }
 
 Response::~Response()
@@ -257,6 +257,11 @@ int Response::getStatusCode() const
     return (_status_code);
 }
 
+const char * NoMatchFound::what() const throw()
+{
+	return (msg.c_str());
+}
+
 std::ostream& operator<<(std::ostream& obj, Response const &response)
 {
     std::map<std::string, std::string> map = response.getHeaders();
@@ -268,7 +273,7 @@ std::ostream& operator<<(std::ostream& obj, Response const &response)
     obj << response.getURI();
     obj << " version: "; 
     obj << response.getHttpVersion();
-    obj << " headers\n";
+    obj << "\nheaders:\n";
     for (std::map<std::string, std::string>::iterator it = map.begin(); it != map.end(); it++)
     {
         obj << "key: "; 

@@ -65,18 +65,27 @@ server {
 
 server {
     server_name giki
-    listen localhost:8000
+    listen localhost:8001
 
-    root ./gikski
-
-    location {
-        allow_methods POST
-        root ./kisstheskin
-        
+    location /
+    {
+        root ./wsite
+        error_page 400 /400.html
+        error_page 404 /404.html
+        error_page 403 /403.html
+        index index.html
     }
 }
 
 server {
     server_name briki
     listen localhost:8002
+    location /
+    {
+        root ./wsite
+        error_page 400 /400.html
+        error_page 404 /404.html
+        error_page 403 /403.html
+        index index.html
+    }
 }

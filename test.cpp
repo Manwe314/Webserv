@@ -1,14 +1,16 @@
 #include "Webserv.hpp"
 
+
 int main()
 {
-    std::map<std::string, std::string> mymap;
+    std::time_t raw_time;
+    std::time(&raw_time);
 
-    mymap.insert(std::make_pair("hi", "henlo"));
+    std::tm* gmt_time = std::gmtime(&raw_time);
 
-    mymap["hi"] += " , I AM A GLODEN GOD!";
-
-    std::cout << mymap["hi"] << std::endl;
-
+    char  buffer[80];
+    std::strftime(buffer, sizeof(buffer), "%a, %d %b %Y %H:%M:%S GMT", gmt_time);
+    
+    std::cout << YELLOW << std::string(buffer) << std::endl;
     return 0;
 }

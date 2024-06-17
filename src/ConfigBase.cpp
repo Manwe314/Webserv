@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/17 19:02:50 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/05/16 21:35:59 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/14 01:08:36 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@ static std::vector<std::string> init_rules()
     rules.push_back("allow_methods");
     rules.push_back("root");
     rules.push_back("index");
+    rules.push_back("error_page");
     
     return (rules);
 }
@@ -50,6 +51,23 @@ static std::vector<std::string> init_valid_headers()
     return (valid_headers);
 }
 
+static std::map<int, std::string> init_reason_phrases()
+{
+    std::map<int, std::string> reason_phrases;
+
+    reason_phrases.insert(std::make_pair(200, "OK"));
+    reason_phrases.insert(std::make_pair(204, "No Content"));
+    reason_phrases.insert(std::make_pair(400, "Bad Request"));
+    reason_phrases.insert(std::make_pair(403, "Forbidden"));
+    reason_phrases.insert(std::make_pair(404, "Not Found"));
+    reason_phrases.insert(std::make_pair(405, "Method Not Allowed"));
+    reason_phrases.insert(std::make_pair(501, "Not Implemented"));
+    reason_phrases.insert(std::make_pair(505, "HTTP Version Not Supported"));
+    reason_phrases.insert(std::make_pair(500, "Internal Server Error"));
+
+    return (reason_phrases);
+}
+
 ConfigBase::ConfigBase()
 {
 
@@ -63,3 +81,4 @@ ConfigBase::~ConfigBase()
 const std::vector<std::string> ConfigBase::_rules = init_rules();
 const std::vector<std::string> ConfigBase::_http_methods = init_http_methods();
 const std::vector<std::string> ConfigBase::_valid_headers = init_valid_headers();
+const std::map<int, std::string> ConfigBase::_reason_phrases = init_reason_phrases();

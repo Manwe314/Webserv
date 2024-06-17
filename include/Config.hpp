@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Config.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 19:33:28 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/05/30 16:47:47 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/06/10 18:01:50 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,8 +53,6 @@ private:
 public:
     Config(std::string path_to_config);
     ~Config();
-
-    std::string readFile(std::string full_name);
 
     std::vector<ServerConfig> getServerConfigs() const;
 

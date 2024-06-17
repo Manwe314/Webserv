@@ -6,7 +6,7 @@
 /*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 14:44:27 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/05 17:00:47 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/06/17 17:27:53 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,12 +31,16 @@
 #include<vector>
 #include<list>
 #include<map>
+#include<stack>
 
 
 //C includes
+#include<sys/stat.h>
 #include<unistd.h>
 #include<fcntl.h>
 #include<poll.h>
+#include<cstdio>
+#include<ctime>
 
 
 //C Network includes
@@ -50,6 +54,7 @@
 #define REQUEST_MAX 1000
 #define MAX_EVENTS 1000
 #define TIMEOUT_SEC 2
+#define DEFAULT_ERROR "/home/manwe/42/commonCoreS2/webserv/error_pages"
 
 //Colours for readbility
 #define DEFAULT "\033[0m"
@@ -69,15 +74,27 @@ typedef struct s_host_port
 
 
 
-
-
 //Utility function declarations
+std::string intToString(int num);
+void toLowerCase(std::string &str);
+std::string sizetToString(size_t num);
+std::string readFile(std::string full_name);
+std::string readBinaryFile(const std::string &path);
 std::vector<std::string> split(std::string string, char delim);
 std::vector<std::string> split(std::string string, std::string delim);
-bool IsFirstAfterWhitespace(std::string string, int pos);
-std::pair<int, int> encapsule(std::vector<std::string> array, std::string a, std::string b, int pos = 0);
+int countMatchingChars(std::string first, std::string second, int pos = 0);
 void eraseRange(std::vector<std::string>& array, int start, int end, int flag = 0);
-void printVector(std::vector<std::string> arr);
+std::pair<int, int> encapsule(std::vector<std::string> array, std::string a, std::string b, int pos = 0);
+
+
+template <typename T>
+void printVector(const std::vector<T>& arr)
+{
+    typename std::vector<T>::const_iterator it;
+    for (it = arr.begin(); it != arr.end(); it++)
+        std::cout << MAGENTA << *it << DEFAULT << std::endl;
+}
+
 template <typename Keytype, typename Valuetype>
 void printMap(const std::map<Keytype, Valuetype>& map)
 {
@@ -85,13 +102,16 @@ void printMap(const std::map<Keytype, Valuetype>& map)
     for (it = map.begin(); it != map.end(); it++)
         std::cout << "Key: " << it->first << "Value: " << it->second << std::endl;
 }
-void toLowerCase(std::string &str);
-bool isValidVersion(std::string version);
-bool isInvalidVersion(std::string version);
-bool isValidHttpMethod(std::string method);
-bool isInvalidHttpMethod(std::string method);
-bool isValidHeader(std::string header);
-bool isValidCgiFile( std::string const & file );
+
+bool isFile(const std::string& path);
+bool isValidHeader(std::string& header);
+bool isValidFile(std::string& file_path);
+bool isValidVersion(std::string& version);
+bool isDirectory(const std::string& path);
+bool isInvalidVersion(std::string& version);
+bool isValidHttpMethod(std::string& method);
+bool isInvalidHttpMethod(std::string& method);
+bool isAllowed(const std::vector<std::string>& allowed_methods, std::string &method);
 
 
 #endif
