@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 16:59:31 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/14 01:21:37 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/18 17:38:56 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,6 +122,7 @@ ServerRoutesConfig Response::matchSubRoute(std::string uri)
 
 std::string Response::makeFullPath(ServerRoutesConfig config, std::string uri)
 {
+    //alias directivve functionality could be added here
     std::string path;
     
     path = config.getRoot();
@@ -325,6 +326,91 @@ std::string Response::processDELETE()
     return (response);
 }
 
+static bool hasUnimplementedContent(std::map<std::string, std::string> headers)
+{
+    std::map<std::string, std::string>::iterator it;
+
+    it = headers.find("content-encoding");
+    if (it != headers.end())
+        return (true);
+    it = headers.find("content-md5");
+    if (it != headers.end())
+        return (true);
+    it = headers.find("content-range");
+    if (it != headers.end())
+        return (true);
+    return (false);
+    
+}
+
+std::string Response::processPUT()
+{
+    ServerRoutesConfig config;
+    std::string path;
+    std::string status_line;
+    std::string headers;
+    std::string response;
+
+    try
+    {
+        config = matchSubRoute(_request_URI);
+        path = makeFullPath(config, _request_URI);
+        if (!isAllowed(config.getMethods(), _method))
+        {
+            _status_code = 405;
+            return (handleErrorResponse());
+        }
+        if (hasUnimplementedContent(_headers))
+        {
+            _status_code = 500;
+            return (handleErrorResponse());
+        }
+        if (isDirectory(path))
+        {
+            _status_code = 409;
+            return (handleErrorResponse());
+        }
+        if (!isValidFile(path))
+        {
+            _status_code = 403;
+            return (handleErrorResponse());
+        }
+        if (isFile(path))
+        {
+            std::ofstream file(path.c_str(), std::ios::out);
+            if (!file)
+            {
+                _status_code = 403;
+                return (handleErrorResponse());
+            }
+            file << _body;
+            file.close();
+            _status_code = 204;
+        }
+        else
+        {
+            std::ofstream file(path.c_str(), std::ios::out);
+            if (!file)
+            {
+                _status_code = 500;
+                return (handleErrorResponse());
+            }
+            file << _body;
+            file.close();
+            _status_code = 201;
+        }
+        status_line = statusLineProcess();
+        headers = headersProcess("", "");
+        response = status_line + headers + "\r\n";
+    }
+    catch(const NoMatchFound& e)
+    {
+        _status_code = std::atoi(e.what());
+        return (handleErrorResponse());
+    }
+    return (response);
+}
+
 std::string Response::process()
 {
     std::string response;
@@ -338,6 +424,8 @@ std::string Response::process()
         response = processGET();
     else if (_method == "DELETE")
         response = processDELETE();
+    else if (_method == "PUT")
+        response = processPUT();
     else
     {
         std::cout << YELLOW << "\n(NOT A GET REQUEST)" << DEFAULT << std::endl;

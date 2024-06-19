@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/17 19:02:50 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/14 01:08:36 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/18 17:36:48 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@ static std::vector<std::string> init_http_methods()
     http_methods.push_back("DELETE");
     http_methods.push_back("GET");
     http_methods.push_back("POST");
+    http_methods.push_back("PUT");
     
     return (http_methods);
 }
@@ -47,6 +48,11 @@ static std::vector<std::string> init_valid_headers()
     valid_headers.push_back("accept-encoding");
     valid_headers.push_back("connection");
     valid_headers.push_back("cache-control");
+    valid_headers.push_back("content-encoding");
+    valid_headers.push_back("content-md5");
+    valid_headers.push_back("content-range");
+    valid_headers.push_back("content-length");
+    valid_headers.push_back("content-language");
 
     return (valid_headers);
 }
@@ -56,14 +62,16 @@ static std::map<int, std::string> init_reason_phrases()
     std::map<int, std::string> reason_phrases;
 
     reason_phrases.insert(std::make_pair(200, "OK"));
+    reason_phrases.insert(std::make_pair(201, "Created"));
     reason_phrases.insert(std::make_pair(204, "No Content"));
     reason_phrases.insert(std::make_pair(400, "Bad Request"));
     reason_phrases.insert(std::make_pair(403, "Forbidden"));
     reason_phrases.insert(std::make_pair(404, "Not Found"));
     reason_phrases.insert(std::make_pair(405, "Method Not Allowed"));
+    reason_phrases.insert(std::make_pair(409, "Conflict"));
+    reason_phrases.insert(std::make_pair(500, "Internal Server Error"));
     reason_phrases.insert(std::make_pair(501, "Not Implemented"));
     reason_phrases.insert(std::make_pair(505, "HTTP Version Not Supported"));
-    reason_phrases.insert(std::make_pair(500, "Internal Server Error"));
 
     return (reason_phrases);
 }

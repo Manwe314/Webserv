@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 14:52:28 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/17 17:38:09 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/06/19 04:04:07 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ int main(int argc, char *argv[], char **envp)
         Cluster cluster(configuration, envp);
         cluster.run();
     }
-    catch(const std::exception& e)
+    catch(const HostDeclarationIssue& e)
     {
         std::cerr << e.what() << std::endl;
     }

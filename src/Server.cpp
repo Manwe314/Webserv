@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 16:12:04 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/12 22:46:05 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/19 03:55:34 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 #include "Response.hpp"
 
 //initialize the class memeber variables. including the requests map to an empty map.
-Server::Server(t_host_port pair, std::string name ,int fd, ServerConfig config) : _requests(), _responses()
+Server::Server(t_host_port pair, std::string name ,int fd, ServerConfig config, std::vector<ServerConfig> alt) : _requests(), _responses(), _alternative_configs(alt)
 {
     _pair.host = pair.host;
     _pair.port = pair.port;
@@ -133,9 +133,13 @@ void Server::receive(int client_fd)
             throw ClientConnectionError("Read error: Connection closed in the server named: " + _name);
     }
     _requests[client_fd] += std::string(buffer);
-    std::cout << YELLOW << "\n~~~~~~~~~~~~~message~~~~~~~~~~~~~" << DEFAULT <<std::endl;
-    std::cout << std::string(buffer) << std::endl;
-    std::cout << YELLOW << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << DEFAULT << std::endl;
+    std::cout << LAVENDER << "\n*************alters*************\n" << DEFAULT << std::endl;
+    std::cout << GREEN << _pair << " " << _name <<DEFAULT << std::endl;
+    printVector(_alternative_configs);
+    std::cout << LAVENDER << "********************************" << DEFAULT << std::endl;
+   // std::cout << YELLOW << "\n~~~~~~~~~~~~~message~~~~~~~~~~~~~" << DEFAULT <<std::endl;
+    //std::cout << std::string(buffer) << std::endl;
+   // std::cout << YELLOW << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << DEFAULT << std::endl;
 }
 
 //So far the functionality of this server simply echos back with extra text
@@ -143,7 +147,7 @@ void Server::process(int client_fd)
 {
     Response response(_requests[client_fd], _config);
     
-    std::cout << MAGENTA << "THE RESPONSE object:\n" << response << DEFAULT << std::endl;
+    //std::cout << MAGENTA << "THE RESPONSE object:\n" << response << DEFAULT << std::endl;
     std::string responseio = response.process();
     
    /* response = _requests[client_fd];

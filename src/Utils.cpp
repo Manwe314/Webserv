@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 18:42:38 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/13 18:34:12 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/19 03:03:46 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -282,7 +282,7 @@ bool isValidHttpMethod(std::string& method)
 */
 bool isInvalidHttpMethod(std::string& method)
 {
-    if (method.compare("OPTIONS") == 0 || method.compare("HEAD") == 0 || method.compare("PUT") == 0)
+    if (method.compare("OPTIONS") == 0 || method.compare("HEAD") == 0)
         return (true);
     if (method.compare("TRACE") == 0 || method.compare("CONNECT") == 0)
         return (true);
@@ -316,7 +316,7 @@ bool isInvalidVersion(std::string& version)
     this function returns true if the given file path points to a valid, readable file
     or false if it dosent.
 */
-bool isValidFile(std::string& file_path)
+bool isValidFile(const std::string& file_path)
 {
     std::ifstream file(file_path.c_str());
     return file.is_open();
@@ -360,6 +360,25 @@ bool isAllowed(const std::vector<std::string>& allowed_methods, std::string &met
     return (false);
 }
 
+
+std::ostream& operator<<(std::ostream& obj, const s_host_port& pair)
+{
+    unsigned int one = pair.host & 0xFF;
+    unsigned int two = (pair.host >> 8) & 0xFF;
+    unsigned int three = (pair.host >> 16) & 0xFF;
+    unsigned int four = (pair.host >> 24) & 0xFF;
+    obj << "HOST PORT PAIR: ";
+    obj << four;
+    obj << ".";
+    obj << three;
+    obj << ".";
+    obj << two;
+    obj << ".";
+    obj << one;
+    obj << ":";
+    obj << pair.port;
+    return (obj);
+}
 
 static void printRouteConfig(std::vector<ServerRoutesConfig> routes)
 {
@@ -409,14 +428,10 @@ void printConfig(Config conf)
     std::cout << "~~~~~~~~~~~~~~~~~" << GREEN << "THE CONFIG" << DEFAULT << "~~~~~~~~~~~~~~~~~" << std::endl;
     for (std::vector<ServerConfig>::iterator i = servers.begin(); i != servers.end(); i++)
     {
-        t_host_port pair = (*i).getHostPortPair();
-        unsigned int one = pair.host & 0xFF;
-        unsigned int two = (pair.host >> 8) & 0xFF;
-        unsigned int three = (pair.host >> 16) & 0xFF;
-        unsigned int four = (pair.host >> 24) & 0xFF;
+        std::vector<t_host_port> pair = (*i).getHostPortPair();
         std::cout << GREEN << "_____________________________________________" << DEFAULT << std::endl;
         std::cout << BLUE << "SERVER NAME: " << DEFAULT << (*i).getName() << std::endl;
-		std::cout << BLUE << "HOST PORT PAIR: " << DEFAULT << four << "." << three << "." << two << "." << one << ":" << pair.port << std::endl;
+		printVector(pair);
         std::cout << "----" << CYAN << "SERVERWIDE CONFIG" << DEFAULT << "----" << std::endl;
         ServerRoutesConfig serverwide = (*i).getServerWideConfig();
         std::cout << CYAN << "Root: " << DEFAULT << serverwide.getRoot() << std::endl;

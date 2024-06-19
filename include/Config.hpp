@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 19:33:28 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/10 18:01:50 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/19 03:05:12 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,6 @@ public:
 
     ServerConfig getServerConfigByName(std::string name) const;
 
-    std::map<std::string, t_host_port> getAllPairs() const;
 };
 
 class CouldNotOpenFile : std::exception

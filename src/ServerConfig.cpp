@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/24 21:44:05 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/08 03:05:25 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/19 03:32:40 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,23 +23,25 @@ const char * BracketPairMissMatch::what() const throw()
 }
 
 
-t_host_port ServerConfig::initHostPort(std::vector<std::string> server_block)
+std::vector<t_host_port> ServerConfig::initHostPort(std::vector<std::string> server_block)
 {
     std::vector<std::string>::iterator it;
     std::vector<std::string> array;
     t_host_port pair;
+    std::vector<t_host_port> pairs;
     unsigned int host;
     /*
         Find 'listen' and consider the next input.
 		If listen isn't declared, then HostDeclarationIssue will be thrown.
-        Split it on . and : to have a vector of 5 elemnents (4 octets and port).
-        Populate the struct by combining the 4 octets into one unsigned int
-		and stocking the port as an int
+        Split it on . and : . we can eaither have just the host, just the port or both. 
+        in case of one of them missing we use default values (0.0.0.0 and PORT define).
+        keeping in mind to handle localhost = 127.0.0.1 we construct a vector of host port pairs.
     */
     it = std::find(server_block.begin(), server_block.end(), "listen");
     if (it == server_block.end())
         throw HostDeclarationIssue();
-    else
+
+    while (it != server_block.end())
     {
         it++;
         array = split(*it, ".:");
@@ -47,7 +49,23 @@ t_host_port ServerConfig::initHostPort(std::vector<std::string> server_block)
         	If the declaration used localhost convert it to 127.0.0.1
 			and place it before the port in the array.
 		*/
-        if (array[0] == "localhost")
+        if (array.size() == 1 && array[0] == "localhost")
+        {
+            array.erase(array.begin());
+            array.insert(array.begin(), "127");
+            array.insert(array.begin() + 1, "0");
+            array.insert(array.begin() + 2, "0");
+            array.insert(array.begin() + 3, "1");
+            array.insert(array.begin() + 4, intToString(PORT));
+        }
+        else if (array.size() == 1 && array[0] != "localhost")
+        {
+            array.insert(array.begin(), "0");
+            array.insert(array.begin() + 1, "0");
+            array.insert(array.begin() + 2, "0");
+            array.insert(array.begin() + 3, "0");
+        }
+        else if (array.size() == 2 && array[0] == "localhost")
         {
             array.erase(array.begin());
             array.insert(array.begin(), "127");
@@ -55,6 +73,8 @@ t_host_port ServerConfig::initHostPort(std::vector<std::string> server_block)
             array.insert(array.begin() + 2, "0");
             array.insert(array.begin() + 3, "1");
         }
+        else if (array.size() == 4)
+            array.insert(array.begin() + 4, intToString(PORT));
         if (array.size() != 5)
             throw HostDeclarationIssue();
         /*
@@ -74,10 +94,13 @@ t_host_port ServerConfig::initHostPort(std::vector<std::string> server_block)
             throw HostDeclarationIssue();
         pair.host = host;
         pair.port = std::atoi(array[4].c_str());
+        
+        pairs.push_back(pair);
+        it = std::find(it, server_block.end(), "listen");
     }
     // std::cout << BLUE << "HOST: " << DEFAULT << pair.host << BLUE << " PORT: "
 	// << DEFAULT << pair.port << std::endl;
-    return (pair);
+    return (pairs);
 }
 
 std::string ServerConfig::initServerName(std::vector<std::string> server_block)
@@ -208,7 +231,7 @@ std::vector<ServerRoutesConfig> ServerConfig::initRouteConfigs(std::vector<std::
     return (route_configs);
 }
 
-ServerConfig::ServerConfig(std::vector<std::string> server_block) : _pair(initHostPort(server_block)),\
+ServerConfig::ServerConfig(std::vector<std::string> server_block) : _pairs(initHostPort(server_block)),\
                                                                      _server_name(initServerName(server_block)),\
                                                                       _serverwide_config(initServerWideConfig(server_block)),\
                                                                        _route_configs(initRouteConfigs(server_block))
@@ -222,9 +245,11 @@ ServerConfig::ServerConfig(std::vector<std::string> server_block) : _pair(initHo
 
 ServerConfig::ServerConfig()
 {
-    _pair.host = 2130706433;
-    _pair.port = 8080;
+    t_host_port pair;
+    pair.host = 2130706433;
+    pair.port = 80;
     _server_name = "";
+    _pairs.push_back(pair);
 }
 
 ServerConfig::~ServerConfig()
@@ -254,16 +279,43 @@ ServerRoutesConfig* ServerConfig::findRootSubRoute()
 
 ServerConfig& ServerConfig::operator=(const ServerConfig& rhs)
 {
-    _pair = rhs.getHostPortPair();
+    _pairs = rhs.getHostPortPair();
     _server_name = rhs.getName();
     _serverwide_config = rhs.getServerWideConfig();
     _route_configs = rhs.getRouteConfigs();
    return *this; 
 }
 
-t_host_port ServerConfig::getHostPortPair() const
+std::ostream& operator<<(std::ostream& obj, const ServerConfig& conf)
 {
-    return (_pair);    
+    std::vector<t_host_port> pairs = conf.getHostPortPair();
+    std::vector<ServerRoutesConfig> routes = conf.getRouteConfigs();
+    
+    obj << "Name: ";
+    obj << conf.getName();
+    if (!pairs.empty())
+    {
+        obj << "\nHost Port Pairs:\n";
+        for (std::vector<t_host_port>::iterator it = pairs.begin(); it != pairs.end(); it++)
+        {
+            obj << (*it);
+            obj << "\n";
+        }
+    }
+    obj << "ServerWide Config:\n";
+    obj << conf.getServerWideConfig();
+    if (!routes.empty())
+    {
+        obj << "Routes config:\n";
+        for (std::vector<ServerRoutesConfig>::iterator it = routes.begin(); it != routes.end(); it++)
+            obj << (*it);
+    }
+    return (obj);
+}
+
+std::vector<t_host_port> ServerConfig::getHostPortPair() const
+{
+    return (_pairs);    
 }
 std::string ServerConfig::getName() const
 {

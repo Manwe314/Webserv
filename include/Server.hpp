@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 15:02:23 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/04 14:31:48 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/06/19 02:30:08 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,9 @@ private:
     //Socket address struct populated during constructor call.
     struct sockaddr_in _server_address;
     //this servers configuration.
-    ServerConfig _config;    
+    ServerConfig _config;
+    //server configs with matching host:port pair.
+    std::vector<ServerConfig> _alternative_configs;
     /*
 		Server socket is already an unique identifier
 		but name is just for logging purposes, to make it more readable.
@@ -46,7 +48,7 @@ public:
     Server();
     //sets the hjost port pair and name, fd is extra, its just another way to make sure the setup() went smoothly since we call this constuctor with -1 for fd.
     //constructor calls setAddress() to populate _server_address.
-    Server(t_host_port pair,std::string name ,int fd, ServerConfig config);
+    Server(t_host_port pair,std::string name ,int fd, ServerConfig config, std::vector<ServerConfig> alt);
     ~Server();
 
     //Sets up the server, it is non-blocking.

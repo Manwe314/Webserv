@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Webserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 14:44:27 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/17 17:27:53 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/06/19 04:03:34 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,12 @@ typedef struct s_host_port
 {
     int port;
     unsigned int host;
+    bool operator==(const s_host_port& other) const {
+        return (port == other.port && host == other.host);
+    }
 }   t_host_port;
+
+std::ostream& operator<<(std::ostream& obj, const s_host_port& pair); 
 
 
 
@@ -105,7 +110,7 @@ void printMap(const std::map<Keytype, Valuetype>& map)
 
 bool isFile(const std::string& path);
 bool isValidHeader(std::string& header);
-bool isValidFile(std::string& file_path);
+bool isValidFile(const std::string& file_path);
 bool isValidVersion(std::string& version);
 bool isDirectory(const std::string& path);
 bool isInvalidVersion(std::string& version);

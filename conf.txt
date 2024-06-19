@@ -1,6 +1,7 @@
 server {
     server_name kuxi
     listen localhost:8000
+    listen localhost
 
     location /
     {
@@ -16,6 +17,7 @@ server {
 server {
     server_name giki
     listen localhost:8001
+    listen localhost:8000
 
     location /
     {
@@ -30,6 +32,8 @@ server {
 server {
     server_name briki
     listen localhost:8002
+    listen localhost
+    listen localhost:8001
     location /
     {
         root ./wsite
