@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 15:02:23 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/19 02:30:08 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/19 16:37:46 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,7 @@ private:
     int _fd;
 
     void setAddress();
+    ServerConfig determineServer(std::string request);
 public:
     Server();
     //sets the hjost port pair and name, fd is extra, its just another way to make sure the setup() went smoothly since we call this constuctor with -1 for fd.
@@ -75,7 +76,7 @@ public:
 
 std::ostream& operator<<(std::ostream& obj, Server const &server);
 
-class SocketCreationError : std::exception
+class SocketCreationError : public std::exception
 {
     private:
         std::string msg;
@@ -86,7 +87,7 @@ class SocketCreationError : std::exception
     
 };
 
-class SocketBindingError : std::exception
+class SocketBindingError : public std::exception
 {
     private:
         std::string msg;
@@ -96,7 +97,7 @@ class SocketBindingError : std::exception
         virtual ~SocketBindingError() throw() {}
 };
 
-class ListeningError : std::exception
+class ListeningError : public std::exception
 {
     private:
         std::string msg;
@@ -107,7 +108,7 @@ class ListeningError : std::exception
     
 };
 
-class ClientConnectionError : std::exception
+class ClientConnectionError : public std::exception
 {
     private:
         std::string msg;

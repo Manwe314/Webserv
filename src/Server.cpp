@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 16:12:04 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/19 03:55:34 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/20 01:03:17 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,23 +137,45 @@ void Server::receive(int client_fd)
     std::cout << GREEN << _pair << " " << _name <<DEFAULT << std::endl;
     printVector(_alternative_configs);
     std::cout << LAVENDER << "********************************" << DEFAULT << std::endl;
-   // std::cout << YELLOW << "\n~~~~~~~~~~~~~message~~~~~~~~~~~~~" << DEFAULT <<std::endl;
-    //std::cout << std::string(buffer) << std::endl;
-   // std::cout << YELLOW << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << DEFAULT << std::endl;
+    std::cout << YELLOW << "\n~~~~~~~~~~~~~message~~~~~~~~~~~~~" << DEFAULT <<std::endl;
+    std::cout << std::string(buffer) << std::endl;
+    std::cout << YELLOW << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << DEFAULT << std::endl;
+}
+
+ServerConfig Server::determineServer(std::string request)
+{
+    Response temp(request, _config);
+    std::map<std::string, std::string> headers = temp.getHeaders();
+    std::map<std::string, std::string>::iterator it = headers.find("host");
+    std::string::iterator end_pos;
+    std::string host_name;
+    if (it == headers.end())
+        return (_config);
+    if (_alternative_configs.empty())
+        return (_config);
+    host_name = (*it).second;
+    end_pos = std::remove(host_name.begin(), host_name.end(), ' ');
+    host_name.erase(end_pos, host_name.end());
+    for (std::vector<ServerConfig>::iterator i = _alternative_configs.begin(); i != _alternative_configs.end() ; i++)
+    {
+        if ((*i).getName() == host_name)
+        {
+            return (*i);
+        }
+    }
+    return (_config);
 }
 
 //So far the functionality of this server simply echos back with extra text
 void Server::process(int client_fd)
 {
-    Response response(_requests[client_fd], _config);
+    ServerConfig config;
+    config = determineServer(_requests[client_fd]);
+    Response response(_requests[client_fd], config);
     
     //std::cout << MAGENTA << "THE RESPONSE object:\n" << response << DEFAULT << std::endl;
     std::string responseio = response.process();
     
-   /* response = _requests[client_fd];
-    response += " -with love, the ";
-    response += _name;
-    response += " Server\n";*/
     //std::cout << CYAN << "THE RESPONSE msg:\n" << responseio << DEFAULT << std::endl;
     _responses.insert(std::make_pair(client_fd, responseio));
 }

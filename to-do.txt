@@ -12,7 +12,7 @@ To-Do:
         1. chunking
         2. URI queries
         3. proxy functionality
-        4. multiple port support.
+        4. 
         5. the headers sent in probably are important :P
         6. handle file permisions to have accutate status codes
         7. cacheing.

@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/28 01:14:37 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/19 04:03:43 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/19 14:53:47 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 #include "Webserv.hpp"
 
 
-static std::vector<ServerConfig> serveAlternatives(std::vector<ServerConfig> servers, t_host_port pair)
+static std::vector<ServerConfig> serveAlternatives(std::vector<ServerConfig> servers, t_host_port pair, std::string name)
 {
     std::vector<ServerConfig> alternatives;
     std::vector<t_host_port> pairs;
@@ -24,7 +24,7 @@ static std::vector<ServerConfig> serveAlternatives(std::vector<ServerConfig> ser
         pairs = (*it).getHostPortPair();
         for (std::vector<t_host_port>::iterator i = pairs.begin(); i != pairs.end(); i++)
         {
-            if ((*i) == pair)
+            if ((*i) == pair && name != (*it).getName())
             {
                 alternatives.push_back((*it));
             }
@@ -55,7 +55,7 @@ Cluster::Cluster(Config conf, char **envp) : _envp(envp)
             if (std::find(bound_pairs.begin(), bound_pairs.end(), (*i)) == bound_pairs.end())
             {
                 //call a server constuctor with t_host_port and name (fd set at -1, fd will be set by the setup() function of the server itself).
-                Server server((*i), (*it).getName(), -1, (*it), serveAlternatives(servers, (*i)));
+                Server server((*i), (*it).getName(), -1, (*it), serveAlternatives(servers, (*i), (*it).getName()));
                 try
                 {
                     //std::cout << server.getPair() << std::endl;

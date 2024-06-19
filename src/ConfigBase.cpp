@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/17 19:02:50 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/18 17:36:48 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/19 04:10:26 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,7 @@ static std::vector<std::string> init_valid_headers()
     std::vector<std::string> valid_headers;
 
     valid_headers.push_back("user-agent");
+    valid_headers.push_back("host");
     valid_headers.push_back("accept");
     valid_headers.push_back("accept-language");
     valid_headers.push_back("accept-encoding");
