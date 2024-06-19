@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 18:42:38 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/13 18:34:12 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/19 13:38:47 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,28 @@ std::vector<std::string> split(std::string string, std::string delim)
         tokens.push_back(token);
     }
     return (tokens);
+}
+
+std::string	removeComments( std::string const & config_file )
+{
+	//Read each line of file and append the uncommented lines to a new string (cleaned_content).
+    std::istringstream	file(config_file.c_str());
+	std::string		line;
+	std::string		cleaned_content;
+	/*
+		If the actual line (ignoring spaces) is a comment that starts with #,
+		do not add it the refined config_file (cleaned_content)
+	*/
+	while (std::getline(file, line))
+	{
+		size_t	pos = 0;
+		while (pos < line.size() && std::isspace(line[pos]))
+			pos++;
+		if (pos < line.size() && line[pos] != '#')
+			cleaned_content += line + "\n";
+	}
+	//return the modified content (without comments)
+	return cleaned_content;
 }
 
 /*

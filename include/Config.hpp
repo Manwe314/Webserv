@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Config.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 19:33:28 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/10 18:01:50 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/19 13:26:47 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ public:
     std::map<std::string, t_host_port> getAllPairs() const;
 };
 
-class CouldNotOpenFile : std::exception
+class CouldNotOpenFile : public std::exception
 {
     public:
         virtual const char * what() const throw();

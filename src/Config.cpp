@@ -6,7 +6,7 @@
 /*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 21:53:46 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/17 17:28:02 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/06/19 13:07:47 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,8 @@ std::vector<ServerConfig> Config::initServerConfigs(std::string path_to_config)
     //read the entire file into a single string
     entire_file = readFile(path_to_config);
 	
-	//add rm comment fn
+	//rm comment fn
+	entire_file = removeComments(entire_file);
     
 	//split it on a charset of space, tab and newline.
     split_file = split(entire_file, " \n\t");

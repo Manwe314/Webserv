@@ -6,7 +6,7 @@
 /*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/30 09:47:34 by bleclerc          #+#    #+#             */
-/*   Updated: 2024/06/05 15:36:36 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/06/19 15:26:49 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ class Cgi
 	void	executeScript( std::string const & file, char **envp);
 	std::string	getCgiResult( void ) const;
 
-	class CgiExecutionError : std::exception
+	class CgiExecutionError : public std::exception
 	{
     private:
         std::string msg;

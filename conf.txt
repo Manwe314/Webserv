@@ -1,9 +1,11 @@
+  				  #helloWorld###
 server {
     server_name kuxi
     listen localhost:8000
 
     location /
     {
+		#helloWorld how are you?
         root ./wsite
         error_page 400 /400.html
         error_page 404 /404.html

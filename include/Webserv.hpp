@@ -6,7 +6,7 @@
 /*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 14:44:27 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/17 17:27:53 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/06/19 13:25:15 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,6 +85,7 @@ std::vector<std::string> split(std::string string, std::string delim);
 int countMatchingChars(std::string first, std::string second, int pos = 0);
 void eraseRange(std::vector<std::string>& array, int start, int end, int flag = 0);
 std::pair<int, int> encapsule(std::vector<std::string> array, std::string a, std::string b, int pos = 0);
+std::string	removeComments( std::string const & config_file );
 
 
 template <typename T>
