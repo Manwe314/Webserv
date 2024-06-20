@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 16:12:04 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/12 22:46:05 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/20 16:55:20 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,19 +138,13 @@ void Server::receive(int client_fd)
     std::cout << YELLOW << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << DEFAULT << std::endl;
 }
 
-//So far the functionality of this server simply echos back with extra text
 void Server::process(int client_fd)
 {
     Response response(_requests[client_fd], _config);
     
     std::cout << MAGENTA << "THE RESPONSE object:\n" << response << DEFAULT << std::endl;
     std::string responseio = response.process();
-    
-   /* response = _requests[client_fd];
-    response += " -with love, the ";
-    response += _name;
-    response += " Server\n";*/
-    //std::cout << CYAN << "THE RESPONSE msg:\n" << responseio << DEFAULT << std::endl;
+
     _responses.insert(std::make_pair(client_fd, responseio));
 }
 

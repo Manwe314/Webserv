@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/08 23:27:16 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/08 02:33:25 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/20 18:21:59 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,17 @@ Response::Response(std::string request, ServerConfig config) : _headers()
         parseMessageHeaders(request.substr((i + 2), (request.find("\r\n\r\n") - (i + 2)))); // parse everything from the 2nd line I.E after the request line before the empty line.
     i = request.find("\r\n\r\n");
     if (i != std::string::npos && (i + 4) < request.size())
-        parseMessageBody(request.substr((i + 4)));
+	{
+		try
+		{
+			parseMessageBody(request.substr((i + 4)));
+		}
+		catch(TransferEncodingError & e)
+		{
+			std::cerr << e.what() << '\n';
+			_status_code = 400;
+		}
+	}
 }
 
 
@@ -100,29 +110,109 @@ static std::pair<std::string, std::string> makeHeaderPair(std::string header)
     value = header.substr((header.find(":") + 1));
     return (std::make_pair(name, value));
 }
+/*
+	An example of a chunked body:
+	"4\r\nWiki\r\n"
+	"5\r\npedia\r\n"
+	"e\r\n in\r\n\r\nchunks.\r\n"
+	"0\r\n\r\n"
 
-//this fucntion reads message body based on content length of the message.
-void Response::parseMessageBody(std::string message_body)
+	The first character is the chunked message size.
+	If 0, then consider as the as the end of the entire message.
+	The chunked size for a chunked message is always delimited by \r\n
+	It will also be in hexadecimal format
+	Thereafter read/stock the following content up until the aforementioned chunk size.
+*/
+void	Response::readChunkSize(std::string const & message_body)
+{
+	//find the chunk size delimiter /r/n
+	size_t end_of_line_size = message_body.find("\r\n", _position);
+	if (end_of_line_size == std::string::npos) //if not found, throw an error
+		throw TransferEncodingError("Invalid chunk size format");
+	
+	//stock the chunk size in a string, to be converted later
+	std::string	line_size = message_body.substr(_position, end_of_line_size - _position);
+	_position = end_of_line_size + 2; //Move past the \r\n
+
+	//convert the chunk size string, represented in a hexadecimal format 
+	char *endptr;
+	_chunk_size = std::strtoul(line_size.c_str(), &endptr, 16);
+	if (*endptr != '\0') //ancient way to check for conversion errors, no choice - C++98
+		throw TransferEncodingError("Invalid chunk size format");
+}
+
+void	Response::readChunkData(std::string const & message_body)
+{
+	/*
+		Check if chunk size is at least smaller (if not equal) to the message size
+		to avoid buffer overflow issues when appending
+		No sure if required, the append fn probably does the job for us.
+	*/
+	if (_position + _chunk_size > message_body.size())
+		throw TransferEncodingError("Invalid chunk data format");
+	
+	_body.append(message_body, _position, _chunk_size);
+
+	//Move past the read chunked message
+	_position += _chunk_size;
+	/*
+		This check ensures that the chunk size needs to be perfect.
+		If the following characters after the appended data are not \r\n,
+		then the data is not respecting the chunk size
+	*/
+	if (message_body.substr(_position, 2) != "\r\n")
+		throw TransferEncodingError("Invalid chunk data format");
+	_position += 2; //Move past the \r\n
+}
+
+//this function reads message body of the message.
+void	Response::parseMessageBody(std::string message_body)
 {
     int bytes_to_read = -1;
-    std::map<std::string, std::string>::iterator it;
-    
+    std::map<std::string, std::string>::iterator it_length;
+	std::map<std::string, std::string>::iterator it_chunk;
+
+	it_length = _headers.find("content-length");
+	it_chunk = _headers.find("transfer-encoding");
+
     if (_status_code != 400) //unless we already had an error.
     {
-        //find the content-length pair in out _headers map
-        it = _headers.find("content-length");
-        if (it != _headers.end()) //if found:
+		/*
+			HTTP/1.1 specification (RFC 7230, Section 3.3.3)
+			A sender MUST NOT send a Content-Length header field in any message
+			that contains a Transfer-Encoding header field.
+		*/
+		if (it_length != _headers.end() && it_chunk != _headers.end())
+			throw TransferEncodingError("Content-length & transfer-encoding headers both present");
+		//if transfer-encoding found and value is set to 'chunked'
+		else if (it_chunk != _headers.end() && trimSpaces(it_chunk->second) == "chunked")
+		{
+			_position = 0;
+			while (true) //loops over the chunked message until the chunk size is 0
+			{
+				_chunk_size = 0;
+					readChunkSize(message_body); //gives us the chunked message size for reading
+					if (_chunk_size == 0)
+						break ;
+					readChunkData(message_body); //reads as per the defined chunked size
+			}
+		}
+		else if (it_length != _headers.end()) //if content_length found:
         {
             //get the value in an int.
-            bytes_to_read = std::atoi(it->second.c_str());
+            bytes_to_read = std::atoi(it_length->second.c_str());
             //if its under MAX_INT and non negative:
             if (bytes_to_read >= 0)
                 _body = message_body.substr(0, bytes_to_read); //read that many bytes I.E characters.
             else
                 _status_code = 400; //otherwise set error code to 400.
         }
+		/*
+			If we don't have content-length or transfer-encoding,
+			take eveything after the "empty line" I.E what was passed as argument.
+		*/
         else
-            _body = message_body; //if we dont have content-length take eveything after the "empty line" I.E what was passed as argument.
+            _body = message_body;
     }
 }
 
@@ -258,6 +348,11 @@ int Response::getStatusCode() const
 }
 
 const char * NoMatchFound::what() const throw()
+{
+	return (msg.c_str());
+}
+
+const char * TransferEncodingError::what() const throw()
 {
 	return (msg.c_str());
 }

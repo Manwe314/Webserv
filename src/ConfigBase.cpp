@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigBase.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/17 19:02:50 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/14 01:08:36 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/20 13:44:47 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,8 @@ static std::vector<std::string> init_valid_headers()
     valid_headers.push_back("accept-encoding");
     valid_headers.push_back("connection");
     valid_headers.push_back("cache-control");
+	valid_headers.push_back("content-length");
+	valid_headers.push_back("transfer-encoding");
 
     return (valid_headers);
 }

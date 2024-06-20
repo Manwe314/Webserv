@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/08 23:20:55 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/14 01:06:22 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/20 17:54:04 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,12 +31,17 @@ private:
     std::string _method;
     std::string _body;
     std::string _path;
-    int _status_code;
+    int 		_status_code;
+	size_t		_position;
+	size_t		_chunk_size;
 
-    void parseRequestLine(std::string request_line);
-    void parseMessageHeaders(std::string message_headers);
-    void parseMessageBody(std::string message_body);
-    
+    void	parseRequestLine(std::string request_line);
+    void	parseMessageHeaders(std::string message_headers);
+    void	parseMessageBody(std::string message_body);
+
+	//chunking functions
+	void	readChunkSize(std::string const & message_body);
+	void	readChunkData(std::string const & message_body);
 
     std::string processGET();
     std::string processDELETE();
@@ -70,6 +75,16 @@ class NoMatchFound : public std::exception
         NoMatchFound(const std::string& msg) : msg(msg) {}
         virtual const char* what() const throw();
         virtual ~NoMatchFound() throw() {}
+};
+
+class TransferEncodingError : public std::exception
+{
+    private:
+        std::string msg;
+    public:
+        TransferEncodingError(const std::string& msg) : msg(msg) {}
+        virtual const char* what() const throw();
+        virtual ~TransferEncodingError() throw() {}
 };
 
 std::ostream& operator<<(std::ostream& obj, Response const &response);

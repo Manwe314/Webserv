@@ -6,7 +6,7 @@
 /*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 18:42:38 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/19 13:38:47 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/06/20 17:38:04 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,6 +79,38 @@ std::string	removeComments( std::string const & config_file )
 	//return the modified content (without comments)
 	return cleaned_content;
 }
+
+/*
+	Handy function to trim spaces and tab spaces at the start and end of a string.
+	This will only consider spaces and tabs, and not carriage returns or other types of spaces
+*/
+std::string	trimSpaces( std::string string )
+{
+	size_t	first = 0;
+	//find the first actual character, iterate through the spaces
+	while (first < string.size())
+	{
+		if (string[first] == ' ' || string[first] == '\t')
+			first++;
+		else
+			break ;
+	}
+	if (first == string.size())
+		return ""; //no content
+	
+	size_t last = string.size() - 1;
+	//removing trailing spaces
+	while (last < string.size())
+	{
+		if (string[last] == ' ' || string[last] == '\t')
+			last--;
+		else
+			break ;
+	}
+	//return the trimmed value
+	return string.substr(first, (last - first + 1));
+}
+
 
 /*
 	This function returns a pair of ints that points to 2 elements in a vector.

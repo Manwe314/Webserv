@@ -1,4 +1,3 @@
-  				  #helloWorld###
 server {
     server_name kuxi
     listen localhost:8000
