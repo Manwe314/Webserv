@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 18:29:19 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/20 18:05:27 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/21 18:47:18 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -177,7 +177,7 @@ void ServerRoutesConfig::inherit(ServerRoutesConfig parent)
 //this function returns a struct that has an int and a pointer. the int represents the amount of characters that matched between uri and location.
 // pointer is a pointer to the ServerRouteConfig that this match has happened in.
 //this function will evaluate itself and all of its sub routes and return the BEST match I.E struct with the highest "int". (note that -1 means a compleate match which is considered as a higher number than any positive integer).
-t_route_match ServerRoutesConfig::findRouteMatch(std::string uri)
+t_route_match ServerRoutesConfig::findRouteMatch(std::string uri, ServerRoutesConfig serverwide)
 {
    //match is evaluating iteslf
    t_route_match match;
@@ -185,7 +185,7 @@ t_route_match ServerRoutesConfig::findRouteMatch(std::string uri)
    std::vector<t_route_match> sub_matches;
 
    //startint from the begining count how many chars match betwen location and uri before first missmatch.
-   match.match_length = countMatchingChars(_location, uri); // ----> need to at logic for counting with slashes "/"  in mind <-----
+   match.match_length = countMatchingChars(_location, uri);
    match.route = this;
    //if the matching length is same as the entire uri AND location path, then it is a compleate match. in this case no further searching is required since we cant find a better match.
    if (match.match_length == (int)uri.size() && match.match_length == (int)_location.size())
@@ -205,8 +205,10 @@ t_route_match ServerRoutesConfig::findRouteMatch(std::string uri)
       //in the case of inproper nesting the subroute just does not inherit from parent but regardless is evaluated for matching purposes. it is considered to be outside of the parent route block.
       if (countMatchingChars(_location, (*it).getLocation()) == (int)_location.size())
          (*it).inherit(*this);
+      else
+         (*it).inherit(serverwide);
       //use this same member function such that each sub route will return the struct with best match among THEIR subroutes. this will reqursively search every nested route.
-      sub_matches.push_back((*it).findRouteMatch(uri));
+      sub_matches.push_back((*it).findRouteMatch(uri, serverwide));
    }
    
    //lastly find the best match among the sub routes and this route. 

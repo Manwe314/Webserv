@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 17:09:31 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/20 18:02:36 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/21 16:02:04 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,7 @@ public:
 
     void inherit(ServerRoutesConfig parent);
     
-    t_route_match findRouteMatch(std::string uri);
+    t_route_match findRouteMatch(std::string uri, ServerRoutesConfig serverwide);
     ServerRoutesConfig* findRootRoute();
     std::string serveCustomError(int status);
 

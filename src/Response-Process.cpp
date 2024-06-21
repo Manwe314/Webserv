@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 16:59:31 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/21 02:02:38 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/21 19:20:07 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ std::string Response::default404()
     response = "HTTP/1.1 404 Not Found \r\nServer: webserv/1.0.0 \r\nContent-Type: text/html \r\nContent-Length: 470 \r\nConnection: Keep-Alive \r\n";
     response += getDateHeader();
     response += "\r\n";
-    response += "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n<title>404 Not Found</title>\n<style>\nbody { font-family: Arial, sans-serif; text-align: center; padding: 50px; }\nh1 { font-size: 50px; }\np { font-size: 20px; }\n</style>\n</head>\n<body>\n<h1>404 Not Found</h1>\n<p>The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.</p>\n</body>\n</html>";
+    response += "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n<title>404 Not Found Default.</title>\n<style>\nbody { font-family: Arial, sans-serif; text-align: center; padding: 50px; }\nh1 { font-size: 50px; }\np { font-size: 20px; }\n</style>\n</head>\n<body>\n<h1>404 Not Found</h1>\n<p>The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.</p>\n</body>\n</html>";
     return (response);
 }
 
@@ -79,7 +79,8 @@ ServerRoutesConfig Response::matchSubRoute(std::string uri)
         //the member function returns a struct with the information about the BEST match it could find among itself and its children
         //match_length specifies how good of a match it was. with -1 meaning exact match.
         //route is a pointer to the object that had match_length amount of characters matching
-        temp = (*it).findRouteMatch(uri);
+        (*it).inherit(_server_config.getServerWideConfig());
+        temp = (*it).findRouteMatch(uri, _server_config.getServerWideConfig());
         //if we find a perfect match, since we are looping from the bbegining its the perfect match written first. we no longer search.
         if (temp.match_length == -1)
         {
@@ -163,17 +164,6 @@ std::string Response::handleErrorResponse()
     std::string headers;
     std::string body;
     ServerRoutesConfig config;
-        /*
-            so far matching is working. currantly i know of 2 issues that need fixing.
-            1. when matching uri to location we just count how many chars match. this is not correct since if location is /HEYBOB 
-                and the uri is /HEYALICE the uri would match the location up to 4 chars, yet this is not correct since its just the 
-                begining of the 2 folders names that match. 
-            2. when searching through the tree of nested subroutes. we need to inherit the rules of correctly nested routes like:
-                /one/two beeing under /one and NOT /three/four beeing under /one. both nested routes should end up inheriting from serverwide directives
-                but, in the case of inccorect nesting the nested route is considered to be highest level, so that one should just directly inherit from
-                serverwide. correctly nested route should inherit from its parent that has inherited from serverwide. this is important since
-                if the parent and the serverwide have same directives but the child doesnt the child should get its parents version and not the serverwide one.
-        */
     
     if (_status_code / 100 != 4 && _status_code / 100 != 5)
         return (std::string(""));

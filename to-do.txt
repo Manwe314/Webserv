@@ -19,5 +19,5 @@ To-Do:
         8. POST is used for proxy and cgi purposes, if said directives are not present then the behaviour is server dependant.
             since the subject asks us to take nginx as referance, nginx will treat this POST request as a GET request without the body.
         9. DELETE should be able to delete both full and empty directories, or maybe no?
-        10. alias directive
+        10.
         11. single host declaratrion issue stops the entire program from running.

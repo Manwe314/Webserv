@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 14:44:27 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/20 18:43:15 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/21 17:41:26 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,7 +89,7 @@ std::string listDirectoryContents(std::string uri);
 std::string readBinaryFile(const std::string &path);
 std::vector<std::string> split(std::string string, char delim);
 std::vector<std::string> split(std::string string, std::string delim);
-int countMatchingChars(std::string first, std::string second, int pos = 0);
+int countMatchingChars(std::string first, std::string second, int pos = 0, int flag = 0);
 void eraseRange(std::vector<std::string>& array, int start, int end, int flag = 0);
 std::pair<int, int> encapsule(std::vector<std::string> array, std::string a, std::string b, int pos = 0);
 

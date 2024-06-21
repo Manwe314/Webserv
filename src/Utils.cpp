@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 18:42:38 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/21 01:58:49 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/21 18:49:56 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -161,23 +161,60 @@ void toLowerCase(std::string &str)
 
 
 //this function count how many characters match until it doesnt starting from pos (default 0), between first and second strings.
-int countMatchingChars(std::string first, std::string second, int pos)
+//the flag (dafult 0) will count with "/" syntax in mind if set to anything else the functionn  will just count the amount of matching chars
+int countMatchingChars(std::string first, std::string second, int pos, int flag)
 {
     int count;
+    int temp;
     int min_size;
 
     count = 0;
+    temp = 0;
     min_size = std::min(first.size(), second.size());
-    
-    if (pos > min_size)
-        return (-1);
-    for (int i = pos; i < min_size; i++)
+    if (flag != 0)
     {
-        if (first[i] == second[i])
-            count++;
-        else
-            break;
+        
+        if (pos > min_size)
+            return (-1);
+        for (int i = pos; i < min_size; i++)
+        {
+            if (first[i] == second[i])
+                count++;
+            else
+                break;
+        }
     }
+    else
+    {
+        if (pos > min_size)
+            return (-1);
+        int i = pos;
+        while (i < min_size)
+        {
+            if (first[i] == second[i])
+            {
+                temp++;
+                if (first[i] == '/')
+                    count = temp;
+                if (i + 1 == min_size && first.size() == second.size())
+                    count = temp;
+                else if (i + 1 == min_size && first.size() > second.size())
+                {
+                    if (first[i + 1] == '/')
+                        count = temp;
+                }
+                else if (i + 1 == min_size && first.size() < second.size())
+                {
+                    if (second[i + 1] == '/')
+                        count = temp;
+                }
+            }
+            else
+                break;
+            i++;
+        }
+    }
+    
     return (count);
 }
 

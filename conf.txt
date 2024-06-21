@@ -56,3 +56,33 @@ server {
         index index.html
     }
 }
+
+
+server {
+    server_name triki
+    listen localhost:8100
+
+    allow_methods GET POST
+    index index.html
+
+    location / {
+        alias ./
+        index index.html
+    }
+
+    location /one
+    {
+        alias ./
+        allow_methods GET DELETE
+        location /one/two
+        {
+            alias ./
+            location /not/one
+            {
+                alias ./
+            }
+        }
+    }
+    
+}
+
