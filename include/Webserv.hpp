@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 14:44:27 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/19 04:03:34 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/20 18:43:15 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@
 #include<poll.h>
 #include<cstdio>
 #include<ctime>
+#include<dirent.h>
 
 
 //C Network includes
@@ -84,13 +85,13 @@ std::string intToString(int num);
 void toLowerCase(std::string &str);
 std::string sizetToString(size_t num);
 std::string readFile(std::string full_name);
+std::string listDirectoryContents(std::string uri);
 std::string readBinaryFile(const std::string &path);
 std::vector<std::string> split(std::string string, char delim);
 std::vector<std::string> split(std::string string, std::string delim);
 int countMatchingChars(std::string first, std::string second, int pos = 0);
 void eraseRange(std::vector<std::string>& array, int start, int end, int flag = 0);
 std::pair<int, int> encapsule(std::vector<std::string> array, std::string a, std::string b, int pos = 0);
-
 
 template <typename T>
 void printVector(const std::vector<T>& arr)

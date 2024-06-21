@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 14:52:28 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/19 04:04:07 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/21 02:00:35 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ int main(int argc, char *argv[], char **envp)
     try
     {
         Config configuration(argv[1]);
-		printConfig(configuration);
+		//printConfig(configuration);
         Cluster cluster(configuration, envp);
         cluster.run();
     }

@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 16:12:04 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/20 01:03:17 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/21 02:00:49 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -133,13 +133,13 @@ void Server::receive(int client_fd)
             throw ClientConnectionError("Read error: Connection closed in the server named: " + _name);
     }
     _requests[client_fd] += std::string(buffer);
-    std::cout << LAVENDER << "\n*************alters*************\n" << DEFAULT << std::endl;
-    std::cout << GREEN << _pair << " " << _name <<DEFAULT << std::endl;
-    printVector(_alternative_configs);
-    std::cout << LAVENDER << "********************************" << DEFAULT << std::endl;
-    std::cout << YELLOW << "\n~~~~~~~~~~~~~message~~~~~~~~~~~~~" << DEFAULT <<std::endl;
-    std::cout << std::string(buffer) << std::endl;
-    std::cout << YELLOW << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << DEFAULT << std::endl;
+    //std::cout << LAVENDER << "\n*************alters*************\n" << DEFAULT << std::endl;
+    //std::cout << GREEN << _pair << " " << _name <<DEFAULT << std::endl;
+    //printVector(_alternative_configs);
+    //std::cout << LAVENDER << "********************************" << DEFAULT << std::endl;
+    //std::cout << YELLOW << "\n~~~~~~~~~~~~~message~~~~~~~~~~~~~" << DEFAULT <<std::endl;
+    //std::cout << std::string(buffer) << std::endl;
+    //std::cout << YELLOW << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << DEFAULT << std::endl;
 }
 
 ServerConfig Server::determineServer(std::string request)
@@ -176,7 +176,7 @@ void Server::process(int client_fd)
     //std::cout << MAGENTA << "THE RESPONSE object:\n" << response << DEFAULT << std::endl;
     std::string responseio = response.process();
     
-    //std::cout << CYAN << "THE RESPONSE msg:\n" << responseio << DEFAULT << std::endl;
+    std::cout << CYAN << "THE RESPONSE msg:\n" << responseio << DEFAULT << std::endl;
     _responses.insert(std::make_pair(client_fd, responseio));
 }
 

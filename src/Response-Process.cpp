@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 16:59:31 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/18 17:38:56 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/21 02:02:38 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,13 +125,31 @@ std::string Response::makeFullPath(ServerRoutesConfig config, std::string uri)
     //alias directivve functionality could be added here
     std::string path;
     
-    path = config.getRoot();
-    
-    if (path.empty())
-        throw NoMatchFound("404");
     if (uri[0] != '/')
         throw NoMatchFound("400");
-    if (path[(path.size() - 1)] == '/')
+
+    if (config.getRoot().empty() && !config.getAlias().empty())
+    {
+        if (countMatchingChars(config.getLocation(), uri) != (int)config.getLocation().size())
+            throw NoMatchFound("404");
+        path = config.getAlias();
+        uri.erase(0, config.getLocation().size());
+    }
+    else if (!config.getRoot().empty() && config.getAlias().empty())
+        path = config.getRoot();
+    else if (config.getRoot().empty() && config.getAlias().empty())
+        throw NoMatchFound("404");
+    else if (!config.getRoot().empty() && !config.getAlias().empty())
+    {
+        if (countMatchingChars(config.getLocation(), uri) == (int)config.getLocation().size())
+        {
+            path = config.getAlias();
+            uri.erase(0, config.getLocation().size());
+        }
+        else
+            path = config.getRoot();
+    }    
+    if (path[(path.size() - 1)] == '/' && uri[0] == '/')
         path.erase(path.size() - 1, 1);
     path += uri;
     return (path);
@@ -210,7 +228,7 @@ std::string Response::serviceGetResource(ServerRoutesConfig config, std::string 
 
     path = uri;
     
-    if (isDirectory(uri)) // autoindex should be considered here
+    if (isDirectory(uri))
     {
         if (uri[uri.size() - 1] != '/')
             uri += "/";
@@ -225,11 +243,22 @@ std::string Response::serviceGetResource(ServerRoutesConfig config, std::string 
             }
         }
         else
-            throw NoMatchFound("403"); //some auto index stuff here. 
+        {
+            if (config.getAutoindex() == 1)
+            {
+                body = listDirectoryContents(uri);
+                if (body.empty())
+                    throw NoMatchFound("403");
+                _path = uri;
+                return (body);
+            }
+            else
+                throw NoMatchFound("403");
+        }
     }
 
     if (!isValidFile(path) && isDirectory(uri))
-         throw NoMatchFound("404"); //some auto index stuff here 2
+        throw NoMatchFound("404");
     if (!isValidFile(path) && !isDirectory(uri))
         throw NoMatchFound("404");
     type = path.substr(path.rfind(".") + 1);

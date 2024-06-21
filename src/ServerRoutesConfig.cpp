@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 18:29:19 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/11 22:03:19 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/20 18:05:27 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,9 @@ enum Rule{
 	ALLOW_METHODS,
 	ROOT,
 	INDEX,
-   ERROR_PAGE
+   ERROR_PAGE,
+   ALIAS,
+   AUTOINDEX
 };
 
 bool ServerRoutesConfig::isRule(std::string input)
@@ -109,6 +111,16 @@ std::vector<std::string>& route_block, std::vector<std::string>::const_iterator 
          for (std::vector<int>::iterator it = status_codes.begin(); it != status_codes.end(); it++)
             _error_pages.insert(std::make_pair((*it), (*input)));
       break;
+   case ALIAS:
+      _alias = *(++input);
+      break;
+   case AUTOINDEX:
+      input++;
+      if ((*input).compare("on") == 0)
+         _autoindex = 1;
+      if ((*input).compare("off") == 0)
+         _autoindex = 0;
+      break;
    
    default:
       break;
@@ -116,7 +128,7 @@ std::vector<std::string>& route_block, std::vector<std::string>::const_iterator 
    
 }
 
-ServerRoutesConfig::ServerRoutesConfig(std::vector<std::string> route_block, std::string location) : _index_files(), _allowed_methods(), _sub_routes(), _error_pages()
+ServerRoutesConfig::ServerRoutesConfig(std::vector<std::string> route_block, std::string location) : _index_files(), _allowed_methods(), _sub_routes(), _error_pages(), _autoindex(-1)
 {
    //the config file is split with a charset (space tab newline). must read info out from a vector like that here.
    //route block is whatever is inside "{ }" after the location is defined.
@@ -155,6 +167,10 @@ void ServerRoutesConfig::inherit(ServerRoutesConfig parent)
       _allowed_methods = parent.getMethods();
    if (_error_pages.empty())
       _error_pages = parent.getErrorPages();
+   if (_alias.empty())
+      _alias = parent.getAlias();
+   if (_autoindex != parent.getAutoindex() && parent.getAutoindex() != -1)
+      _autoindex = parent.getAutoindex();
    
 }
 
@@ -234,16 +250,16 @@ ServerRoutesConfig* ServerRoutesConfig::findRootRoute()
 }
 
 //this function will try to serve the path to a valid file using the error_page and root directives.
-//if any problems are encountered (no error_page, no root or their combination does not point to a valid file) default error page will be used.
+//if any problems are encountered (no error_page or does not point to a valid file) default error page will be used.
 std::string ServerRoutesConfig::serveCustomError(int status)
 {
    std::string path;
    std::map<int, std::string>::iterator it;
 
-   if (!_error_pages.empty() && !_root.empty())
+   if (!_error_pages.empty())
    {
       path = _root;
-      if (path[(path.size() - 1)] == '/')
+      if (!path.empty() && path[(path.size() - 1)] == '/')
          path.erase(path.size() - 1, 1);
       it = _error_pages.find(status);
       if (it != _error_pages.end())
@@ -282,6 +298,8 @@ ServerRoutesConfig& ServerRoutesConfig::operator=(const ServerRoutesConfig& rhs)
    _allowed_methods = rhs.getMethods();
    _sub_routes = rhs.getSubRoutes();
    _error_pages = rhs.getErrorPages();
+   _alias = rhs.getAlias();
+   _autoindex = rhs.getAutoindex();
    return (*this);
 }
 
@@ -313,6 +331,14 @@ std::vector<ServerRoutesConfig> ServerRoutesConfig::getSubRoutes() const
 std::map<int, std::string> ServerRoutesConfig::getErrorPages() const
 {
    return (_error_pages);  
+}
+std::string ServerRoutesConfig::getAlias() const
+{
+   return (_alias);
+}
+int ServerRoutesConfig::getAutoindex() const
+{
+   return (_autoindex);
 }
 
 
@@ -370,5 +396,12 @@ std::ostream& operator<<(std::ostream& obj, ServerRoutesConfig const &conf)
       }
       obj << "\n";
    }
+   obj << "Alias: ";
+   obj << conf.getAlias();
+   obj << "\nAuto Index: ";
+   if (conf.getAutoindex() == 1)
+      obj << "True";
+   else
+      obj << "False";
    return (obj);
 }

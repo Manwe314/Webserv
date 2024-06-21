@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 18:42:38 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/19 03:03:46 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/21 01:58:49 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -181,6 +181,7 @@ int countMatchingChars(std::string first, std::string second, int pos)
     return (count);
 }
 
+
 //Function to read an entire file into a single string (including new line characters).
 std::string readFile(std::string full_name)
 {
@@ -239,6 +240,35 @@ std::string readBinaryFile(const std::string &path)
     file.seekg(0, std::ios::beg);
     file.read(&data[0], data.size());
     return (data);
+}
+
+std::string listDirectoryContents(std::string uri)
+{
+    std::vector<std::string> content;
+    DIR* dir = opendir(uri.c_str());
+    if (dir == NULL)
+        return (std::string(""));
+
+    struct dirent* entry;
+    while ((entry= readdir(dir)) != NULL)
+    {
+        if (std::strcmp(entry->d_name, ".") != 0 && std::strcmp(entry->d_name, "..") != 0)
+            content.push_back(entry->d_name);
+    }
+    closedir(dir);
+    
+    std::stringstream body;
+    
+    body << "<html>\n<head>\n<title>Directory Listing</title>\n</head>\n<body>\n";
+    body << "<h1>Contents of Direcotry: " << uri.substr(uri.rfind("/") + 1) << "</h1>\n";
+    body << "<ul>\n";
+    for (size_t i = 0; i < content.size(); i++)
+    {
+        body << "<li>" << content[i] << "</li>\n";
+    }
+    body << "</ul>\n</body>\n</html>\n";
+    
+    return (body.str());
 }
 
 
