@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: brettleclerc <brettleclerc@student.42.f    +#+  +:+       +#+        */
+/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 18:42:38 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/20 19:11:44 by brettlecler      ###   ########.fr       */
+/*   Updated: 2024/06/24 16:10:50 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,6 +111,16 @@ std::string	trimSpaces( std::string string )
 	return string.substr(first, (last - first + 1));
 }
 
+//Check function before initiating Cgi class
+bool isValidCgiFile( std::string const & file )
+{
+	std::string type;
+
+	type = file.substr(file.rfind(".") + 1);
+	if (type == ".py" || type == ".php")
+		return true;
+	return false; // Unsupported script type
+}
 
 /*
 	This function returns a pair of ints that points to 2 elements in a vector.

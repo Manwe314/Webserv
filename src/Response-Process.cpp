@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response-Process.cpp                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: brettleclerc <brettleclerc@student.42.f    +#+  +:+       +#+        */
+/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 16:59:31 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/22 17:42:48 by brettlecler      ###   ########.fr       */
+/*   Updated: 2024/06/24 16:12:00 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -267,7 +267,25 @@ std::string Response::processPOST()
             _status_code = 405;
             return (handleErrorResponse());
         }
-	
+		if (isValidCgiFile(_request_URI)) // how to get the envp file in the most efficient way?
+		{
+			Cgi()
+		}
+		else
+		{
+			
+		}
+		_status_code = 200;
+        headers = headersProcess(body, _path);
+        status_line = statusLineProcess();
+        response = status_line + headers + "\r\n" + body;
+	}
+	catch(const NoMatchFound& e)
+    {
+        _status_code = std::atoi(e.what());
+        response = handleErrorResponse();
+    }
+	return (response);
 }
 
 std::string Response::processGET()

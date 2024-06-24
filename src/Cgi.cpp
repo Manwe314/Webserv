@@ -6,7 +6,7 @@
 /*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/30 09:46:55 by bleclerc          #+#    #+#             */
-/*   Updated: 2024/06/05 17:00:42 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/06/24 16:09:48 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,16 +25,6 @@ Cgi::Cgi( std::string & file, char **envp ) : _file(file)
 		executeScript(_file, envp);
 }
 
-//Check function before initiating Cgi class
-bool isValidCgiFile( std::string const & file )
-{
-	if (file.length() >= 5 && !file.compare(file.length() - 4, 4, ".php"))
-		return true; // PHP script
-	else if (file.length() >= 4 && !file.compare(file.length() - 3, 3, ".py"))
-		return true; // Python script
-	return false; // Unsupported script type
-}
-
 /*
 	Check the file extension and determine the type of script.
 	Return 0 if script type not found.
@@ -42,9 +32,12 @@ bool isValidCgiFile( std::string const & file )
 */
 int	Cgi::determineExtension( std::string const & file ) const
 {
-	if (file.length() >= 5 && !file.compare(file.length() - 4, 4, ".php"))
+	std::string type;
+
+	type = file.substr(file.rfind(".") + 1);
+	if (type == ".php")
 		return 1; // PHP script
-	else if (file.length() >= 4 && !file.compare(file.length() - 3, 3, ".py"))
+	else if (type == ".py")
 		return 2; // Python script
 	return 0; // Unsupported script type
 }

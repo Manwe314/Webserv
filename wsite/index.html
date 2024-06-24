@@ -15,6 +15,18 @@
     </div>
 
     <button onclick="onChangeImage()">Change Image</button>
+
+	<div class="form-wrapper">
+        <form id="contactForm" onsubmit="return onSubmitForm(event)">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required><br><br>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required><br><br>
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+
+    <div id="formResponse"></div>
 </body>
 
 </html>

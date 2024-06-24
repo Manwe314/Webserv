@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Webserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: brettleclerc <brettleclerc@student.42.f    +#+  +:+       +#+        */
+/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 14:44:27 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/20 19:27:15 by brettlecler      ###   ########.fr       */
+/*   Updated: 2024/06/24 16:11:14 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,6 +113,6 @@ bool isInvalidVersion(std::string& version);
 bool isValidHttpMethod(std::string& method);
 bool isInvalidHttpMethod(std::string& method);
 bool isAllowed(const std::vector<std::string>& allowed_methods, std::string &method);
-
+bool isValidCgiFile( std::string const & file );
 
 #endif
