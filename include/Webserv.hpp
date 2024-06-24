@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Webserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: brettleclerc <brettleclerc@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 14:44:27 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/20 17:38:39 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/06/20 19:27:15 by brettlecler      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@
 #define REQUEST_MAX 1000
 #define MAX_EVENTS 1000
 #define TIMEOUT_SEC 2
-#define DEFAULT_ERROR "/home/manwe/42/commonCoreS2/webserv/error_pages"
+#define DEFAULT_ERROR "/Users/brettleclerc/Documents/ecole_42/schoolWork/webserv_github_levan/error_pages"
 
 //Colours for readbility
 #define DEFAULT "\033[0m"

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: brettleclerc <brettleclerc@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/08 23:27:16 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/20 18:21:59 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/06/20 19:49:24 by brettlecler      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,11 +111,35 @@ static std::pair<std::string, std::string> makeHeaderPair(std::string header)
     return (std::make_pair(name, value));
 }
 /*
-	An example of a chunked body:
+	POST / HTTP/1.1
+	Host: localfedfgw
+	Transfer-encoding: chunked
+
 	"4\r\nWiki\r\n"
+	
+	POST / HTTP/1.1
+	Host: localfedfgw
+	Transfer-encoding: chunked
+	
+
 	"5\r\npedia\r\n"
+
+
+	POST / HTTP/1.1
+	Host: localfedfgw
+	Transfer-encoding: chunked
+	
+
 	"e\r\n in\r\n\r\nchunks.\r\n"
+
+
+	POST / HTTP/1.1
+	Host: localfedfgw
+	Transfer-encoding: chunked
+	
+	
 	"0\r\n\r\n"
+
 
 	The first character is the chunked message size.
 	If 0, then consider as the as the end of the entire message.
@@ -191,10 +215,10 @@ void	Response::parseMessageBody(std::string message_body)
 			while (true) //loops over the chunked message until the chunk size is 0
 			{
 				_chunk_size = 0;
-					readChunkSize(message_body); //gives us the chunked message size for reading
-					if (_chunk_size == 0)
-						break ;
-					readChunkData(message_body); //reads as per the defined chunked size
+				readChunkSize(message_body); //gives us the chunked message size for reading
+				if (_chunk_size == 0)
+					break ;
+				readChunkData(message_body); //reads as per the defined chunked size
 			}
 		}
 		else if (it_length != _headers.end()) //if content_length found:

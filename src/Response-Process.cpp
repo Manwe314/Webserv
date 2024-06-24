@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response-Process.cpp                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
+/*   By: brettleclerc <brettleclerc@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 16:59:31 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/14 01:21:37 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/22 17:42:48 by brettlecler      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -251,6 +251,25 @@ std::string Response::serviceGetResource(ServerRoutesConfig config, std::string 
     return (body);
 }
 
+std::string Response::processPOST()
+{
+	ServerRoutesConfig config;
+    std::string response;
+    std::string status_line;
+    std::string headers;
+    std::string body;
+
+	try
+    {
+        config = matchSubRoute(_request_URI);
+        if (!isAllowed(config.getMethods() ,_method))
+        {
+            _status_code = 405;
+            return (handleErrorResponse());
+        }
+	
+}
+
 std::string Response::processGET()
 {
     ServerRoutesConfig config;
@@ -338,6 +357,8 @@ std::string Response::process()
         response = processGET();
     else if (_method == "DELETE")
         response = processDELETE();
+	else if (_method == "POST")
+		response = processPOST();
     else
     {
         std::cout << YELLOW << "\n(NOT A GET REQUEST)" << DEFAULT << std::endl;
