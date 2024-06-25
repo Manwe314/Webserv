@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: brettleclerc <brettleclerc@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 18:42:38 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/24 16:10:50 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/06/25 11:20:25 by brettlecler      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -225,25 +225,63 @@ void toLowerCase(std::string &str)
 
 
 //this function count how many characters match until it doesnt starting from pos (default 0), between first and second strings.
-int countMatchingChars(std::string first, std::string second, int pos)
+//the flag (dafult 0) will count with "/" syntax in mind if set to anything else the functionn  will just count the amount of matching chars
+int countMatchingChars(std::string first, std::string second, int pos, int flag)
 {
     int count;
+    int temp;
     int min_size;
 
     count = 0;
+    temp = 0;
     min_size = std::min(first.size(), second.size());
-    
-    if (pos > min_size)
-        return (-1);
-    for (int i = pos; i < min_size; i++)
+    if (flag != 0)
     {
-        if (first[i] == second[i])
-            count++;
-        else
-            break;
+        
+        if (pos > min_size)
+            return (-1);
+        for (int i = pos; i < min_size; i++)
+        {
+            if (first[i] == second[i])
+                count++;
+            else
+                break;
+        }
     }
+    else
+    {
+        if (pos > min_size)
+            return (-1);
+        int i = pos;
+        while (i < min_size)
+        {
+            if (first[i] == second[i])
+            {
+                temp++;
+                if (first[i] == '/')
+                    count = temp;
+                if (i + 1 == min_size && first.size() == second.size())
+                    count = temp;
+                else if (i + 1 == min_size && first.size() > second.size())
+                {
+                    if (first[i + 1] == '/')
+                        count = temp;
+                }
+                else if (i + 1 == min_size && first.size() < second.size())
+                {
+                    if (second[i + 1] == '/')
+                        count = temp;
+                }
+            }
+            else
+                break;
+            i++;
+        }
+    }
+    
     return (count);
 }
+
 
 //Function to read an entire file into a single string (including new line characters).
 std::string readFile(std::string full_name)
@@ -306,6 +344,74 @@ std::string readBinaryFile(const std::string &path)
 }
 
 
+std::string lastModifiedTime(std::string path)
+{
+    struct stat stat_buffer;
+    std::stringstream time;
+    std::time_t mod_time;
+    
+    if (stat(path.c_str(), &stat_buffer) != 0)
+    {
+        time << "";
+        return (time.str());
+    }
+    
+    mod_time = stat_buffer.st_mtime;
+    time << std::ctime(&mod_time);
+    return (time.str()); 
+}
+
+static std::string generateListElement(std::string uri, t_host_port pair, std::string name)
+{
+    std::stringstream element;
+    std::string path;
+
+    path = uri + "/" + name;
+
+    if (uri[0] == '.')
+        uri.erase(0, 1);
+    element << "\t\t<p><a href=\"http://";
+    element << pair;
+    element << uri;
+    element << name + "\">" + name + "</a>";
+    element << "\t\t\t\t";
+    element << lastModifiedTime(path);
+    element << "</p>\n";
+    return (element.str());
+}
+
+std::string listDirectoryContents(std::string uri, t_host_port pair)
+{
+    std::vector<std::string> content;
+    DIR* dir = opendir(uri.c_str());
+    if (dir == NULL)
+        return (std::string(""));
+
+    struct dirent* entry;
+    while ((entry= readdir(dir)) != NULL)
+    {
+        if (std::strcmp(entry->d_name, ".") != 0 && std::strcmp(entry->d_name, "..") != 0)
+            content.push_back(entry->d_name);
+    }
+    closedir(dir);
+    
+    std::stringstream body;
+    
+    body << "<html>\n<head>\n<title>Directory Listing</title>\n</head>\n<body>\n";
+    body << "<h1>Contents of Direcotry: ";
+    body << uri.substr(uri.rfind("/", uri.rfind("/") - 1) + 1);
+    body << "</h1>\n";
+    body << "<ul>\n";
+    for (size_t i = 0; i < content.size(); i++)
+    {
+        body << "<li>" << generateListElement(uri, pair, content[i]) << "</li>\n";
+    }
+    body << "</ul>\n</body>\n</html>\n";
+    
+    return (body.str());
+}
+
+
 //this function returns true if a header line is formated correctly or false if its not.
 //only rule is that the string must start with a name that is between 33 and 126 asccii characters ending with a colon ":". after that its free game.
 bool isValidHeader(std::string& header)
@@ -346,7 +452,7 @@ bool isValidHttpMethod(std::string& method)
 */
 bool isInvalidHttpMethod(std::string& method)
 {
-    if (method.compare("OPTIONS") == 0 || method.compare("HEAD") == 0 || method.compare("PUT") == 0)
+    if (method.compare("OPTIONS") == 0 || method.compare("HEAD") == 0)
         return (true);
     if (method.compare("TRACE") == 0 || method.compare("CONNECT") == 0)
         return (true);
@@ -376,38 +482,40 @@ bool isInvalidVersion(std::string& version)
     return (false);
 }
 
-/*
-    this function returns true if the given file path points to a valid, readable file
-    or false if it dosent.
-*/
-bool isValidFile(std::string& file_path)
-{
-    std::ifstream file(file_path.c_str());
-    return file.is_open();
-}
 
 /*
-    this function returns true if a given path point to a directory
-    or false if it doesnt or if path is invalid.
+    this function returns the enumirated status of a given path.
+    what each enum reprisents is self explanatory.
 */
-bool isDirectory(const std::string& path)
+int pathStatus(const std::string& path)
 {
     struct stat stat_buffer;
+    int status = UNKNOWN;
     if (stat(path.c_str(), &stat_buffer) != 0)
-        return (false);
-    return (S_ISDIR(stat_buffer.st_mode));
-}
-
-/*
-    this function returns true if a given path points to a file
-    or false if it doesnt or if path is invalid
-*/
-bool isFile(const std::string& path)
-{
-    struct stat stat_buffer;
-    if (stat(path.c_str(), &stat_buffer) != 0)
-        return (false);
-    return (S_ISREG(stat_buffer.st_mode));
+    {
+        switch (errno)
+        {
+        case ENOENT:
+            status = DOES_NOT_EXIST;
+            break;
+        case EACCES:
+            status = PERMISSION_DENIED;
+            break;
+        default:
+            status = UNKNOWN;
+            break;
+        }
+    }
+    else
+    {
+        if (S_ISDIR(stat_buffer.st_mode))
+            status = IS_DIRECTORY;
+        else if (S_ISREG(stat_buffer.st_mode))
+            status = IS_FILE;
+        else
+            status = UNKNOWN;
+    }
+    return (status);
 }
 
 /*
@@ -424,6 +532,24 @@ bool isAllowed(const std::vector<std::string>& allowed_methods, std::string &met
     return (false);
 }
 
+
+std::ostream& operator<<(std::ostream& obj, const s_host_port& pair)
+{
+    unsigned int one = pair.host & 0xFF;
+    unsigned int two = (pair.host >> 8) & 0xFF;
+    unsigned int three = (pair.host >> 16) & 0xFF;
+    unsigned int four = (pair.host >> 24) & 0xFF;
+    obj << four;
+    obj << ".";
+    obj << three;
+    obj << ".";
+    obj << two;
+    obj << ".";
+    obj << one;
+    obj << ":";
+    obj << pair.port;
+    return (obj);
+}
 
 static void printRouteConfig(std::vector<ServerRoutesConfig> routes)
 {
@@ -473,14 +599,10 @@ void printConfig(Config conf)
     std::cout << "~~~~~~~~~~~~~~~~~" << GREEN << "THE CONFIG" << DEFAULT << "~~~~~~~~~~~~~~~~~" << std::endl;
     for (std::vector<ServerConfig>::iterator i = servers.begin(); i != servers.end(); i++)
     {
-        t_host_port pair = (*i).getHostPortPair();
-        unsigned int one = pair.host & 0xFF;
-        unsigned int two = (pair.host >> 8) & 0xFF;
-        unsigned int three = (pair.host >> 16) & 0xFF;
-        unsigned int four = (pair.host >> 24) & 0xFF;
+        std::vector<t_host_port> pair = (*i).getHostPortPair();
         std::cout << GREEN << "_____________________________________________" << DEFAULT << std::endl;
         std::cout << BLUE << "SERVER NAME: " << DEFAULT << (*i).getName() << std::endl;
-		std::cout << BLUE << "HOST PORT PAIR: " << DEFAULT << four << "." << three << "." << two << "." << one << ":" << pair.port << std::endl;
+		printVector(pair);
         std::cout << "----" << CYAN << "SERVERWIDE CONFIG" << DEFAULT << "----" << std::endl;
         ServerRoutesConfig serverwide = (*i).getServerWideConfig();
         std::cout << CYAN << "Root: " << DEFAULT << serverwide.getRoot() << std::endl;

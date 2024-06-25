@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   Cgi.cpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: brettleclerc <brettleclerc@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/30 09:46:55 by bleclerc          #+#    #+#             */
-/*   Updated: 2024/06/24 16:09:48 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/06/25 12:12:17 by brettlecler      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/Cgi.hpp"
 
-Cgi::Cgi( std::string & file, char **envp ) : _file(file)
+Cgi::Cgi( std::string & file, char **envp ) : _file(file), _envp(envp)
 {
 	//	Checks if file is accessible and executable
 	if (access(_file.c_str(), X_OK) != 0)
@@ -22,7 +22,7 @@ Cgi::Cgi( std::string & file, char **envp ) : _file(file)
 	if (!_extension)
 		throw CgiExecutionError("Error: " + _file + " unsupported script format");
 	else
-		executeScript(_file, envp);
+		executeScript(_file);
 }
 
 /*
@@ -46,15 +46,15 @@ int	Cgi::determineExtension( std::string const & file ) const
 	Extract the PATH environment variable and split it into individual paths.
 	First step towards retrieving the php-cgi interpreter in a system
 */
-std::vector<std::string>	Cgi::extractEnvPath( char ** envp )
+std::vector<std::string>	Cgi::extractEnvPath()
 {
 	std::vector<std::string>	env_paths;
 
 	int i = -1;
 
-	while (envp[++i])
+	while (_envp[++i])
 	{
-		std::string tmp_env_var = static_cast<std::string>(envp[i]);
+		std::string tmp_env_var = static_cast<std::string>(_envp[i]);
 		if (!tmp_env_var.compare(0, 5, "PATH="))
 		{
 			tmp_env_var.erase(0, 5);
@@ -69,9 +69,9 @@ std::vector<std::string>	Cgi::extractEnvPath( char ** envp )
 	Here we add the correct relative path of the PHP-CGI interpreter,
 	paths extracted from the system's environment
 */
-std::string	Cgi::retrievePhpCgiInterpreter( char ** envp )
+std::string	Cgi::retrievePhpCgiInterpreter()
 {
-	std::vector<std::string>	env_paths = extractEnvPath(envp);
+	std::vector<std::string>	env_paths = extractEnvPath();
 
 	if (env_paths.size() == 0)
 		return "";
@@ -101,7 +101,7 @@ bool	Cgi::readfile(int read_fd)
 }
 
 // Function to execute a script and capture its output
-void	Cgi::executeScript( std::string const & file, char **envp)
+void	Cgi::executeScript( std::string const & file)
 {
 	int			pfd[2], status;
 	pid_t		pid;
@@ -110,7 +110,7 @@ void	Cgi::executeScript( std::string const & file, char **envp)
 	// Determine the interpreter based on the script type
 	if (_extension == 1) // PHP script
 	{
-		interpreter = retrievePhpCgiInterpreter(envp);
+		interpreter = retrievePhpCgiInterpreter();
 		//std::cout << interpreter << std::endl;
 		if (interpreter.empty())
 			throw CgiExecutionError("Error: php-cgi not found");
@@ -128,12 +128,12 @@ void	Cgi::executeScript( std::string const & file, char **envp)
 		{
 			char *args[] = {const_cast<char *>(interpreter.c_str()),\
 			const_cast<char *>(file.c_str()), NULL};
-			execve(interpreter.c_str(), args, envp);
+			execve(interpreter.c_str(), args, _envp);
 		}
 		else
 		{
 			char *args[] = {const_cast<char *>(file.c_str()), NULL};
-			execve(file.c_str(), args, envp);
+			execve(file.c_str(), args, _envp);
 		}
 		close(STDOUT_FILENO); //not sure about this.
 		exit(EXIT_FAILURE);
@@ -169,7 +169,7 @@ void	Cgi::executeScript( std::string const & file, char **envp)
 
 /**** UNUSED FUNCTIONS ****/
 
-Cgi::Cgi() : _file("default")
+Cgi::Cgi()
 {
 	return ;
 }
@@ -179,12 +179,14 @@ Cgi::~Cgi()
 	return ;
 }
 
-Cgi::Cgi( Cgi const & src ) : _file(src._file) {
+Cgi::Cgi( Cgi const & src ) {
+	*this = src;
 	return ;
 }
 
 Cgi &	Cgi::operator=( Cgi const & rhs ) {
-	(void)rhs;	
+	(void)rhs;
+	return *this;
 }
 
 

@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 18:29:19 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/11 22:03:19 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/25 03:30:38 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,9 @@ enum Rule{
 	ALLOW_METHODS,
 	ROOT,
 	INDEX,
-   ERROR_PAGE
+   ERROR_PAGE,
+   ALIAS,
+   AUTOINDEX
 };
 
 bool ServerRoutesConfig::isRule(std::string input)
@@ -109,6 +111,16 @@ std::vector<std::string>& route_block, std::vector<std::string>::const_iterator 
          for (std::vector<int>::iterator it = status_codes.begin(); it != status_codes.end(); it++)
             _error_pages.insert(std::make_pair((*it), (*input)));
       break;
+   case ALIAS:
+      _alias = *(++input);
+      break;
+   case AUTOINDEX:
+      input++;
+      if ((*input).compare("on") == 0)
+         _autoindex = 1;
+      if ((*input).compare("off") == 0)
+         _autoindex = 0;
+      break;
    
    default:
       break;
@@ -116,7 +128,7 @@ std::vector<std::string>& route_block, std::vector<std::string>::const_iterator 
    
 }
 
-ServerRoutesConfig::ServerRoutesConfig(std::vector<std::string> route_block, std::string location) : _index_files(), _allowed_methods(), _sub_routes(), _error_pages()
+ServerRoutesConfig::ServerRoutesConfig(std::vector<std::string> route_block, std::string location) : _index_files(), _allowed_methods(), _sub_routes(), _error_pages(), _autoindex(-1)
 {
    //the config file is split with a charset (space tab newline). must read info out from a vector like that here.
    //route block is whatever is inside "{ }" after the location is defined.
@@ -155,13 +167,17 @@ void ServerRoutesConfig::inherit(ServerRoutesConfig parent)
       _allowed_methods = parent.getMethods();
    if (_error_pages.empty())
       _error_pages = parent.getErrorPages();
+   if (_alias.empty())
+      _alias = parent.getAlias();
+   if (_autoindex != parent.getAutoindex() && parent.getAutoindex() != -1)
+      _autoindex = parent.getAutoindex();
    
 }
 
 //this function returns a struct that has an int and a pointer. the int represents the amount of characters that matched between uri and location.
 // pointer is a pointer to the ServerRouteConfig that this match has happened in.
 //this function will evaluate itself and all of its sub routes and return the BEST match I.E struct with the highest "int". (note that -1 means a compleate match which is considered as a higher number than any positive integer).
-t_route_match ServerRoutesConfig::findRouteMatch(std::string uri)
+t_route_match ServerRoutesConfig::findRouteMatch(std::string uri, ServerRoutesConfig serverwide)
 {
    //match is evaluating iteslf
    t_route_match match;
@@ -169,7 +185,7 @@ t_route_match ServerRoutesConfig::findRouteMatch(std::string uri)
    std::vector<t_route_match> sub_matches;
 
    //startint from the begining count how many chars match betwen location and uri before first missmatch.
-   match.match_length = countMatchingChars(_location, uri); // ----> need to at logic for counting with slashes "/"  in mind <-----
+   match.match_length = countMatchingChars(_location, uri);
    match.route = this;
    //if the matching length is same as the entire uri AND location path, then it is a compleate match. in this case no further searching is required since we cant find a better match.
    if (match.match_length == (int)uri.size() && match.match_length == (int)_location.size())
@@ -189,8 +205,10 @@ t_route_match ServerRoutesConfig::findRouteMatch(std::string uri)
       //in the case of inproper nesting the subroute just does not inherit from parent but regardless is evaluated for matching purposes. it is considered to be outside of the parent route block.
       if (countMatchingChars(_location, (*it).getLocation()) == (int)_location.size())
          (*it).inherit(*this);
+      else
+         (*it).inherit(serverwide);
       //use this same member function such that each sub route will return the struct with best match among THEIR subroutes. this will reqursively search every nested route.
-      sub_matches.push_back((*it).findRouteMatch(uri));
+      sub_matches.push_back((*it).findRouteMatch(uri, serverwide));
    }
    
    //lastly find the best match among the sub routes and this route. 
@@ -234,22 +252,22 @@ ServerRoutesConfig* ServerRoutesConfig::findRootRoute()
 }
 
 //this function will try to serve the path to a valid file using the error_page and root directives.
-//if any problems are encountered (no error_page, no root or their combination does not point to a valid file) default error page will be used.
+//if any problems are encountered (no error_page or does not point to a valid file) default error page will be used.
 std::string ServerRoutesConfig::serveCustomError(int status)
 {
    std::string path;
    std::map<int, std::string>::iterator it;
 
-   if (!_error_pages.empty() && !_root.empty())
+   if (!_error_pages.empty())
    {
       path = _root;
-      if (path[(path.size() - 1)] == '/')
+      if (!path.empty() && path[(path.size() - 1)] == '/')
          path.erase(path.size() - 1, 1);
       it = _error_pages.find(status);
       if (it != _error_pages.end())
       {
          path += (*it).second;
-         if (isValidFile(path))
+         if (pathStatus(path) == IS_FILE)
             return (path);
       }
    }
@@ -282,6 +300,8 @@ ServerRoutesConfig& ServerRoutesConfig::operator=(const ServerRoutesConfig& rhs)
    _allowed_methods = rhs.getMethods();
    _sub_routes = rhs.getSubRoutes();
    _error_pages = rhs.getErrorPages();
+   _alias = rhs.getAlias();
+   _autoindex = rhs.getAutoindex();
    return (*this);
 }
 
@@ -313,6 +333,14 @@ std::vector<ServerRoutesConfig> ServerRoutesConfig::getSubRoutes() const
 std::map<int, std::string> ServerRoutesConfig::getErrorPages() const
 {
    return (_error_pages);  
+}
+std::string ServerRoutesConfig::getAlias() const
+{
+   return (_alias);
+}
+int ServerRoutesConfig::getAutoindex() const
+{
+   return (_autoindex);
 }
 
 
@@ -370,5 +398,12 @@ std::ostream& operator<<(std::ostream& obj, ServerRoutesConfig const &conf)
       }
       obj << "\n";
    }
+   obj << "Alias: ";
+   obj << conf.getAlias();
+   obj << "\nAuto Index: ";
+   if (conf.getAutoindex() == 1)
+      obj << "True";
+   else
+      obj << "False";
    return (obj);
 }

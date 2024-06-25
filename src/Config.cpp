@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Config.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: brettleclerc <brettleclerc@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 21:53:46 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/19 13:07:47 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/06/25 11:18:42 by brettlecler      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,15 +88,6 @@ ServerConfig Config::getServerConfigByName(std::string name) const
     return (_server_configurations[0]);
 }
 
-std::map<std::string, t_host_port> Config::getAllPairs() const
-{
-    std::map<std::string, t_host_port> servers;
-    
-    for (std::vector<ServerConfig>::const_iterator it = _server_configurations.begin(); \
-	it != _server_configurations.end(); it++)
-        servers.insert(std::make_pair((*it).getName(), (*it).getHostPortPair()));
-    return (servers);
-}
 
 Config::Config(std::string path_to_config) : _server_configurations(initServerConfigs(path_to_config))
 {

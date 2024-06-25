@@ -6,7 +6,7 @@
 /*   By: brettleclerc <brettleclerc@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/08 23:27:16 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/20 19:49:24 by brettlecler      ###   ########.fr       */
+/*   Updated: 2024/06/25 11:31:37 by brettlecler      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 	505 - HTTP version not supported
 */
 
-Response::Response(std::string request, ServerConfig config) : _headers()
+Response::Response(std::string request, ServerConfig config, t_host_port pair, char **envp) : _headers(), _pair(pair), _envp(envp)
 {
     size_t i;
     _status_code = -1; //if the status code is -1 after this constructor finishes that means no errors were encountered.

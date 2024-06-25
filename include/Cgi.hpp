@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Cgi.hpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: brettleclerc <brettleclerc@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/30 09:47:34 by bleclerc          #+#    #+#             */
-/*   Updated: 2024/06/19 15:26:49 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/06/25 12:10:53 by brettlecler      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,10 +21,10 @@ class Cgi
 	virtual ~Cgi();
 	 
 	int	determineExtension( std::string const & file ) const;
-	std::string	retrievePhpCgiInterpreter( char ** envp );
-	std::vector<std::string>	extractEnvPath( char ** envp );
+	std::string	retrievePhpCgiInterpreter();
+	std::vector<std::string>	extractEnvPath();
 	bool	readfile(int read_fd);
-	void	executeScript( std::string const & file, char **envp);
+	void	executeScript( std::string const & file);
 	std::string	getCgiResult( void ) const;
 
 	class CgiExecutionError : public std::exception
@@ -42,7 +42,8 @@ class Cgi
 	Cgi( Cgi const & src );
 	Cgi &	operator=( Cgi const & rhs );
 
-	int	_extension;
-	std::string const &	_file;
+	int			_extension;
+	std::string	_file;
 	std::string _result;
+	char		**_envp;
 };

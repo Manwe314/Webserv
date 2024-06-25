@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: brettleclerc <brettleclerc@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 15:02:23 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/19 15:27:04 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/06/25 11:30:37 by brettlecler      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,9 @@ private:
     //Socket address struct populated during constructor call.
     struct sockaddr_in _server_address;
     //this servers configuration.
-    ServerConfig _config;    
+    ServerConfig _config;
+    //server configs with matching host:port pair.
+    std::vector<ServerConfig> _alternative_configs;
     /*
 		Server socket is already an unique identifier
 		but name is just for logging purposes, to make it more readable.
@@ -42,11 +44,12 @@ private:
     int _fd;
 
     void setAddress();
+    ServerConfig determineServer(std::string request);
 public:
     Server();
     //sets the hjost port pair and name, fd is extra, its just another way to make sure the setup() went smoothly since we call this constuctor with -1 for fd.
     //constructor calls setAddress() to populate _server_address.
-    Server(t_host_port pair,std::string name ,int fd, ServerConfig config);
+    Server(t_host_port pair,std::string name ,int fd, ServerConfig config, std::vector<ServerConfig> alt);
     ~Server();
 
     //Sets up the server, it is non-blocking.
@@ -56,7 +59,7 @@ public:
     //Receives client data, it is blocking.
     void receive(int client_fd);
     //Process is like this because I assume that responses are all strings. It is non-blocking.
-    void process(int client_fd);
+    void process(int client_fd, char **envp);
     //Sends the processed client data, it is blocking.
     void send(int client_fd);
     //Closes the fd and deletes the coresponding request, it is non-blocking.
@@ -73,7 +76,7 @@ public:
 
 std::ostream& operator<<(std::ostream& obj, Server const &server);
 
-class SocketCreationError : std::exception
+class SocketCreationError : public std::exception
 {
     private:
         std::string msg;
@@ -84,7 +87,7 @@ class SocketCreationError : std::exception
     
 };
 
-class SocketBindingError : std::exception
+class SocketBindingError : public std::exception
 {
     private:
         std::string msg;
@@ -94,7 +97,7 @@ class SocketBindingError : std::exception
         virtual ~SocketBindingError() throw() {}
 };
 
-class ListeningError : std::exception
+class ListeningError : public std::exception
 {
     private:
         std::string msg;
@@ -105,7 +108,7 @@ class ListeningError : std::exception
     
 };
 
-class ClientConnectionError : std::exception
+class ClientConnectionError : public std::exception
 {
     private:
         std::string msg;

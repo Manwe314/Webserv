@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response-Process.cpp                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: brettleclerc <brettleclerc@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 16:59:31 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/24 16:12:00 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/06/25 11:39:35 by brettlecler      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ std::string Response::default404()
     response = "HTTP/1.1 404 Not Found \r\nServer: webserv/1.0.0 \r\nContent-Type: text/html \r\nContent-Length: 470 \r\nConnection: Keep-Alive \r\n";
     response += getDateHeader();
     response += "\r\n";
-    response += "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n<title>404 Not Found</title>\n<style>\nbody { font-family: Arial, sans-serif; text-align: center; padding: 50px; }\nh1 { font-size: 50px; }\np { font-size: 20px; }\n</style>\n</head>\n<body>\n<h1>404 Not Found</h1>\n<p>The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.</p>\n</body>\n</html>";
+    response += "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n<title>404 Not Found Default.</title>\n<style>\nbody { font-family: Arial, sans-serif; text-align: center; padding: 50px; }\nh1 { font-size: 50px; }\np { font-size: 20px; }\n</style>\n</head>\n<body>\n<h1>404 Not Found</h1>\n<p>The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.</p>\n</body>\n</html>";
     return (response);
 }
 
@@ -79,7 +79,8 @@ ServerRoutesConfig Response::matchSubRoute(std::string uri)
         //the member function returns a struct with the information about the BEST match it could find among itself and its children
         //match_length specifies how good of a match it was. with -1 meaning exact match.
         //route is a pointer to the object that had match_length amount of characters matching
-        temp = (*it).findRouteMatch(uri);
+        (*it).inherit(_server_config.getServerWideConfig());
+        temp = (*it).findRouteMatch(uri, _server_config.getServerWideConfig());
         //if we find a perfect match, since we are looping from the bbegining its the perfect match written first. we no longer search.
         if (temp.match_length == -1)
         {
@@ -122,15 +123,34 @@ ServerRoutesConfig Response::matchSubRoute(std::string uri)
 
 std::string Response::makeFullPath(ServerRoutesConfig config, std::string uri)
 {
+    //alias directivve functionality could be added here
     std::string path;
     
-    path = config.getRoot();
-    
-    if (path.empty())
-        throw NoMatchFound("404");
     if (uri[0] != '/')
         throw NoMatchFound("400");
-    if (path[(path.size() - 1)] == '/')
+
+    if (config.getRoot().empty() && !config.getAlias().empty())
+    {
+        if (countMatchingChars(config.getLocation(), uri) != (int)config.getLocation().size())
+            throw NoMatchFound("404");
+        path = config.getAlias();
+        uri.erase(0, config.getLocation().size());
+    }
+    else if (!config.getRoot().empty() && config.getAlias().empty())
+        path = config.getRoot();
+    else if (config.getRoot().empty() && config.getAlias().empty())
+        throw NoMatchFound("404");
+    else if (!config.getRoot().empty() && !config.getAlias().empty())
+    {
+        if (countMatchingChars(config.getLocation(), uri) == (int)config.getLocation().size())
+        {
+            path = config.getAlias();
+            uri.erase(0, config.getLocation().size());
+        }
+        else
+            path = config.getRoot();
+    }    
+    if (path[(path.size() - 1)] == '/' && uri[0] == '/')
         path.erase(path.size() - 1, 1);
     path += uri;
     return (path);
@@ -144,17 +164,6 @@ std::string Response::handleErrorResponse()
     std::string headers;
     std::string body;
     ServerRoutesConfig config;
-        /*
-            so far matching is working. currantly i know of 2 issues that need fixing.
-            1. when matching uri to location we just count how many chars match. this is not correct since if location is /HEYBOB 
-                and the uri is /HEYALICE the uri would match the location up to 4 chars, yet this is not correct since its just the 
-                begining of the 2 folders names that match. 
-            2. when searching through the tree of nested subroutes. we need to inherit the rules of correctly nested routes like:
-                /one/two beeing under /one and NOT /three/four beeing under /one. both nested routes should end up inheriting from serverwide directives
-                but, in the case of inccorect nesting the nested route is considered to be highest level, so that one should just directly inherit from
-                serverwide. correctly nested route should inherit from its parent that has inherited from serverwide. this is important since
-                if the parent and the serverwide have same directives but the child doesnt the child should get its parents version and not the serverwide one.
-        */
     
     if (_status_code / 100 != 4 && _status_code / 100 != 5)
         return (std::string(""));
@@ -209,7 +218,7 @@ std::string Response::serviceGetResource(ServerRoutesConfig config, std::string 
 
     path = uri;
     
-    if (isDirectory(uri)) // autoindex should be considered here
+    if (pathStatus(uri) == IS_DIRECTORY)
     {
         if (uri[uri.size() - 1] != '/')
             uri += "/";
@@ -219,18 +228,29 @@ std::string Response::serviceGetResource(ServerRoutesConfig config, std::string 
             for (std::vector<std::string>::iterator it = index.begin(); it != index.end(); it++)
             {
                 path = uri + (*it);
-                if (isValidFile(path))
+                if (pathStatus(path) == IS_FILE)
                     break;
             }
         }
         else
-            throw NoMatchFound("403"); //some auto index stuff here. 
+        {
+            if (config.getAutoindex() == 1)
+            {
+                body = listDirectoryContents(uri, _pair);
+                if (body.empty())
+                    throw NoMatchFound("403");
+                _path = uri;
+                return (body);
+            }
+            else
+                throw NoMatchFound("403");
+        }
     }
 
-    if (!isValidFile(path) && isDirectory(uri))
-         throw NoMatchFound("404"); //some auto index stuff here 2
-    if (!isValidFile(path) && !isDirectory(uri))
+    if (pathStatus(path) == DOES_NOT_EXIST)
         throw NoMatchFound("404");
+    if (pathStatus(path) == PERMISSION_DENIED)
+        throw NoMatchFound("403");
     type = path.substr(path.rfind(".") + 1);
     try
     {
@@ -269,16 +289,17 @@ std::string Response::processPOST()
         }
 		if (isValidCgiFile(_request_URI)) // how to get the envp file in the most efficient way?
 		{
-			Cgi()
+			Cgi cgi(_request_URI, _envp);
+			body = cgi.getCgiResult();
+			_status_code = 200;
+			status_line = statusLineProcess();
+        	headers = headersProcess("", ""); //need to check what kind if headers should be included.
+        	response = status_line + headers + "\r\n";
 		}
 		else
 		{
-			
+			return (processPUT());
 		}
-		_status_code = 200;
-        headers = headersProcess(body, _path);
-        status_line = statusLineProcess();
-        response = status_line + headers + "\r\n" + body;
 	}
 	catch(const NoMatchFound& e)
     {
@@ -325,26 +346,33 @@ std::string Response::processDELETE()
     std::string status_line;
     std::string headers;
     std::string body;
+    std::string path;
 
     try
     {
         config = matchSubRoute(_request_URI);
+        path = makeFullPath(config, _request_URI);
         if (!isAllowed(config.getMethods(), _method))
         {
             _status_code = 405;
             return (handleErrorResponse());
         }
-        if (isFile(makeFullPath(config, _request_URI)))
+        if (pathStatus(path) == IS_FILE)
         {
             if (remove(makeFullPath(config, _request_URI).c_str()) == 0)
                 _status_code = 204;
             else
             {
-                _status_code = 403;
+                _status_code = 500;
                 return (handleErrorResponse());
             }
         }
-        else
+        else if (pathStatus(path) == PERMISSION_DENIED)
+        {
+            _status_code = 403;
+            return (handleErrorResponse());
+        }
+        else if (pathStatus(path) == DOES_NOT_EXIST)
         {
             _status_code = 404;
             return (handleErrorResponse());
@@ -358,6 +386,91 @@ std::string Response::processDELETE()
     {
         _status_code = std::atoi(e.what());
         response = handleErrorResponse();
+    }
+    return (response);
+}
+
+static bool hasUnimplementedContent(std::map<std::string, std::string> headers)
+{
+    std::map<std::string, std::string>::iterator it;
+
+    it = headers.find("content-encoding");
+    if (it != headers.end())
+        return (true);
+    it = headers.find("content-md5");
+    if (it != headers.end())
+        return (true);
+    it = headers.find("content-range");
+    if (it != headers.end())
+        return (true);
+    return (false);
+    
+}
+
+std::string Response::processPUT()
+{
+    ServerRoutesConfig config;
+    std::string path;
+    std::string status_line;
+    std::string headers;
+    std::string response;
+
+    try
+    {
+        config = matchSubRoute(_request_URI);
+        path = makeFullPath(config, _request_URI);
+        if (!isAllowed(config.getMethods(), _method))
+        {
+            _status_code = 405;
+            return (handleErrorResponse());
+        }
+        if (hasUnimplementedContent(_headers))
+        {
+            _status_code = 500;
+            return (handleErrorResponse());
+        }
+        if (pathStatus(path) == IS_DIRECTORY)
+        {
+            _status_code = 409;
+            return (handleErrorResponse());
+        }
+        if (pathStatus(path) == PERMISSION_DENIED)
+        {
+            _status_code = 403;
+            return (handleErrorResponse());
+        }
+        if (pathStatus(path) == IS_FILE)
+        {
+            std::ofstream file(path.c_str(), std::ios::out);
+            if (!file)
+            {
+                _status_code = 403;
+                return (handleErrorResponse());
+            }
+            file << _body;
+            file.close();
+            _status_code = 204;
+        }
+        else
+        {
+            std::ofstream file(path.c_str(), std::ios::out);
+            if (!file)
+            {
+                _status_code = 500;
+                return (handleErrorResponse());
+            }
+            file << _body;
+            file.close();
+            _status_code = 201;
+        }
+        status_line = statusLineProcess();
+        headers = headersProcess("", "");
+        response = status_line + headers + "\r\n";
+    }
+    catch(const NoMatchFound& e)
+    {
+        _status_code = std::atoi(e.what());
+        return (handleErrorResponse());
     }
     return (response);
 }
@@ -377,6 +490,8 @@ std::string Response::process()
         response = processDELETE();
 	else if (_method == "POST")
 		response = processPOST();
+    else if (_method == "PUT")
+        response = processPUT();
     else
     {
         std::cout << YELLOW << "\n(NOT A GET REQUEST)" << DEFAULT << std::endl;

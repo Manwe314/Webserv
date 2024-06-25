@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 17:09:31 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/12 21:08:57 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/21 16:02:04 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,10 @@ private:
     std::vector<ServerRoutesConfig> _sub_routes;
     //a map of error page URI's with key being status code and value the URI
     std::map<int, std::string> _error_pages;
+    //alias path
+    std::string _alias;
+    //autoindex state (-1, not declared. 0, declared to off. 1 declared to on).
+    int _autoindex;
     
     //A function that helps with initilization
     void readRule(std::vector<std::string>::iterator input, std::vector<std::string>& route_block, std::vector<std::string>::const_iterator rule);
@@ -65,7 +69,7 @@ public:
 
     void inherit(ServerRoutesConfig parent);
     
-    t_route_match findRouteMatch(std::string uri);
+    t_route_match findRouteMatch(std::string uri, ServerRoutesConfig serverwide);
     ServerRoutesConfig* findRootRoute();
     std::string serveCustomError(int status);
 
@@ -77,6 +81,8 @@ public:
     std::vector<std::string> getMethods() const;
     std::vector<ServerRoutesConfig> getSubRoutes() const;
     std::map<int, std::string> getErrorPages() const;
+    std::string getAlias() const;
+    int getAutoindex() const;
 };
 std::ostream& operator<<(std::ostream& obj, ServerRoutesConfig const &conf);
 

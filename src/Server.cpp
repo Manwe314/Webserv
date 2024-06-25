@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: brettleclerc <brettleclerc@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 16:12:04 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/20 16:55:20 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/06/25 11:52:32 by brettlecler      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 #include "Response.hpp"
 
 //initialize the class memeber variables. including the requests map to an empty map.
-Server::Server(t_host_port pair, std::string name ,int fd, ServerConfig config) : _requests(), _responses()
+Server::Server(t_host_port pair, std::string name ,int fd, ServerConfig config, std::vector<ServerConfig> alt) : _requests(), _responses(), _alternative_configs(alt)
 {
     _pair.host = pair.host;
     _pair.port = pair.port;
@@ -133,18 +133,49 @@ void Server::receive(int client_fd)
             throw ClientConnectionError("Read error: Connection closed in the server named: " + _name);
     }
     _requests[client_fd] += std::string(buffer);
-    std::cout << YELLOW << "\n~~~~~~~~~~~~~message~~~~~~~~~~~~~" << DEFAULT <<std::endl;
-    std::cout << std::string(buffer) << std::endl;
-    std::cout << YELLOW << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << DEFAULT << std::endl;
+    //std::cout << LAVENDER << "\n*************alters*************\n" << DEFAULT << std::endl;
+    //std::cout << GREEN << _pair << " " << _name <<DEFAULT << std::endl;
+    //printVector(_alternative_configs);
+    //std::cout << LAVENDER << "********************************" << DEFAULT << std::endl;
+    //std::cout << YELLOW << "\n~~~~~~~~~~~~~message~~~~~~~~~~~~~" << DEFAULT <<std::endl;
+    //std::cout << std::string(buffer) << std::endl;
+    //std::cout << YELLOW << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << DEFAULT << std::endl;
 }
 
-void Server::process(int client_fd)
+ServerConfig Server::determineServer(std::string request)
 {
-    Response response(_requests[client_fd], _config);
-    
-    std::cout << MAGENTA << "THE RESPONSE object:\n" << response << DEFAULT << std::endl;
-    std::string responseio = response.process();
+    Response temp(request, _config, _pair, NULL);
+    std::map<std::string, std::string> headers = temp.getHeaders();
+    std::map<std::string, std::string>::iterator it = headers.find("host");
+    std::string::iterator end_pos;
+    std::string host_name;
+    if (it == headers.end())
+        return (_config);
+    if (_alternative_configs.empty())
+        return (_config);
+    host_name = (*it).second;
+    end_pos = std::remove(host_name.begin(), host_name.end(), ' ');
+    host_name.erase(end_pos, host_name.end());
+    for (std::vector<ServerConfig>::iterator i = _alternative_configs.begin(); i != _alternative_configs.end() ; i++)
+    {
+        if ((*i).getName() == host_name)
+        {
+            return (*i);
+        }
+    }
+    return (_config);
+}
 
+void Server::process(int client_fd, char **envp)
+{
+    ServerConfig config;
+    config = determineServer(_requests[client_fd]);
+    Response response(_requests[client_fd], config, _pair, envp);
+    
+    //std::cout << MAGENTA << "THE RESPONSE object:\n" << response << DEFAULT << std::endl;
+    std::string responseio = response.process();
+    
+    //std::cout << CYAN << "THE RESPONSE msg:\n" << responseio << DEFAULT << std::endl;
     _responses.insert(std::make_pair(client_fd, responseio));
 }
 

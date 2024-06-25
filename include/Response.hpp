@@ -6,7 +6,7 @@
 /*   By: brettleclerc <brettleclerc@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/08 23:20:55 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/22 17:41:46 by brettlecler      ###   ########.fr       */
+/*   Updated: 2024/06/25 12:01:17 by brettlecler      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,12 +15,15 @@
 
 #include "Webserv.hpp"
 #include "Config.hpp"
+#include "Cgi.hpp"
 
 /*
 	This class will do all the processing for a given request
 	and provide a response to the server. 
 	A bunch of things will be needed in this class.
 */
+
+class Cgi;
 class Response
 {
 private:
@@ -31,9 +34,11 @@ private:
     std::string _method;
     std::string _body;
     std::string _path;
-    int 		_status_code;
+	int			_status_code;
 	size_t		_position;
 	size_t		_chunk_size;
+    t_host_port _pair;
+	char		**_envp;
 
     void	parseRequestLine(std::string request_line);
     void	parseMessageHeaders(std::string message_headers);
@@ -45,13 +50,14 @@ private:
 
     std::string processGET();
     std::string processDELETE();
+    std::string processPUT();
 	std::string processPOST();
     std::string statusLineProcess();
     std::string handleErrorResponse();
     std::string headersProcess(std::string body, std::string path);
     std::string serviceGetResource(ServerRoutesConfig config, std::string uri);
 public:
-    Response(std::string request, ServerConfig config);
+    Response(std::string request, ServerConfig config, t_host_port pair, char **envp);
     ~Response();
     
     std::string process();

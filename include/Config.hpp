@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Config.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: brettleclerc <brettleclerc@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 19:33:28 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/19 13:26:47 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/06/25 11:17:04 by brettlecler      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,6 @@ public:
 
     ServerConfig getServerConfigByName(std::string name) const;
 
-    std::map<std::string, t_host_port> getAllPairs() const;
 };
 
 class CouldNotOpenFile : public std::exception

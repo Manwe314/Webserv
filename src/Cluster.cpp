@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Cluster.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: brettleclerc <brettleclerc@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/28 01:14:37 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/17 17:38:45 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/06/25 11:54:22 by brettlecler      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,12 +14,33 @@
 #include "Webserv.hpp"
 
 
+static std::vector<ServerConfig> serveAlternatives(std::vector<ServerConfig> servers, t_host_port pair, std::string name)
+{
+    std::vector<ServerConfig> alternatives;
+    std::vector<t_host_port> pairs;
+
+    for (std::vector<ServerConfig>::iterator it = servers.begin(); it != servers.end(); it++)
+    {
+        pairs = (*it).getHostPortPair();
+        for (std::vector<t_host_port>::iterator i = pairs.begin(); i != pairs.end(); i++)
+        {
+            if ((*i) == pair && name != (*it).getName())
+            {
+                alternatives.push_back((*it));
+            }
+        }
+    }
+    //printVector(alternatives);
+    return (alternatives);
+}
+
 //Cluster config that creates the servers and prepares them for run().
 Cluster::Cluster(Config conf, char **envp) : _envp(envp)
 {
-	(void)_envp;
     //for Server constuctor we only need the host port pair and name, so we use a map with string and t_host_port key value pair.
     std::vector<ServerConfig> servers;
+    std::vector<t_host_port> bound_pairs;
+    std::vector<t_host_port> pairs;
 
     //config member function to return all succsessfuly configured servers name and t_host_pair.        
     servers = conf.getServerConfigs();
@@ -27,22 +48,31 @@ Cluster::Cluster(Config conf, char **envp) : _envp(envp)
     //we need to itterate over every element of this map and for each:
     for (std::vector<ServerConfig>::iterator it = servers.begin(); it != servers.end(); it++)
     {
-        //call a server constuctor with t_host_port and name (fd set at -1, fd will be set by the setup() function of the server itself).
-        Server server((*it).getHostPortPair(), (*it).getName(), -1, (*it));
-        try
+        pairs = (*it).getHostPortPair();
+        for (std::vector<t_host_port>::iterator i = pairs.begin(); i != pairs.end(); i++)
         {
-            //Call setup() member function
-            server.setup();
-            //Make a pair of fd and server and insert it to _servers variable
-            _servers.insert(std::make_pair(server.getFD(), server));
-        }
-        catch (const  ListeningError& e)
-        {
-            std::cout << e.what() << std::endl;
-        }
-        catch (const SocketBindingError& e)
-        {
-            std::cout << e.what() << std::endl;
+            if (std::find(bound_pairs.begin(), bound_pairs.end(), (*i)) == bound_pairs.end())
+            {
+                //call a server constuctor with t_host_port and name (fd set at -1, fd will be set by the setup() function of the server itself).
+                Server server((*i), (*it).getName(), -1, (*it), serveAlternatives(servers, (*i), (*it).getName()));
+                try
+                {
+                    //std::cout << server.getPair() << std::endl;
+                    //Call setup() member function
+                    server.setup();
+                    //Make a pair of fd and server and insert it to _servers variable
+                    _servers.insert(std::make_pair(server.getFD(), server));
+                    bound_pairs.push_back((*i));
+                }
+                catch (const  ListeningError& e)
+                {
+                    std::cout << e.what() << std::endl;
+                }
+                catch (const SocketBindingError& e)
+                {
+                    std::cout << e.what() << std::endl;
+                }
+            }
         }
     }
     //printMap<int, Server>(_servers);
@@ -219,7 +249,7 @@ void Cluster::run()
 								and the process wont happen.
 							*/
                             _servers[client_server[fds[i].fd]].receive(fds[i].fd);
-                            _servers[client_server[fds[i].fd]].process(fds[i].fd);
+                            _servers[client_server[fds[i].fd]].process(fds[i].fd, _envp);
                         }
                         catch(const ClientConnectionError& e)
                         {
