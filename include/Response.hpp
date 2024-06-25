@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
+/*   By: brettleclerc <brettleclerc@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/08 23:20:55 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/25 00:49:47 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/25 19:06:33 by brettlecler      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,8 +31,10 @@ private:
     std::string _method;
     std::string _body;
     std::string _path;
+	std::string	_query;
     t_host_port _pair;
-    int _status_code;
+    int 		_status_code;
+	char		**_envp;
 
     void parseRequestLine(std::string request_line);
     void parseMessageHeaders(std::string message_headers);
@@ -46,6 +48,7 @@ private:
     std::string handleErrorResponse();
     std::string headersProcess(std::string body, std::string path);
     std::string serviceGetResource(ServerRoutesConfig config, std::string uri);
+	char ** appendToCharArray(char** array, int size, const char* new_element);
 public:
     Response(std::string request, ServerConfig config, t_host_port pair);
     ~Response();
@@ -61,6 +64,7 @@ public:
     std::string getURI() const;
     std::string getMethod() const;
     std::string getBody() const;
+	std::string getQuery() const;
     int getStatusCode() const;
 };
 

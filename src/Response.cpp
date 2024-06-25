@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
+/*   By: brettleclerc <brettleclerc@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/08 23:27:16 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/25 00:50:30 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/25 19:07:39 by brettlecler      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -164,6 +164,34 @@ void Response::parseMessageHeaders(std::string message_headers)
     }   
 }
 
+char ** Response::appendToCharArray(char** array, int size, const char* new_element) 
+{
+    int i = 0;
+    char** new_array = (char**)malloc((size + 2) * sizeof(char*));
+    
+    if (new_array == NULL) 
+    {
+        throw NoMatchFound("500");
+    }
+
+    
+    while (i < size)
+    {
+        new_array[i] = ft_strdup(array[i]);
+        i++;
+    }
+    new_array[i] = ft_strdup(new_element);
+    if (new_array[i] == NULL)
+    {
+        free(new_array[i + 1]);
+        freeCsplit(new_array);
+        throw NoMatchFound("500");
+    }
+    new_array[i + 1] = NULL;
+
+    return (new_array);
+}
+
 /*
 	This function parses the request line of the message
 	by convection space, new line and carrage return
@@ -173,49 +201,81 @@ void Response::parseMessageHeaders(std::string message_headers)
 */
 void Response::parseRequestLine(std::string request_line)
 {
-    std::vector<std::string> split_request_line = split(request_line, " \n\r");
+	std::vector<std::string> split_request_line = split(request_line, " \n\r");
+    std::vector<std::string> split_uri;
+    std::string query_variable;
 
-	/*
-		If the number of elements is not 3, the request is invalid.
-	*/
+    /*
+        If the number of elements is not 3, the request is invalid.
+    */
     if (split_request_line.size() != 3)
     {
         _status_code = 400;
         return ;
     }
+    
     _method = split_request_line[0];
-    _request_URI = split_request_line[1];
     _http_version = split_request_line[2];
-	/*
-		If the first part of the string is not an http method, the request is invalid.
-	*/
-	if (!isValidHttpMethod(split_request_line[0]) && !isInvalidHttpMethod(split_request_line[0]))
+    
+    split_uri = split(split_request_line[1], "?");
+    
+    if (split_uri.size() > 2)
     {
         _status_code = 400;
         return ;
     }
-	/*
-		If the first element is an http method but it isn't supported,
-		the request is invalid with 501 (not 400).
-	*/
+    else if (split_uri.size() == 2)
+    {
+        _request_URI = split_uri[0];
+        _query = split_uri[1];
+        query_variable = "QUERY_STRING=" + _query;
+        try
+        {
+            if (_envp != NULL)
+                _envp = appendToCharArray(_envp, cArraySize(_envp), query_variable.c_str());
+        }
+        catch (const NoMatchFound &e)
+        {
+            _status_code = std::atoi(e.what());
+            _query.clear();
+            return ;
+        }
+    }
+    else
+    {
+        _request_URI = split_request_line[1];
+    }
+    
+    /*
+        If the first part of the string is not an http method, the request is invalid.
+    */
+    if (!isValidHttpMethod(split_request_line[0]) && !isInvalidHttpMethod(split_request_line[0]))
+    {
+        _status_code = 400;
+        return ;
+    }
+    /*
+        If the first element is an http method but it isn't supported,
+        the request is invalid with 501 (not 400).
+    */
     if (isInvalidHttpMethod(split_request_line[0]))
     {
         _status_code = 501;
         return ;
     }
-	/*
-		If the version is not one of valid (supported) or invalid (not supported),
-		the request is invalid.
-	*/
+    /*
+        If the version is not one of valid (supported) or invalid (not supported),
+        the request is invalid.
+    */
     if (!isValidVersion(split_request_line[2]) && !isInvalidVersion(split_request_line[2]))
     {
         _status_code = 400;
         return ;
     }
-	/*
-		If the request is one of invalid (unsupported) versions,
-		the request is invalid with 505 (not 400).
-	*/
+    /*
+        If the request is one of invalid (unsupported) versions,
+        the request is invalid with 505 (not 400).
+    */
     if(isInvalidVersion(split_request_line[2]))
     {
         _status_code = 505;
@@ -225,7 +285,8 @@ void Response::parseRequestLine(std::string request_line)
 
 Response::~Response()
 {
-    
+    if (!_query.empty() && _envp != NULL)
+		freeCsplit(_envp);
 }
 
 std::map<std::string, std::string> Response::getHeaders() const
@@ -257,6 +318,11 @@ int Response::getStatusCode() const
     return (_status_code);
 }
 
+std::string Response::getQuery() const
+{
+	return (_query);
+}
+
 const char * NoMatchFound::what() const throw()
 {
 	return (msg.c_str());
@@ -284,5 +350,8 @@ std::ostream& operator<<(std::ostream& obj, Response const &response)
     }
     obj << "body: "; 
     obj << response.getBody();
+	obj << "\n";
+	obj << "query: ";
+	obj << response.getQuery();
     return (obj);
 }

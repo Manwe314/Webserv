@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Webserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
+/*   By: brettleclerc <brettleclerc@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 14:44:27 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/25 03:57:21 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/25 19:00:12 by brettlecler      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,6 +102,9 @@ std::vector<std::string> split(std::string string, std::string delim);
 void eraseRange(std::vector<std::string>& array, int start, int end, int flag = 0);
 int countMatchingChars(std::string first, std::string second, int pos = 0, int flag = 0);
 std::pair<int, int> encapsule(std::vector<std::string> array, std::string a, std::string b, int pos = 0);
+void	freeCsplit(char **array);
+int		cArraySize(char **array);
+char    *ft_strdup(char const *s1);
 
 template <typename T>
 void printVector(const std::vector<T>& arr)
