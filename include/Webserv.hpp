@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 14:44:27 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/21 17:41:26 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/25 03:57:21 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,7 @@
 #define MAX_EVENTS 1000
 #define TIMEOUT_SEC 2
 #define DEFAULT_ERROR "/home/manwe/42/commonCoreS2/webserv/error_pages"
+#define SAFE_MODE 1
 
 //Colours for readbility
 #define DEFAULT "\033[0m"
@@ -66,7 +67,7 @@
 #define YELLOW "\033[0;33m"
 #define LAVENDER "\033[38;5;183m"
 
-//Structurtes
+//Structurtes and Enums
 typedef struct s_host_port
 {
     int port;
@@ -76,7 +77,15 @@ typedef struct s_host_port
     }
 }   t_host_port;
 
-std::ostream& operator<<(std::ostream& obj, const s_host_port& pair); 
+std::ostream& operator<<(std::ostream& obj, const s_host_port& pair);
+
+enum FileStatus{
+    DOES_NOT_EXIST,
+    PERMISSION_DENIED,
+    IS_DIRECTORY,
+    IS_FILE,
+    UNKNOWN
+};
 
 
 
@@ -85,12 +94,13 @@ std::string intToString(int num);
 void toLowerCase(std::string &str);
 std::string sizetToString(size_t num);
 std::string readFile(std::string full_name);
-std::string listDirectoryContents(std::string uri);
+std::string lastModifiedTime(std::string path);
 std::string readBinaryFile(const std::string &path);
 std::vector<std::string> split(std::string string, char delim);
+std::string listDirectoryContents(std::string uri, t_host_port pair);
 std::vector<std::string> split(std::string string, std::string delim);
-int countMatchingChars(std::string first, std::string second, int pos = 0, int flag = 0);
 void eraseRange(std::vector<std::string>& array, int start, int end, int flag = 0);
+int countMatchingChars(std::string first, std::string second, int pos = 0, int flag = 0);
 std::pair<int, int> encapsule(std::vector<std::string> array, std::string a, std::string b, int pos = 0);
 
 template <typename T>
@@ -109,11 +119,10 @@ void printMap(const std::map<Keytype, Valuetype>& map)
         std::cout << "Key: " << it->first << "Value: " << it->second << std::endl;
 }
 
-bool isFile(const std::string& path);
+int pathStatus(const std::string& path);
+
 bool isValidHeader(std::string& header);
-bool isValidFile(const std::string& file_path);
 bool isValidVersion(std::string& version);
-bool isDirectory(const std::string& path);
 bool isInvalidVersion(std::string& version);
 bool isValidHttpMethod(std::string& method);
 bool isInvalidHttpMethod(std::string& method);

@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 18:29:19 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/21 18:47:18 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/25 03:30:38 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -267,7 +267,7 @@ std::string ServerRoutesConfig::serveCustomError(int status)
       if (it != _error_pages.end())
       {
          path += (*it).second;
-         if (isValidFile(path))
+         if (pathStatus(path) == IS_FILE)
             return (path);
       }
    }

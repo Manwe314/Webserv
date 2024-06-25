@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 16:59:31 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/21 19:20:07 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/25 03:49:59 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -218,7 +218,7 @@ std::string Response::serviceGetResource(ServerRoutesConfig config, std::string 
 
     path = uri;
     
-    if (isDirectory(uri))
+    if (pathStatus(uri) == IS_DIRECTORY)
     {
         if (uri[uri.size() - 1] != '/')
             uri += "/";
@@ -228,7 +228,7 @@ std::string Response::serviceGetResource(ServerRoutesConfig config, std::string 
             for (std::vector<std::string>::iterator it = index.begin(); it != index.end(); it++)
             {
                 path = uri + (*it);
-                if (isValidFile(path))
+                if (pathStatus(path) == IS_FILE)
                     break;
             }
         }
@@ -236,7 +236,7 @@ std::string Response::serviceGetResource(ServerRoutesConfig config, std::string 
         {
             if (config.getAutoindex() == 1)
             {
-                body = listDirectoryContents(uri);
+                body = listDirectoryContents(uri, _pair);
                 if (body.empty())
                     throw NoMatchFound("403");
                 _path = uri;
@@ -247,10 +247,10 @@ std::string Response::serviceGetResource(ServerRoutesConfig config, std::string 
         }
     }
 
-    if (!isValidFile(path) && isDirectory(uri))
+    if (pathStatus(path) == DOES_NOT_EXIST)
         throw NoMatchFound("404");
-    if (!isValidFile(path) && !isDirectory(uri))
-        throw NoMatchFound("404");
+    if (pathStatus(path) == PERMISSION_DENIED)
+        throw NoMatchFound("403");
     type = path.substr(path.rfind(".") + 1);
     try
     {
@@ -308,26 +308,33 @@ std::string Response::processDELETE()
     std::string status_line;
     std::string headers;
     std::string body;
+    std::string path;
 
     try
     {
         config = matchSubRoute(_request_URI);
+        path = makeFullPath(config, _request_URI);
         if (!isAllowed(config.getMethods(), _method))
         {
             _status_code = 405;
             return (handleErrorResponse());
         }
-        if (isFile(makeFullPath(config, _request_URI)))
+        if (pathStatus(path) == IS_FILE)
         {
             if (remove(makeFullPath(config, _request_URI).c_str()) == 0)
                 _status_code = 204;
             else
             {
-                _status_code = 403;
+                _status_code = 500;
                 return (handleErrorResponse());
             }
         }
-        else
+        else if (pathStatus(path) == PERMISSION_DENIED)
+        {
+            _status_code = 403;
+            return (handleErrorResponse());
+        }
+        else if (pathStatus(path) == DOES_NOT_EXIST)
         {
             _status_code = 404;
             return (handleErrorResponse());
@@ -384,17 +391,17 @@ std::string Response::processPUT()
             _status_code = 500;
             return (handleErrorResponse());
         }
-        if (isDirectory(path))
+        if (pathStatus(path) == IS_DIRECTORY)
         {
             _status_code = 409;
             return (handleErrorResponse());
         }
-        if (!isValidFile(path))
+        if (pathStatus(path) == PERMISSION_DENIED)
         {
             _status_code = 403;
             return (handleErrorResponse());
         }
-        if (isFile(path))
+        if (pathStatus(path) == IS_FILE)
         {
             std::ofstream file(path.c_str(), std::ios::out);
             if (!file)

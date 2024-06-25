@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/11 19:26:24 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/21 02:05:00 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/25 03:43:18 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ std::string getContentHeaders(size_t length, std::string path)
     index = path.rfind(".");
     if (index != std::string::npos)
         type = path.substr(index + 1);
-    if (isDirectory(path))
+    if (pathStatus(path) == IS_DIRECTORY)
         type = "html";
     content = "Content-Length: ";
     content += sizetToString(length);

@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 16:12:04 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/21 02:00:49 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/25 04:08:51 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -144,7 +144,7 @@ void Server::receive(int client_fd)
 
 ServerConfig Server::determineServer(std::string request)
 {
-    Response temp(request, _config);
+    Response temp(request, _config, _pair);
     std::map<std::string, std::string> headers = temp.getHeaders();
     std::map<std::string, std::string>::iterator it = headers.find("host");
     std::string::iterator end_pos;
@@ -171,12 +171,12 @@ void Server::process(int client_fd)
 {
     ServerConfig config;
     config = determineServer(_requests[client_fd]);
-    Response response(_requests[client_fd], config);
+    Response response(_requests[client_fd], config, _pair);
     
     //std::cout << MAGENTA << "THE RESPONSE object:\n" << response << DEFAULT << std::endl;
     std::string responseio = response.process();
     
-    std::cout << CYAN << "THE RESPONSE msg:\n" << responseio << DEFAULT << std::endl;
+    //std::cout << CYAN << "THE RESPONSE msg:\n" << responseio << DEFAULT << std::endl;
     _responses.insert(std::make_pair(client_fd, responseio));
 }
 

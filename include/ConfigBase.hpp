@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/17 19:00:39 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/10 21:17:44 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/24 18:28:19 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,7 @@ public:
     static const std::vector<std::string>  _http_methods;
     static const std::vector<std::string>   _valid_headers;
 	static const std::map<int, std::string> _reason_phrases;
+	static char ** _envp;
 
     ConfigBase();
     ~ConfigBase();

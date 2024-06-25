@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 20:35:33 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/19 03:25:32 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/25 01:51:48 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,13 +51,17 @@ public:
 
 std::ostream& operator<<(std::ostream& obj, const ServerConfig& conf);
 
-class HostDeclarationIssue : std::exception
+class HostDeclarationIssue : public std::exception
 {
+    private:
+        std::string msg;
     public:
+        HostDeclarationIssue(const std::string& msg) : msg(msg) {}
         virtual const char * what() const throw();
+        virtual ~HostDeclarationIssue() throw () {}
 };
 
-class BracketPairMissMatch : std::exception
+class BracketPairMissMatch : public std::exception
 {
     private:
         std::string msg;

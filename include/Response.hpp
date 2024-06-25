@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/08 23:20:55 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/18 16:12:13 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/25 00:49:47 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ private:
     std::string _method;
     std::string _body;
     std::string _path;
+    t_host_port _pair;
     int _status_code;
 
     void parseRequestLine(std::string request_line);
@@ -46,7 +47,7 @@ private:
     std::string headersProcess(std::string body, std::string path);
     std::string serviceGetResource(ServerRoutesConfig config, std::string uri);
 public:
-    Response(std::string request, ServerConfig config);
+    Response(std::string request, ServerConfig config, t_host_port pair);
     ~Response();
     
     std::string process();

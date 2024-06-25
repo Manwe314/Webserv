@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 18:42:38 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/21 18:49:56 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/25 03:57:03 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -279,7 +279,44 @@ std::string readBinaryFile(const std::string &path)
     return (data);
 }
 
-std::string listDirectoryContents(std::string uri)
+
+std::string lastModifiedTime(std::string path)
+{
+    struct stat stat_buffer;
+    std::stringstream time;
+    std::time_t mod_time;
+    
+    if (stat(path.c_str(), &stat_buffer) != 0)
+    {
+        time << "";
+        return (time.str());
+    }
+    
+    mod_time = stat_buffer.st_mtime;
+    time << std::ctime(&mod_time);
+    return (time.str()); 
+}
+
+static std::string generateListElement(std::string uri, t_host_port pair, std::string name)
+{
+    std::stringstream element;
+    std::string path;
+
+    path = uri + "/" + name;
+
+    if (uri[0] == '.')
+        uri.erase(0, 1);
+    element << "\t\t<p><a href=\"http://";
+    element << pair;
+    element << uri;
+    element << name + "\">" + name + "</a>";
+    element << "\t\t\t\t";
+    element << lastModifiedTime(path);
+    element << "</p>\n";
+    return (element.str());
+}
+
+std::string listDirectoryContents(std::string uri, t_host_port pair)
 {
     std::vector<std::string> content;
     DIR* dir = opendir(uri.c_str());
@@ -297,11 +334,13 @@ std::string listDirectoryContents(std::string uri)
     std::stringstream body;
     
     body << "<html>\n<head>\n<title>Directory Listing</title>\n</head>\n<body>\n";
-    body << "<h1>Contents of Direcotry: " << uri.substr(uri.rfind("/") + 1) << "</h1>\n";
+    body << "<h1>Contents of Direcotry: ";
+    body << uri.substr(uri.rfind("/", uri.rfind("/") - 1) + 1);
+    body << "</h1>\n";
     body << "<ul>\n";
     for (size_t i = 0; i < content.size(); i++)
     {
-        body << "<li>" << content[i] << "</li>\n";
+        body << "<li>" << generateListElement(uri, pair, content[i]) << "</li>\n";
     }
     body << "</ul>\n</body>\n</html>\n";
     
@@ -379,38 +418,40 @@ bool isInvalidVersion(std::string& version)
     return (false);
 }
 
-/*
-    this function returns true if the given file path points to a valid, readable file
-    or false if it dosent.
-*/
-bool isValidFile(const std::string& file_path)
-{
-    std::ifstream file(file_path.c_str());
-    return file.is_open();
-}
 
 /*
-    this function returns true if a given path point to a directory
-    or false if it doesnt or if path is invalid.
+    this function returns the enumirated status of a given path.
+    what each enum reprisents is self explanatory.
 */
-bool isDirectory(const std::string& path)
+int pathStatus(const std::string& path)
 {
     struct stat stat_buffer;
+    int status = UNKNOWN;
     if (stat(path.c_str(), &stat_buffer) != 0)
-        return (false);
-    return (S_ISDIR(stat_buffer.st_mode));
-}
-
-/*
-    this function returns true if a given path points to a file
-    or false if it doesnt or if path is invalid
-*/
-bool isFile(const std::string& path)
-{
-    struct stat stat_buffer;
-    if (stat(path.c_str(), &stat_buffer) != 0)
-        return (false);
-    return (S_ISREG(stat_buffer.st_mode));
+    {
+        switch (errno)
+        {
+        case ENOENT:
+            status = DOES_NOT_EXIST;
+            break;
+        case EACCES:
+            status = PERMISSION_DENIED;
+            break;
+        default:
+            status = UNKNOWN;
+            break;
+        }
+    }
+    else
+    {
+        if (S_ISDIR(stat_buffer.st_mode))
+            status = IS_DIRECTORY;
+        else if (S_ISREG(stat_buffer.st_mode))
+            status = IS_FILE;
+        else
+            status = UNKNOWN;
+    }
+    return (status);
 }
 
 /*
@@ -434,7 +475,6 @@ std::ostream& operator<<(std::ostream& obj, const s_host_port& pair)
     unsigned int two = (pair.host >> 8) & 0xFF;
     unsigned int three = (pair.host >> 16) & 0xFF;
     unsigned int four = (pair.host >> 24) & 0xFF;
-    obj << "HOST PORT PAIR: ";
     obj << four;
     obj << ".";
     obj << three;

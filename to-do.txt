@@ -9,15 +9,17 @@ To-Do:
 
 
     things to remember:
-        1. chunking
-        2. URI queries
-        3. proxy functionality
+        1. chunking brett
+        2. URI queries ???
+        3. proxy functionality brett
         4. 
-        5. the headers sent in probably are important :P
+        5. 
         6. handle file permisions to have accutate status codes
-        7. cacheing.
+        7. cacheing. ???
         8. POST is used for proxy and cgi purposes, if said directives are not present then the behaviour is server dependant.
-            since the subject asks us to take nginx as referance, nginx will treat this POST request as a GET request without the body.
-        9. DELETE should be able to delete both full and empty directories, or maybe no?
+            since the subject asks us to take nginx as referance, nginx will treat this POST request as a GET request without the body. brett
+        9. DELETE should be able to delete both full and empty directories, or maybe no? ????
         10.
-        11. single host declaratrion issue stops the entire program from running.
+        11. single host declaratrion issue stops the entire program from running. for the best.
+
+

@@ -42,6 +42,7 @@ server {
     }
 }
 
+
 server {
     server_name briki
     listen localhost:8002

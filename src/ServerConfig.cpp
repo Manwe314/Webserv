@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/24 21:44:05 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/19 03:32:40 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/25 02:02:28 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 const char * HostDeclarationIssue::what() const throw()
 {
-    return ("IPv4, port address declaration inccorect");
+    return (msg.c_str());
 }
 
 const char * BracketPairMissMatch::what() const throw()
@@ -39,7 +39,7 @@ std::vector<t_host_port> ServerConfig::initHostPort(std::vector<std::string> ser
     */
     it = std::find(server_block.begin(), server_block.end(), "listen");
     if (it == server_block.end())
-        throw HostDeclarationIssue();
+        throw HostDeclarationIssue("No Listen directive Found in a server");
 
     while (it != server_block.end())
     {
@@ -76,7 +76,7 @@ std::vector<t_host_port> ServerConfig::initHostPort(std::vector<std::string> ser
         else if (array.size() == 4)
             array.insert(array.begin() + 4, intToString(PORT));
         if (array.size() != 5)
-            throw HostDeclarationIssue();
+            throw HostDeclarationIssue("Listen Directive Issue in: " + (*it));
         /*
 			Make sure that each octet has a value betwwen 0 and 255,
 			take the least significant 8 bits (first 8) of each octet
@@ -86,14 +86,17 @@ std::vector<t_host_port> ServerConfig::initHostPort(std::vector<std::string> ser
         for (int i = 0; i < 4; i++)
         {
             if (std::atoi(array[i].c_str()) > 255 || std::atoi(array[i].c_str()) < 0)
-                throw HostDeclarationIssue();
+                throw HostDeclarationIssue("Listen Directive Issue in: " + (*it));
             host = (host << 8) | (std::atoi(array[i].c_str()) & 0xFF);
         }
         //Make sure that the port number is between 0 and max 16 bit number
         if (std::atoi(array[4].c_str()) < 0 || std::atoi(array[4].c_str()) > 65535)
-            throw HostDeclarationIssue();
+            throw HostDeclarationIssue("Listen Directive Issue in: " + (*it));
         pair.host = host;
         pair.port = std::atoi(array[4].c_str());
+        
+        if (pair.port < 1023 && SAFE_MODE)
+            throw HostDeclarationIssue("Use of restriced port in: " + (*it));
         
         pairs.push_back(pair);
         it = std::find(it, server_block.end(), "listen");

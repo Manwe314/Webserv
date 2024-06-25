@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 19:33:28 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/19 03:05:12 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/24 15:49:14 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ public:
 
 };
 
-class CouldNotOpenFile : std::exception
+class CouldNotOpenFile : public std::exception
 {
     public:
         virtual const char * what() const throw();
