@@ -6,7 +6,7 @@
 /*   By: brettleclerc <brettleclerc@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 14:44:27 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/25 11:21:05 by brettlecler      ###   ########.fr       */
+/*   Updated: 2024/06/25 19:11:26 by brettlecler      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,6 +104,9 @@ int countMatchingChars(std::string first, std::string second, int pos = 0, int f
 std::pair<int, int> encapsule(std::vector<std::string> array, std::string a, std::string b, int pos = 0);
 std::string	removeComments( std::string const & config_file );
 std::string	trimSpaces( std::string string );
+void	freeCsplit(char **array);
+int		cArraySize(char **array);
+char    *ft_strdup(char const *s1);
 
 template <typename T>
 void printVector(const std::vector<T>& arr)

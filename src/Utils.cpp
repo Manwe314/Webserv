@@ -6,7 +6,7 @@
 /*   By: brettleclerc <brettleclerc@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 18:42:38 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/25 18:31:31 by brettlecler      ###   ########.fr       */
+/*   Updated: 2024/06/25 19:11:52 by brettlecler      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -410,6 +410,52 @@ std::string listDirectoryContents(std::string uri, t_host_port pair)
     return (body.str());
 }
 
+char    *ft_strdup(char const *s1)
+{
+    int     size;
+    char    *copy;
+    int     i;
+    char    *s;
+
+    s = (char *)s1;
+    size = (int)strlen(s1);
+    copy = (char *)malloc((size + 1) * sizeof(char));
+    if (!copy)
+        return (0);
+    i = 0;
+    while (s[i] != '\0')
+    {
+        copy[i] = s[i];
+        i++;
+    }
+    copy[i] = '\0';
+    return (copy);
+}
+
+
+int cArraySize(char **array)
+{
+    int i = 0;
+    if (array == NULL)
+        return 0;
+    while (array[i])
+        i++;
+    return i;
+}
+
+void	freeCsplit(char **array)
+{
+    int i = 0;
+    if (array == NULL)
+        return ;
+    while (array[i])
+    {
+        free(array[i]);
+        i++;
+    }
+    free(array[i]);
+    free(array);
+}
 
 //this function returns true if a header line is formated correctly or false if its not.
 //only rule is that the string must start with a name that is between 33 and 126 asccii characters ending with a colon ":". after that its free game.
@@ -530,7 +576,6 @@ bool isAllowed(const std::vector<std::string>& allowed_methods, std::string &met
             return (true);
     return (false);
 }
-
 
 std::ostream& operator<<(std::ostream& obj, const s_host_port& pair)
 {

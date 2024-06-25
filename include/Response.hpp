@@ -6,7 +6,7 @@
 /*   By: brettleclerc <brettleclerc@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/08 23:20:55 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/25 12:01:17 by brettlecler      ###   ########.fr       */
+/*   Updated: 2024/06/25 19:12:21 by brettlecler      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,7 @@ private:
 	int			_status_code;
 	size_t		_position;
 	size_t		_chunk_size;
+	std::string	_query;
     t_host_port _pair;
 	char		**_envp;
 
@@ -56,6 +57,7 @@ private:
     std::string handleErrorResponse();
     std::string headersProcess(std::string body, std::string path);
     std::string serviceGetResource(ServerRoutesConfig config, std::string uri);
+	char ** appendToCharArray(char** array, int size, const char* new_element);
 public:
     Response(std::string request, ServerConfig config, t_host_port pair, char **envp);
     ~Response();
@@ -71,6 +73,7 @@ public:
     std::string getURI() const;
     std::string getMethod() const;
     std::string getBody() const;
+	std::string getQuery() const;
     int getStatusCode() const;
 };
 
