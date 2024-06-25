@@ -6,7 +6,7 @@
 /*   By: brettleclerc <brettleclerc@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 18:42:38 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/25 11:20:25 by brettlecler      ###   ########.fr       */
+/*   Updated: 2024/06/25 18:31:31 by brettlecler      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,11 +114,10 @@ std::string	trimSpaces( std::string string )
 //Check function before initiating Cgi class
 bool isValidCgiFile( std::string const & file )
 {
-	std::string type;
-
-	type = file.substr(file.rfind(".") + 1);
-	if (type == ".py" || type == ".php")
-		return true;
+	if (file.length() >= 5 && !file.compare(file.length() - 4, 4, ".php"))
+		return true; // PHP script
+	else if (file.length() >= 4 && !file.compare(file.length() - 3, 3, ".py"))
+		return true; // Python script
 	return false; // Unsupported script type
 }
 

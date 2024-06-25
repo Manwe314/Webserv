@@ -6,7 +6,7 @@
 /*   By: brettleclerc <brettleclerc@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 16:59:31 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/25 11:39:35 by brettlecler      ###   ########.fr       */
+/*   Updated: 2024/06/25 18:46:02 by brettlecler      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -274,6 +274,7 @@ std::string Response::serviceGetResource(ServerRoutesConfig config, std::string 
 std::string Response::processPOST()
 {
 	ServerRoutesConfig config;
+	std::string	path;
     std::string response;
     std::string status_line;
     std::string headers;
@@ -282,19 +283,20 @@ std::string Response::processPOST()
 	try
     {
         config = matchSubRoute(_request_URI);
+		path = makeFullPath(config, _request_URI);
         if (!isAllowed(config.getMethods() ,_method))
         {
             _status_code = 405;
             return (handleErrorResponse());
         }
-		if (isValidCgiFile(_request_URI)) // how to get the envp file in the most efficient way?
+		if (isValidCgiFile(path))
 		{
-			Cgi cgi(_request_URI, _envp);
+			Cgi cgi(path, _envp);
 			body = cgi.getCgiResult();
 			_status_code = 200;
 			status_line = statusLineProcess();
-        	headers = headersProcess("", ""); //need to check what kind if headers should be included.
-        	response = status_line + headers + "\r\n";
+        	headers = headersProcess("", "");
+        	response = status_line + headers + body;
 		}
 		else
 		{
@@ -306,12 +308,19 @@ std::string Response::processPOST()
         _status_code = std::atoi(e.what());
         response = handleErrorResponse();
     }
+	catch(const Cgi::CgiExecutionError& e)
+    {
+		std::cerr << "Error: " << e.what() << std::endl;
+        _status_code = 400;
+        response = handleErrorResponse();
+    }
 	return (response);
 }
 
 std::string Response::processGET()
 {
     ServerRoutesConfig config;
+	std::string	path;
     std::string response;
     std::string status_line;
     std::string headers;
@@ -320,20 +329,39 @@ std::string Response::processGET()
     try
     {
         config = matchSubRoute(_request_URI);
+		path = makeFullPath(config, _request_URI);
         if (!isAllowed(config.getMethods() ,_method))
         {
             _status_code = 405;
             return (handleErrorResponse());
         }
-        body = serviceGetResource(config, makeFullPath(config, _request_URI));
-        _status_code = 200;
-        headers = headersProcess(body, _path);
-        status_line = statusLineProcess();
-        response = status_line + headers + "\r\n" + body;
+		if (isValidCgiFile(path))
+		{
+			Cgi cgi(path, _envp);
+			body = cgi.getCgiResult();
+			_status_code = 200;
+			status_line = statusLineProcess();
+        	headers = headersProcess("", "");
+        	response = status_line + headers + body;
+		}
+		else
+		{
+			body = serviceGetResource(config, makeFullPath(config, _request_URI));
+			_status_code = 200;
+			headers = headersProcess(body, _path);
+			status_line = statusLineProcess();
+			response = status_line + headers + "\r\n" + body;
+		}
     }
     catch(const NoMatchFound& e)
     {
         _status_code = std::atoi(e.what());
+        response = handleErrorResponse();
+    }
+	catch(const Cgi::CgiExecutionError& e)
+    {
+		std::cerr << "Error: " << e.what() << std::endl;
+        _status_code = 400;
         response = handleErrorResponse();
     }
     return (response);

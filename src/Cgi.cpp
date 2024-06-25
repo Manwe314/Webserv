@@ -6,7 +6,7 @@
 /*   By: brettleclerc <brettleclerc@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/30 09:46:55 by bleclerc          #+#    #+#             */
-/*   Updated: 2024/06/25 12:12:17 by brettlecler      ###   ########.fr       */
+/*   Updated: 2024/06/25 18:40:25 by brettlecler      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,12 +32,9 @@ Cgi::Cgi( std::string & file, char **envp ) : _file(file), _envp(envp)
 */
 int	Cgi::determineExtension( std::string const & file ) const
 {
-	std::string type;
-
-	type = file.substr(file.rfind(".") + 1);
-	if (type == ".php")
+	if (file.length() >= 5 && !file.compare(file.length() - 4, 4, ".php"))
 		return 1; // PHP script
-	else if (type == ".py")
+	else if (file.length() >= 4 && !file.compare(file.length() - 3, 3, ".py"))
 		return 2; // Python script
 	return 0; // Unsupported script type
 }
@@ -118,12 +115,18 @@ void	Cgi::executeScript( std::string const & file)
 	if (pipe(pfd) == -1)
 		throw CgiExecutionError("Error: pipe fn issue");
 	pid = fork();
+	if (pid == -1)
+	{
+		close(pfd[0]);
+		close(pfd[1]);
+	}
 	//Enter child process
 	if (!pid)
 	{
-		if (dup2(pfd[1], STDOUT_FILENO) == -1 || close(pfd[0]) == -1 \
-		|| close(pfd[1]) == -1)
+		close(pfd[0]);
+		if (dup2(pfd[1], STDOUT_FILENO) == -1)
 			throw CgiExecutionError("Error: dup2 or close fn issue");
+		close(pfd[1]);
 		if (_extension == 1) // PHP script
 		{
 			char *args[] = {const_cast<char *>(interpreter.c_str()),\
@@ -135,10 +138,9 @@ void	Cgi::executeScript( std::string const & file)
 			char *args[] = {const_cast<char *>(file.c_str()), NULL};
 			execve(file.c_str(), args, _envp);
 		}
-		close(STDOUT_FILENO); //not sure about this.
 		exit(EXIT_FAILURE);
 	}
-
+	close(pfd[1]);
 	/*
 		Found this solution on slack.
 		Apparently helps when scripts are launched in a loop.
@@ -150,20 +152,17 @@ void	Cgi::executeScript( std::string const & file)
 	if (WIFEXITED(status) && WEXITSTATUS(status))
 	{
 		close(pfd[0]);
-		close(pfd[1]);
-		throw CgiExecutionError("Error: execve: cannot execute " + _file + ": "\
-		+ std::to_string(WEXITSTATUS(status)) + " exit code.");
+		throw CgiExecutionError("Error: execve: cannot execute " + _file);
 	}
-	
 	/*
 		Saves the execve content from the read end of the pipe
 		into the string _result variable
 	*/
-	if (!readfile(pfd[0]))
+	if (!readfile(pfd[0])) {
+		close(pfd[0]);
 		throw CgiExecutionError("Error: read fn failed");
-
-	if (close(pfd[1]) == -1 || close(pfd[0]) == -1)
-		throw CgiExecutionError("Error: dup2 or close fn issue");
+	}
+	close(pfd[0]);
 }
 
 
