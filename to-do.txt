@@ -1,11 +1,11 @@
 To-Do:
 
-    1. Finish the Response class. - Levan
-    2. Figure out CGI. - Brett
-    3. compleate the config file parsing and config class functionality.
-    4. Figure out possible bugs (bind, config parseing, etc.). - Brett
-    5. Handle chunked requests.
-
+    1. Figure out possible bugs (bind, config parseing, etc.). - Brett/Levan
+    2. Handle chunked requests. - testing in progress
+	3. CGI headers process
+	4. CGI tester check
+	5. Adding visual tests for POST/PUT, upload = Levan
+	6. Adding visual tests for CGI GET and POST scripts. Also a bash script that sends a lot of script GET requests to a server to see resistance
 
 
     things to remember:
@@ -15,7 +15,7 @@ To-Do:
         4. 
         5. 
         6. handle file permisions to have accutate status codes
-        7. cacheing. ??? done by the browser. 
+        7. cacheing. ??? done by the browser.
         8. POST is used for proxy and cgi purposes, if said directives are not present then the behaviour is server dependant.
             since the subject asks us to take nginx as referance, nginx will treat this POST request as a GET request without the body. brett
         9. DELETE should be able to delete both full and empty directories, or maybe no? ????

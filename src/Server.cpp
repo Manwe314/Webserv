@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 16:12:04 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/26 18:45:03 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/26 20:42:28 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -175,7 +175,7 @@ void Server::process(int client_fd, char **envp)
     std::cout << MAGENTA << "THE RESPONSE object:\n" << response << DEFAULT << std::endl;
     std::string responseio = response.process();
     
-    std::cout << CYAN << "THE RESPONSE msg:\n" << responseio << DEFAULT << std::endl;
+    //std::cout << CYAN << "THE RESPONSE msg:\n" << responseio << DEFAULT << std::endl;
     _responses.insert(std::make_pair(client_fd, responseio));
 }
 
@@ -189,7 +189,7 @@ void Server::send(int client_fd)
     it = _responses.find(client_fd);
     if (it != _responses.end() && (*it).second != "")
     {
-        std::cout << LAVENDER << "SENING DATA" << DEFAULT << std::endl;
+        std::cout << LAVENDER << "SENDING DATA" << DEFAULT << std::endl;
         to_send = (*it).second;
         ret = ::send(client_fd, to_send.c_str(), to_send.size(), 0);
         if (ret == -1)
