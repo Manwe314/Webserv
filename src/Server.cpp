@@ -6,7 +6,7 @@
 /*   By: brettleclerc <brettleclerc@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 16:12:04 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/25 19:41:20 by brettlecler      ###   ########.fr       */
+/*   Updated: 2024/06/26 17:21:12 by brettlecler      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -175,7 +175,7 @@ void Server::process(int client_fd, char **envp)
     //std::cout << MAGENTA << "THE RESPONSE object:\n" << response << DEFAULT << std::endl;
     std::string responseio = response.process();
     
-    std::cout << CYAN << "THE RESPONSE msg:\n" << responseio << DEFAULT << std::endl;
+    //std::cout << CYAN << "THE RESPONSE msg:\n" << responseio << DEFAULT << std::endl;
     _responses.insert(std::make_pair(client_fd, responseio));
 }
 
@@ -183,20 +183,26 @@ void Server::process(int client_fd, char **envp)
 void Server::send(int client_fd)
 {
     std::string to_send;
+    std::map<int, std::string>::iterator it;
     int ret;
 
-    to_send = _responses[client_fd];
-    ret = ::send(client_fd, to_send.c_str(), to_send.size(), 0);
-    if (ret == -1)
+    it = _responses.find(client_fd);
+    if (it != _responses.end() && (*it).second != "")
     {
-        this->close(client_fd); //closing the fd if there was a send error
-        _responses.erase(client_fd);
-        throw ClientConnectionError("Error while sending data in the server named: " + _name);
-    }
-    else
-    {
-        _requests[client_fd] = "";
-        _responses.erase(client_fd);
+        std::cout << LAVENDER << "SENDING DATA" << DEFAULT << std::endl;
+        to_send = (*it).second;
+        ret = ::send(client_fd, to_send.c_str(), to_send.size(), 0);
+        if (ret == -1)
+        {
+            this->close(client_fd); //closing the fd if there was a send error
+            _responses.erase(client_fd);
+            throw ClientConnectionError("Error while sending data in the server named: " + _name);
+        }
+        else
+        {
+            _requests[client_fd] = "";
+            _responses.erase(client_fd);
+        }
     }
 }
 

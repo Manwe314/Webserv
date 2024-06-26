@@ -5,8 +5,8 @@ import time
 
 def send_chunked_request():
     # Replace with your server's address and port
-    server_address = 'localhost'
-    server_port = 8100
+    server_address = '127.0.0.1'
+    server_port = 8000
 
     # Create a connection to the server
     connection = http.client.HTTPConnection(server_address, server_port)

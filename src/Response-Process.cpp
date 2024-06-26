@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response-Process.cpp                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: brettleclerc <brettleclerc@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 16:59:31 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/26 14:27:15 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/06/26 17:44:08 by brettlecler      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ std::string Response::default404()
 }
 
 //this function builds and returns the headers feild of a http response
-std::string Response::headersProcess(std::string body, std::string path)
+std::string Response::headersProcess(std::string body, std::string path, bool is_cgi)
 {
     std::string headers;
     
@@ -37,6 +37,9 @@ std::string Response::headersProcess(std::string body, std::string path)
     headers += getConnectionHeader();
     if (body != "")
         headers += getContentHeaders(body.size(), path);
+	else
+		if (is_cgi == false)
+			headers += "Content-Length: 0\r\n";
     return (headers);
 }
 
@@ -180,7 +183,7 @@ std::string Response::handleErrorResponse()
         config = matchSubRoute(_request_URI);
         status_line = statusLineProcess();
         body = readFile(config.serveCustomError(_status_code));
-        headers = headersProcess(body, config.serveCustomError(_status_code));
+        headers = headersProcess(body, config.serveCustomError(_status_code), false);
         error_response = status_line + headers + "\r\n" + body;
     }
     catch(const NoMatchFound& e)
@@ -193,7 +196,7 @@ std::string Response::handleErrorResponse()
             _status_code = std::atoi(e.what());
             status_line = statusLineProcess();
             body = readFile(config.serveCustomError(std::atoi(e.what())));
-            headers = headersProcess(body, config.serveCustomError(std::atoi(e.what())));
+            headers = headersProcess(body, config.serveCustomError(std::atoi(e.what())), false);
             error_response = status_line + headers + "\r\n" + body;
         }
         catch(const CouldNotOpenFile& e)
@@ -282,7 +285,6 @@ void	Response::validCgiContentHeader(std::string response)
 	else
 	{
 		content_headers = response.substr(0, limiter);
-		std::cout << YELLOW << "Content_header: " << content_headers << std::endl;
 		toLowerCase(content_headers);
 		
 		limiter = content_headers.find("content-type");
@@ -318,7 +320,7 @@ std::string Response::processPOST()
 			body = cgi.getCgiResult();
 			_status_code = 200;
 			status_line = statusLineProcess();
-        	headers = headersProcess("", "");
+        	headers = headersProcess("", "", true);
         	response = status_line + headers + body;
 			validCgiContentHeader(response);
 		}
@@ -365,7 +367,7 @@ std::string Response::processGET()
 			body = cgi.getCgiResult();
 			_status_code = 200;
 			status_line = statusLineProcess();
-        	headers = headersProcess("", "");
+        	headers = headersProcess("", "", true);
         	response = status_line + headers + body;
 			validCgiContentHeader(response);
 		}
@@ -373,7 +375,7 @@ std::string Response::processGET()
 		{
 			body = serviceGetResource(config, makeFullPath(config, _request_URI));
 			_status_code = 200;
-			headers = headersProcess(body, _path);
+			headers = headersProcess(body, _path, false);
 			status_line = statusLineProcess();
 			response = status_line + headers + "\r\n" + body;
 		}
@@ -432,7 +434,7 @@ std::string Response::processDELETE()
         }
         body = "";
         status_line = statusLineProcess();
-        headers = headersProcess(body, _request_URI);
+        headers = headersProcess(body, _request_URI, false);
         response = status_line + headers + "\r\n";
     }
     catch(const NoMatchFound& e)
@@ -517,7 +519,7 @@ std::string Response::processPUT()
             _status_code = 201;
         }
         status_line = statusLineProcess();
-        headers = headersProcess("", "");
+        headers = headersProcess("", "", false);
         response = status_line + headers + "\r\n";
     }
     catch(const NoMatchFound& e)
