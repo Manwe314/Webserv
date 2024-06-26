@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: brettleclerc <brettleclerc@student.42.f    +#+  +:+       +#+        */
+/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 16:12:04 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/25 19:41:20 by brettlecler      ###   ########.fr       */
+/*   Updated: 2024/06/26 18:45:03 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,9 +137,9 @@ void Server::receive(int client_fd)
     //std::cout << GREEN << _pair << " " << _name <<DEFAULT << std::endl;
     //printVector(_alternative_configs);
     //std::cout << LAVENDER << "********************************" << DEFAULT << std::endl;
-    //std::cout << YELLOW << "\n~~~~~~~~~~~~~message~~~~~~~~~~~~~" << DEFAULT <<std::endl;
-    //std::cout << std::string(buffer) << std::endl;
-    //std::cout << YELLOW << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << DEFAULT << std::endl;
+    std::cout << YELLOW << "\n~~~~~~~~~~~~~message~~~~~~~~~~~~~" << DEFAULT <<std::endl;
+    std::cout << std::string(buffer) << std::endl;
+    std::cout << YELLOW << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << DEFAULT << std::endl;
 }
 
 ServerConfig Server::determineServer(std::string request)
@@ -172,7 +172,7 @@ void Server::process(int client_fd, char **envp)
     config = determineServer(_requests[client_fd]);
     Response response(_requests[client_fd], config, _pair, envp);
     
-    //std::cout << MAGENTA << "THE RESPONSE object:\n" << response << DEFAULT << std::endl;
+    std::cout << MAGENTA << "THE RESPONSE object:\n" << response << DEFAULT << std::endl;
     std::string responseio = response.process();
     
     std::cout << CYAN << "THE RESPONSE msg:\n" << responseio << DEFAULT << std::endl;
@@ -183,20 +183,26 @@ void Server::process(int client_fd, char **envp)
 void Server::send(int client_fd)
 {
     std::string to_send;
+    std::map<int, std::string>::iterator it;
     int ret;
 
-    to_send = _responses[client_fd];
-    ret = ::send(client_fd, to_send.c_str(), to_send.size(), 0);
-    if (ret == -1)
+    it = _responses.find(client_fd);
+    if (it != _responses.end() && (*it).second != "")
     {
-        this->close(client_fd); //closing the fd if there was a send error
-        _responses.erase(client_fd);
-        throw ClientConnectionError("Error while sending data in the server named: " + _name);
-    }
-    else
-    {
-        _requests[client_fd] = "";
-        _responses.erase(client_fd);
+        std::cout << LAVENDER << "SENING DATA" << DEFAULT << std::endl;
+        to_send = (*it).second;
+        ret = ::send(client_fd, to_send.c_str(), to_send.size(), 0);
+        if (ret == -1)
+        {
+            this->close(client_fd); //closing the fd if there was a send error
+            _responses.erase(client_fd);
+            throw ClientConnectionError("Error while sending data in the server named: " + _name);
+        }
+        else
+        {
+            _requests[client_fd] = "";
+            _responses.erase(client_fd);
+        }
     }
 }
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response-Process.cpp                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 16:59:31 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/26 14:27:15 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/06/26 20:26:12 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,8 @@ std::string Response::headersProcess(std::string body, std::string path)
     headers += getConnectionHeader();
     if (body != "")
         headers += getContentHeaders(body.size(), path);
+    else
+        headers += "Content-Length: 0\r\n";
     return (headers);
 }
 
@@ -177,6 +179,7 @@ std::string Response::handleErrorResponse()
             4. get the headers (key: value CRLF);
             5. build the response by stiching status line and headers, adding an empty line and then the body.
         */
+       //std::cout << GREEN << _status_code << DEFAULT << std::endl;
         config = matchSubRoute(_request_URI);
         status_line = statusLineProcess();
         body = readFile(config.serveCustomError(_status_code));
@@ -186,24 +189,29 @@ std::string Response::handleErrorResponse()
     catch(const NoMatchFound& e)
     {
         //if a matching route cant be found use serverwide configuration.
+        //std::cout << GREEN << _status_code << DEFAULT << std::endl; 
         config = _server_config.getServerWideConfig();
         try
         {
             //route matching's failure results in eaither 404 or 400. e.what() equals one of these values in string form. (if status line fails it equals 500)
+            //std::cout << GREEN << _status_code << DEFAULT << std::endl;
             _status_code = std::atoi(e.what());
             status_line = statusLineProcess();
             body = readFile(config.serveCustomError(std::atoi(e.what())));
             headers = headersProcess(body, config.serveCustomError(std::atoi(e.what())));
+            //std::cout << GREEN << _status_code << DEFAULT << std::endl;
             error_response = status_line + headers + "\r\n" + body;
         }
         catch(const CouldNotOpenFile& e)
         {
+            //std::cout << GREEN << _status_code << DEFAULT << std::endl;
             //if the error file cant be opened use a hard coded 404 message.
             error_response = default404();
         }
     }
     catch(const CouldNotOpenFile& e)
     {
+        std::cout << GREEN << _status_code << DEFAULT << std::endl;
         error_response = default404();
     }
     return error_response;
@@ -430,6 +438,17 @@ std::string Response::processDELETE()
             _status_code = 404;
             return (handleErrorResponse());
         }
+        else if (pathStatus(path) == IS_DIRECTORY)
+        {
+            _status_code = 500;
+            return (handleErrorResponse());
+        }
+        else if (pathStatus(path) == UNKNOWN)
+        {
+            _status_code = 500;
+            return (handleErrorResponse());
+        }
+        
         body = "";
         status_line = statusLineProcess();
         headers = headersProcess(body, _request_URI);

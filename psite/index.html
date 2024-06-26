@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PUT Request Example</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>PUT Request Example</h1>
+    <form id="dataForm">
+        <label for="key1">Key 1:</label>
+        <input type="text" id="key1" name="key1">
+        <br>
+        <label for="key2">Key 2:</label>
+        <input type="text" id="key2" name="key2">
+        <br>
+        <button type="button" id="updateButton">Send PUT Request</button>
+        <button type="button" id="displayButton">Display JSON</button>
+    </form>
+    <div id="jsonOutput" style="display: none;">
+        <h2>Sent JSON Data:</h2>
+        <pre id="jsonData"></pre>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

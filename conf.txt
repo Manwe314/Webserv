@@ -79,7 +79,7 @@ server {
         location /one/two
         {
             alias ./
-            location /not/one
+            location /not/onec
             {
                 alias ./
             }
@@ -88,3 +88,35 @@ server {
     
 }
 
+server
+{
+    server_name liki
+    listen localhost:8111
+    index index.html
+    location / 
+    {
+        root ./psite
+    }
+}
+
+server
+{
+    server_name sniki
+    listen localhost:8222
+    index index.html
+    location /
+    {
+        root ./usite
+    }
+}
+
+server
+{
+    server_name gliki
+    listen localhost:8333
+    index index.html
+    location /
+    {
+        root ./dsite
+    }
+}

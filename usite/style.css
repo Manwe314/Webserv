@@ -1,0 +1,46 @@
+body {
+    background-color: #e0f7fa; /* Light blue background */
+    color: #01579b; /* Dark blue text */
+    font-family: Arial, sans-serif;
+    margin: 20px;
+}
+
+h1 {
+    color: #0288d1; /* Darker blue for headings */
+}
+
+#dropArea {
+    border: 2px dashed #0288d1; /* Dashed blue border */
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 20px;
+    background-color: #e1f5fe; /* Very light blue background */
+    cursor: pointer;
+}
+
+#dropArea.dragging {
+    border-color: #01579b; /* Darker blue border when dragging */
+    background-color: #b3e5fc; /* Light blue background when dragging */
+}
+
+input[type="file"] {
+    display: none;
+}
+
+button {
+    background-color: #0288d1;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    margin: 5px 0;
+}
+
+button:hover {
+    background-color: #01579b;
+}
+
+#status {
+    margin-top: 20px;
+    color: #01579b;
+}

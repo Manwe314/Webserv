@@ -1,0 +1,46 @@
+body {
+    background-color: #e0f7fa; /* Light green background */
+    color: #00695c; /* Dark green text */
+    font-family: Arial, sans-serif;
+    margin: 20px;
+}
+
+h1 {
+    color: #004d40; /* Darker green for headings */
+}
+
+label {
+    color: #00796b;
+}
+
+input {
+    margin-bottom: 10px;
+    padding: 5px;
+    border: 1px solid #004d40;
+}
+
+button {
+    background-color: #00796b;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    margin: 5px 0;
+}
+
+button:hover {
+    background-color: #004d40;
+}
+
+#jsonOutput {
+    background-color: #ffffff;
+    border: 1px solid #004d40;
+    padding: 10px;
+    margin-top: 20px;
+}
+
+pre {
+    background-color: #e0f7fa;
+    padding: 10px;
+    border: 1px solid #004d40;
+}

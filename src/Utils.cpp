@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: brettleclerc <brettleclerc@student.42.f    +#+  +:+       +#+        */
+/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 18:42:38 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/25 19:11:52 by brettlecler      ###   ########.fr       */
+/*   Updated: 2024/06/26 20:29:57 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -528,6 +528,12 @@ bool isInvalidVersion(std::string& version)
 }
 
 
+bool isValidFile(const std::string& path)
+{
+    std::ifstream file(path.c_str());
+    return (file.is_open());
+}
+
 /*
     this function returns the enumirated status of a given path.
     what each enum reprisents is self explanatory.
@@ -556,7 +562,10 @@ int pathStatus(const std::string& path)
         if (S_ISDIR(stat_buffer.st_mode))
             status = IS_DIRECTORY;
         else if (S_ISREG(stat_buffer.st_mode))
-            status = IS_FILE;
+            if (isValidFile(path))
+                status = IS_FILE;
+            else
+                status = PERMISSION_DENIED;
         else
             status = UNKNOWN;
     }

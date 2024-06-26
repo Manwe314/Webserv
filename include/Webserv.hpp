@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Webserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: brettleclerc <brettleclerc@student.42.f    +#+  +:+       +#+        */
+/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 14:44:27 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/25 19:11:26 by brettlecler      ###   ########.fr       */
+/*   Updated: 2024/06/26 20:29:50 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@
 #define REQUEST_MAX 1000
 #define MAX_EVENTS 1000
 #define TIMEOUT_SEC 2
-#define DEFAULT_ERROR "/Users/brettleclerc/Documents/ecole_42/schoolWork/webserv_github_levan/error_pages"
+#define DEFAULT_ERROR "/home/manwe/42/commonCoreS2/webserv/error_pages"
 #define SAFE_MODE 1
 
 //Colours for readbility
@@ -128,6 +128,7 @@ int pathStatus(const std::string& path);
 
 bool isValidHeader(std::string& header);
 bool isValidVersion(std::string& version);
+bool isValidFile(const std::string& path);
 bool isInvalidVersion(std::string& version);
 bool isValidHttpMethod(std::string& method);
 bool isInvalidHttpMethod(std::string& method);

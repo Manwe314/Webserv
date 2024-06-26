@@ -23,3 +23,9 @@ To-Do:
         11. single host declaratrion issue stops the entire program from running. for the best.
 
 
+
+uploaded files via post (could be browser thing).
+client body size 
+keep alive / close
+siege / stress TESTING
+Testing def for printouts
