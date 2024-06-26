@@ -6,7 +6,7 @@
 /*   By: brettleclerc <brettleclerc@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 16:59:31 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/25 18:46:02 by brettlecler      ###   ########.fr       */
+/*   Updated: 2024/06/25 19:55:09 by brettlecler      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -296,6 +296,7 @@ std::string Response::processPOST()
 			_status_code = 200;
 			status_line = statusLineProcess();
         	headers = headersProcess("", "");
+			// headers += "Content-Length: " + sizetToString(body.size());
         	response = status_line + headers + body;
 		}
 		else

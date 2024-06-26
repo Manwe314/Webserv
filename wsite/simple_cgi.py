@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
 
-print("Content-Type: text/html")
-print()
-print("<html>")
-print("<head>")
-print("<title>Simple CGI Script</title>")
-print("</head>")
-print("<body>")
-print("<h1>Hello, this is a simple CGI script!</h1>")
-print("</body>")
-print("</html>")
+html_content = """
+<html>
+<head>
+<title>Simple CGI Script</title>
+</head>
+<body>
+<h1>Hello, this is a simple CGI script!</h1>
+</body>
+</html>
+"""
+
+print("Content-Type: text/html\r\n")
+print("\r\n")
+print(html_content)
