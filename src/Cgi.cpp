@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Cgi.cpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: brettleclerc <brettleclerc@student.42.f    +#+  +:+       +#+        */
+/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/30 09:46:55 by bleclerc          #+#    #+#             */
-/*   Updated: 2024/06/25 18:40:25 by brettlecler      ###   ########.fr       */
+/*   Updated: 2024/06/26 10:56:38 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,11 +16,11 @@ Cgi::Cgi( std::string & file, char **envp ) : _file(file), _envp(envp)
 {
 	//	Checks if file is accessible and executable
 	if (access(_file.c_str(), X_OK) != 0)
-		throw CgiExecutionError("Error: " + _file + " not accessible or executable");
+		throw CgiExecutionError(_file + " not accessible or executable");
 
 	_extension = determineExtension(file);
 	if (!_extension)
-		throw CgiExecutionError("Error: " + _file + " unsupported script format");
+		throw CgiExecutionError(_file + " unsupported script format");
 	else
 		executeScript(_file);
 }
@@ -110,10 +110,10 @@ void	Cgi::executeScript( std::string const & file)
 		interpreter = retrievePhpCgiInterpreter();
 		//std::cout << interpreter << std::endl;
 		if (interpreter.empty())
-			throw CgiExecutionError("Error: php-cgi not found");
+			throw CgiExecutionError("php-cgi not found");
 	}
 	if (pipe(pfd) == -1)
-		throw CgiExecutionError("Error: pipe fn issue");
+		throw CgiExecutionError("pipe fn issue");
 	pid = fork();
 	if (pid == -1)
 	{
@@ -125,7 +125,7 @@ void	Cgi::executeScript( std::string const & file)
 	{
 		close(pfd[0]);
 		if (dup2(pfd[1], STDOUT_FILENO) == -1)
-			throw CgiExecutionError("Error: dup2 or close fn issue");
+			throw CgiExecutionError("dup2 or close fn issue");
 		close(pfd[1]);
 		if (_extension == 1) // PHP script
 		{
@@ -152,7 +152,7 @@ void	Cgi::executeScript( std::string const & file)
 	if (WIFEXITED(status) && WEXITSTATUS(status))
 	{
 		close(pfd[0]);
-		throw CgiExecutionError("Error: execve: cannot execute " + _file);
+		throw CgiExecutionError("execve: cannot execute " + _file);
 	}
 	/*
 		Saves the execve content from the read end of the pipe
@@ -160,7 +160,7 @@ void	Cgi::executeScript( std::string const & file)
 	*/
 	if (!readfile(pfd[0])) {
 		close(pfd[0]);
-		throw CgiExecutionError("Error: read fn failed");
+		throw CgiExecutionError("read fn failed");
 	}
 	close(pfd[0]);
 }

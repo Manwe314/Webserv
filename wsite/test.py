@@ -16,8 +16,7 @@ def parse_query_string(query_string):
 
 def generate_html(parameters):
     """Generate HTML content based on the parsed parameters."""
-    html_content = """
-    <html>
+    html_content = """<html>
     <head>
         <title>CGI Script Output</title>
     </head>
@@ -47,7 +46,10 @@ def main():
     html_content = generate_html(parameters)
 
     # Print the HTTP headers and HTML content
-    print("Content-Type: text/html\n")
+    content_length = len(html_content)
+    print(f"Content-length: {content_length}")
+    print("Content-Type: text/html")
+    print("\r\n\r\n")
     print(html_content)
 
 if __name__ == "__main__":

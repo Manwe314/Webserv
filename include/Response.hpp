@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: brettleclerc <brettleclerc@student.42.f    +#+  +:+       +#+        */
+/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/08 23:20:55 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/25 19:12:21 by brettlecler      ###   ########.fr       */
+/*   Updated: 2024/06/26 12:26:01 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,7 @@ private:
     std::string headersProcess(std::string body, std::string path);
     std::string serviceGetResource(ServerRoutesConfig config, std::string uri);
 	char ** appendToCharArray(char** array, int size, const char* new_element);
+	void	validCgiContentHeader(std::string response);
 public:
     Response(std::string request, ServerConfig config, t_host_port pair, char **envp);
     ~Response();

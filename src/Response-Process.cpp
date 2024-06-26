@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response-Process.cpp                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: brettleclerc <brettleclerc@student.42.f    +#+  +:+       +#+        */
+/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 16:59:31 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/25 19:55:09 by brettlecler      ###   ########.fr       */
+/*   Updated: 2024/06/26 14:27:15 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -271,6 +271,29 @@ std::string Response::serviceGetResource(ServerRoutesConfig config, std::string 
     return (body);
 }
 
+void	Response::validCgiContentHeader(std::string response)
+{
+	std::string content_headers;
+	std::string::size_type limiter;
+	
+	limiter = response.find("\r\n\r\n");
+	if (limiter == std::string::npos)
+		throw NoMatchFound("400");
+	else
+	{
+		content_headers = response.substr(0, limiter);
+		std::cout << YELLOW << "Content_header: " << content_headers << std::endl;
+		toLowerCase(content_headers);
+		
+		limiter = content_headers.find("content-type");
+		if (limiter == std::string::npos)
+			throw NoMatchFound("400");
+		limiter = content_headers.find("content-length");
+		if (limiter == std::string::npos)
+			throw NoMatchFound("400");
+	}
+}
+
 std::string Response::processPOST()
 {
 	ServerRoutesConfig config;
@@ -296,8 +319,8 @@ std::string Response::processPOST()
 			_status_code = 200;
 			status_line = statusLineProcess();
         	headers = headersProcess("", "");
-			// headers += "Content-Length: " + sizetToString(body.size());
         	response = status_line + headers + body;
+			validCgiContentHeader(response);
 		}
 		else
 		{
@@ -344,6 +367,7 @@ std::string Response::processGET()
 			status_line = statusLineProcess();
         	headers = headersProcess("", "");
         	response = status_line + headers + body;
+			validCgiContentHeader(response);
 		}
 		else
 		{
