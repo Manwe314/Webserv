@@ -1,0 +1,6 @@
+PUT /my_secret.txt HTTP/1.1
+host: localhost:8555
+Content-lEngth: 10
+Content-tYpe: text/plain
+
+I am GROOT

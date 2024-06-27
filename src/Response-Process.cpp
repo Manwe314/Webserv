@@ -137,6 +137,8 @@ std::string Response::makeFullPath(ServerRoutesConfig config, std::string uri)
         if (countMatchingChars(config.getLocation(), uri) != (int)config.getLocation().size())
             throw NoMatchFound("404");
         path = config.getAlias();
+        if (countMatchingChars(config.getLocation(), uri) == 1)
+            path += "/";
         uri.erase(0, config.getLocation().size());
     }
     else if (!config.getRoot().empty() && config.getAlias().empty())
@@ -147,6 +149,8 @@ std::string Response::makeFullPath(ServerRoutesConfig config, std::string uri)
     {
         if (countMatchingChars(config.getLocation(), uri) == (int)config.getLocation().size())
         {
+            if (countMatchingChars(config.getLocation(), uri) == 1)
+            path += "/";
             path = config.getAlias();
             uri.erase(0, config.getLocation().size());
         }
@@ -322,6 +326,11 @@ std::string Response::processPOST()
         }
 		if (isValidCgiFile(path))
 		{
+            if (_body.size() > config.getMaxBodySize())
+            {
+                _status_code =413;
+                return (handleErrorResponse());
+            }
 			Cgi cgi(path, _envp);
 			body = cgi.getCgiResult();
 			_status_code = 200;
@@ -494,6 +503,11 @@ std::string Response::processPUT()
         if (!isAllowed(config.getMethods(), _method))
         {
             _status_code = 405;
+            return (handleErrorResponse());
+        }
+        if (_body.size() > config.getMaxBodySize())
+        {
+            _status_code = 413;
             return (handleErrorResponse());
         }
         if (hasUnimplementedContent(_headers))

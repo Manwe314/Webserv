@@ -1,92 +1,15 @@
-server {
-    server_name kuxi
+
+server
+{
+    server_name spiki
     listen localhost:8000
-    listen localhost
-    listen 7000
-
-    location /
-    {
-        allow_methods DELETE
-        root ./wsite
-        error_page 400 /400.html
-        error_page 404 /404.html
-        error_page 403 /403.html
-        index index.html
-    }
-
-}
-
-
-server {
-    server_name 127.0.0.1:8000
-    listen localhost:8001
-    listen localhost:8000
-
-    location /
-    {
-		#helloWorld how are you?
-        root ./wsite
-        error_page 400 /400.html
-        error_page 404 /404.html
-        error_page 403 /403.html
-        index index.html
-    }
-    location /alt
-    {
-        alias ./
-        index index.html
-    }
-    location /dir
-    {
-        alias ./dir
-        autoindex on
-    }
-}
-
-
-server {
-    server_name briki
-    listen localhost:8002
-    listen localhost
-    listen localhost:8001
-    location /
-    {
-        root ./wsite
-        error_page 400 /400.html
-        error_page 404 /404.html
-        error_page 403 /403.html
-        index index.html
-    }
-}
-
-
-server {
-    server_name triki
-    listen localhost:8100
-
-    allow_methods GET POST
     index index.html
-
-    location / {
-        alias ./
-        index index.html
-    }
-
-    location /one
+    location / 
     {
-        alias ./
-        allow_methods GET DELETE
-        location /one/two
-        {
-            alias ./
-            location /not/onec
-            {
-                alias ./
-            }
-        }
+        root ./wsite
     }
-    
 }
+
 
 server
 {
@@ -118,5 +41,17 @@ server
     location /
     {
         root ./dsite
+    }
+}
+
+server 
+{
+    server_name niki
+    listen localhost:8555
+    index index.html
+    location /
+    {
+        alias ./psite/saves
+        client_max_body_size 800
     }
 }

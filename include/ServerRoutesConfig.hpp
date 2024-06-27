@@ -57,6 +57,8 @@ private:
     std::string _alias;
     //autoindex state (-1, not declared. 0, declared to off. 1 declared to on).
     int _autoindex;
+    //max client body size in bytes.
+    size_t _max_body_size;
     
     //A function that helps with initilization
     void readRule(std::vector<std::string>::iterator input, std::vector<std::string>& route_block, std::vector<std::string>::const_iterator rule);
@@ -83,6 +85,7 @@ public:
     std::map<int, std::string> getErrorPages() const;
     std::string getAlias() const;
     int getAutoindex() const;
+    size_t getMaxBodySize() const;
 };
 std::ostream& operator<<(std::ostream& obj, ServerRoutesConfig const &conf);
 
