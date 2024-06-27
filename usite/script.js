@@ -39,7 +39,7 @@ function updateStatus() {
 }
 
 function uploadFile(file) {
-    const url = 'http://localhost:8222/saves/myfile';
+    const url = 'http://localhost:8222/uploads/myfile';
     const formData = new FormData();
     formData.append('file', file);
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: brettleclerc <brettleclerc@student.42.f    +#+  +:+       +#+        */
+/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/08 23:27:16 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/25 19:11:36 by brettlecler      ###   ########.fr       */
+/*   Updated: 2024/06/27 18:06:49 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,8 @@
 	505 - HTTP version not supported
 */
 
-Response::Response(std::string request, ServerConfig config, t_host_port pair, char **envp) : _headers(), _pair(pair), _envp(envp)
+Response::Response(std::string request, ServerConfig config, t_host_port pair, char **envp) : \
+			_headers(), _pair(pair), _envp(envp), _chunk_message(false), _chunk_completed(false)
 {
     size_t i;
     _status_code = -1; //if the status code is -1 after this constructor finishes that means no errors were encountered.
@@ -49,7 +50,7 @@ Response::Response(std::string request, ServerConfig config, t_host_port pair, c
 		}
 		catch(TransferEncodingError & e)
 		{
-			std::cerr << e.what() << '\n';
+			std::cerr << e.what() << std::endl;
 			_status_code = 400;
 		}
 	}
@@ -110,84 +111,6 @@ static std::pair<std::string, std::string> makeHeaderPair(std::string header)
     value = header.substr((header.find(":") + 1));
     return (std::make_pair(name, value));
 }
-/*
-	POST / HTTP/1.1
-	Host: localfedfgw
-	Transfer-encoding: chunked
-
-	"4\r\nWiki\r\n"
-	
-	POST / HTTP/1.1
-	Host: localfedfgw
-	Transfer-encoding: chunked
-	
-
-	"5\r\npedia\r\n"
-
-
-	POST / HTTP/1.1
-	Host: localfedfgw
-	Transfer-encoding: chunked
-	
-
-	"e\r\n in\r\n\r\nchunks.\r\n"
-
-
-	POST / HTTP/1.1
-	Host: localfedfgw
-	Transfer-encoding: chunked
-	
-	
-	"0\r\n\r\n"
-
-
-	The first character is the chunked message size.
-	If 0, then consider as the as the end of the entire message.
-	The chunked size for a chunked message is always delimited by \r\n
-	It will also be in hexadecimal format
-	Thereafter read/stock the following content up until the aforementioned chunk size.
-*/
-void	Response::readChunkSize(std::string const & message_body)
-{
-	//find the chunk size delimiter /r/n
-	size_t end_of_line_size = message_body.find("\r\n", _position);
-	if (end_of_line_size == std::string::npos) //if not found, throw an error
-		throw TransferEncodingError("Invalid chunk size format");
-	
-	//stock the chunk size in a string, to be converted later
-	std::string	line_size = message_body.substr(_position, end_of_line_size - _position);
-	_position = end_of_line_size + 2; //Move past the \r\n
-
-	//convert the chunk size string, represented in a hexadecimal format 
-	char *endptr;
-	_chunk_size = std::strtoul(line_size.c_str(), &endptr, 16);
-	if (*endptr != '\0') //ancient way to check for conversion errors, no choice - C++98
-		throw TransferEncodingError("Invalid chunk size format");
-}
-
-void	Response::readChunkData(std::string const & message_body)
-{
-	/*
-		Check if chunk size is at least smaller (if not equal) to the message size
-		to avoid buffer overflow issues when appending
-		No sure if required, the append fn probably does the job for us.
-	*/
-	if (_position + _chunk_size > message_body.size())
-		throw TransferEncodingError("Invalid chunk data format");
-	
-	_body.append(message_body, _position, _chunk_size);
-
-	//Move past the read chunked message
-	_position += _chunk_size;
-	/*
-		This check ensures that the chunk size needs to be perfect.
-		If the following characters after the appended data are not \r\n,
-		then the data is not respecting the chunk size
-	*/
-	if (message_body.substr(_position, 2) != "\r\n")
-		throw TransferEncodingError("Invalid chunk data format");
-	_position += 2; //Move past the \r\n
-}
 
 //this function reads message body of the message.
 void	Response::parseMessageBody(std::string message_body)
@@ -196,9 +119,6 @@ void	Response::parseMessageBody(std::string message_body)
     std::map<std::string, std::string>::iterator it_length;
 	std::map<std::string, std::string>::iterator it_chunk;
 
-	it_length = _headers.find("content-length");
-	it_chunk = _headers.find("transfer-encoding");
-
     if (_status_code != 400) //unless we already had an error.
     {
 		/*
@@ -206,21 +126,10 @@ void	Response::parseMessageBody(std::string message_body)
 			A sender MUST NOT send a Content-Length header field in any message
 			that contains a Transfer-Encoding header field.
 		*/
+		it_length = _headers.find("content-length");
+		it_chunk = _headers.find("transfer-encoding");
 		if (it_length != _headers.end() && it_chunk != _headers.end())
 			throw TransferEncodingError("Content-length & transfer-encoding headers both present");
-		//if transfer-encoding found and value is set to 'chunked'
-		else if (it_chunk != _headers.end() && trimSpaces(it_chunk->second) == "chunked")
-		{
-			_position = 0;
-			while (true) //loops over the chunked message until the chunk size is 0
-			{
-				_chunk_size = 0;
-				readChunkSize(message_body); //gives us the chunked message size for reading
-				if (_chunk_size == 0)
-					break ;
-				readChunkData(message_body); //reads as per the defined chunked size
-			}
-		}
 		else if (it_length != _headers.end()) //if content_length found:
         {
             //get the value in an int.
@@ -435,6 +344,16 @@ int Response::getStatusCode() const
 std::string Response::getQuery() const
 {
 	return (_query);
+}
+
+bool	Response::isChunkMessage() const
+{
+	return _chunk_message;	
+}
+
+bool	Response::isChunkProcessComplete() const
+{
+	return _chunk_completed;	
 }
 
 const char * NoMatchFound::what() const throw()

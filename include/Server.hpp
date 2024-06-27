@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: brettleclerc <brettleclerc@student.42.f    +#+  +:+       +#+        */
+/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 15:02:23 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/25 11:30:37 by brettlecler      ###   ########.fr       */
+/*   Updated: 2024/06/27 17:51:58 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,8 @@ private:
     std::map<int, std::string> _requests;
     //So far, I'm assuming that all responses are strings. This probably is not true.
     std::map<int, std::string> _responses;
+	//Map for new and on-going chunked requests
+	std::map<int, std::string> _chunked;
     //Socket address struct populated during constructor call.
     struct sockaddr_in _server_address;
     //this servers configuration.
@@ -66,8 +68,12 @@ public:
     void close(int client_fd);
 
     //Checks if a response for a given client fd is ready, it is non-blocking
-    bool hasResponse(int client_fd);
+    bool	hasResponse(int client_fd);
     
+	//Chunking functions
+	bool	isChunkedMessage( std::string const & buffer );
+	std::string	parseChunkedMessage( int client_fd );
+
     int getFD() const;
     t_host_port getPair() const;
     std::string getName() const;

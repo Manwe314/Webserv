@@ -104,9 +104,9 @@ server
     server_name sniki
     listen localhost:8222
     index index.html
-    location /
+    location /usite
     {
-        root ./usite
+        alias ./psite
     }
 }
 
@@ -118,5 +118,16 @@ server
     location /
     {
         root ./dsite
+    }
+}
+
+server
+{
+    server_name chunki
+    listen localhost:8444
+    index index.html
+    location /
+    {
+        root ./wsite
     }
 }

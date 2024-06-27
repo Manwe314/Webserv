@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 16:12:04 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/26 20:42:28 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/27 18:08:18 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,6 +108,60 @@ int Server::accept()
     return (client_socket);
 }
 
+bool	Server::isChunkedMessage( std::string const & buffer )
+{
+	Response temp(buffer, _config, _pair, NULL);
+    std::map<std::string, std::string> headers = temp.getHeaders();
+    std::map<std::string, std::string>::iterator it = headers.find("transfer-encoding");
+    std::string::iterator end_pos;
+    std::string chunk_value;
+
+    if (it == headers.end())
+        return (false);
+	else
+	{
+		chunk_value = (*it).second;
+		end_pos = std::remove(chunk_value.begin(), chunk_value.end(), ' ');
+		chunk_value.erase(end_pos, chunk_value.end());
+		if (chunk_value == "chunked")
+			return (true);
+		else
+			return (false);
+	}
+	return (false);
+}
+
+std::string	Server::parseChunkedMessage( int client_fd )
+{
+	std::string					raw_message;
+	std::string					body = "";
+	std::vector<std::string>	vector_messages;
+	std::string::size_type		pos;
+
+	raw_message = _chunked[client_fd];
+	pos = raw_message.find_first_of("\r\n\r\n");
+	if (pos == std::string::npos)
+		throw TransferEncodingError("Invalid chunk size format: header separation not present");
+	pos += 2;
+	raw_message = raw_message.substr(pos, raw_message.length() - pos);
+	vector_messages = split(raw_message, "\r\n");
+	for (size_t i = 0; i < vector_messages.size(); i++)
+	{
+		if (i % 2 == 0)
+		{
+			size_t	chunk_size = std::atoi(vector_messages[i].c_str());
+			if (i + 1 < vector_messages.size() && chunk_size != vector_messages[i + 1].length())
+				throw TransferEncodingError("Invalid chunk size format, wrong chunk length(s)");
+			else if (i + 1 >= vector_messages.size() && chunk_size != 0)
+				throw TransferEncodingError("Invalid chunk size format: not ending properly");
+		}
+		else
+			body += vector_messages[i];
+	}
+		
+	return (body);
+}
+
 /*
 	The receive function will read into the buffer.
 	The buffer will be turned into std::string
@@ -118,28 +172,55 @@ int Server::accept()
 */
 void Server::receive(int client_fd)
 {
-    //this function should take care of chunking and receiving of chunked data.
     char buffer[BUFFER_SIZE] = {0};
+	std::string	raw_buffer;
     int ret;
-    
-    ret = recv(client_fd, buffer, BUFFER_SIZE, 0);
-    
-    if (ret == 0 || ret == -1)
-    {
-        this->close(client_fd); //close the fd if a recv error occured.
-        if (ret == 0)
-            throw ClientConnectionError("Connection was closed by the client, in " + _name);
-        else
-            throw ClientConnectionError("Read error: Connection closed in the server named: " + _name);
-    }
-    _requests[client_fd] += std::string(buffer);
-    //std::cout << LAVENDER << "\n*************alters*************\n" << DEFAULT << std::endl;
-    //std::cout << GREEN << _pair << " " << _name <<DEFAULT << std::endl;
-    //printVector(_alternative_configs);
-    //std::cout << LAVENDER << "********************************" << DEFAULT << std::endl;
-    std::cout << YELLOW << "\n~~~~~~~~~~~~~message~~~~~~~~~~~~~" << DEFAULT <<std::endl;
-    std::cout << std::string(buffer) << std::endl;
-    std::cout << YELLOW << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << DEFAULT << std::endl;
+
+	while(true)
+	{
+		ret = recv(client_fd, buffer, BUFFER_SIZE, 0);
+		if (ret < 0)
+			throw ClientConnectionError("Read error: Connection closed in the server named: " + _name);
+		if (ret == 0)
+			break;
+		raw_buffer += std::string(buffer);
+	}
+	//add connection keepalive or close option;
+	// if (ret == 0 || ret == -1)
+	// {
+	// 	std::cout << MAGENTA << "Buffer read by recv: " << buffer << DEFAULT << std::endl;
+	// 	this->close(client_fd); //close the fd if a recv error occured.
+	// 	if (ret == 0)
+	// 		throw ClientConnectionError("Connection was closed by the client, in " + _name);
+	// 	else
+	// 		throw ClientConnectionError("Read error: Connection closed in the server named: " + _name);
+	// }
+	if (_chunked.find(client_fd) != _chunked.end() || isChunkedMessage(std::string(buffer)))
+	{
+		if (_chunked.find(client_fd) == _chunked.end())
+			_chunked.insert(std::make_pair(client_fd, std::string(buffer)));
+		else
+			_chunked[client_fd] += buffer;
+		if (std::string(buffer).find("0\r\n\r\n") != std::string::npos)
+		{
+			try
+			{
+				_requests[client_fd] = parseChunkedMessage(client_fd);
+			}
+			catch(TransferEncodingError & e)
+			{
+				std::cerr << e.what() << std::endl;
+			}
+			_chunked.erase(client_fd);
+		}
+	}
+	else
+	{
+		_requests[client_fd] += std::string(buffer);
+	}
+	std::cout << YELLOW << "\n~~~~~~~~~~~~~message~~~~~~~~~~~~~" << DEFAULT <<std::endl;
+	std::cout << std::string(buffer) << std::endl;
+	std::cout << YELLOW << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << DEFAULT << std::endl;
 }
 
 ServerConfig Server::determineServer(std::string request)
@@ -169,14 +250,19 @@ ServerConfig Server::determineServer(std::string request)
 void Server::process(int client_fd, char **envp)
 {
     ServerConfig config;
+
+	if (_requests.find(client_fd) == _requests.end())
+	{
+		_responses.insert(std::make_pair(client_fd, ""));
+		return ;
+	}
     config = determineServer(_requests[client_fd]);
     Response response(_requests[client_fd], config, _pair, envp);
     
-    std::cout << MAGENTA << "THE RESPONSE object:\n" << response << DEFAULT << std::endl;
-    std::string responseio = response.process();
-    
+	std::cout << MAGENTA << "THE RESPONSE object:\n" << response << DEFAULT << std::endl;
+	std::string responseio = response.process();
+	_responses.insert(std::make_pair(client_fd, responseio));
     //std::cout << CYAN << "THE RESPONSE msg:\n" << responseio << DEFAULT << std::endl;
-    _responses.insert(std::make_pair(client_fd, responseio));
 }
 
 //The send function sends the processed data by matching client_fd to _responses map.
@@ -277,3 +363,9 @@ const char * ClientConnectionError::what() const throw()
 {
     return (msg.c_str());
 }
+
+//Receive() prints
+//std::cout << LAVENDER << "\n*************alters*************\n" << DEFAULT << std::endl;
+//std::cout << GREEN << _pair << " " << _name <<DEFAULT << std::endl;
+//printVector(_alternative_configs);
+//std::cout << LAVENDER << "********************************" << DEFAULT << std::endl;

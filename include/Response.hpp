@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: brettleclerc <brettleclerc@student.42.f    +#+  +:+       +#+        */
+/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/08 23:20:55 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/26 17:41:25 by brettlecler      ###   ########.fr       */
+/*   Updated: 2024/06/27 18:07:50 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,14 +40,12 @@ private:
 	std::string	_query;
     t_host_port _pair;
 	char		**_envp;
+	bool		_chunk_message;
+	bool		_chunk_completed;
 
     void	parseRequestLine(std::string request_line);
     void	parseMessageHeaders(std::string message_headers);
     void	parseMessageBody(std::string message_body);
-
-	//chunking functions
-	void	readChunkSize(std::string const & message_body);
-	void	readChunkData(std::string const & message_body);
 
     std::string processGET();
     std::string processDELETE();
@@ -67,6 +65,8 @@ public:
     std::string default404();
     ServerRoutesConfig matchSubRoute(std::string uri);
     std::string makeFullPath(ServerRoutesConfig config, std::string uri);
+	bool	isChunkMessage() const;
+	bool	isChunkProcessComplete() const;
 
     std::map<std::string, std::string> getHeaders() const;
     ServerConfig getServerConfig() const;
