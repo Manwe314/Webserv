@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 18:29:19 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/26 19:46:08 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/28 22:12:51 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,6 +135,7 @@ ServerRoutesConfig::ServerRoutesConfig(std::vector<std::string> route_block, std
    //location is the path that is defined after the key word location and before the "{ }" block.
    _location = location;
    std::pair<int, int> brackets;
+   //printVector(route_block);
 
    //iterate over all elements of the route block and for each check against the predefined set of rules, if its a match use the readRule function to fill in the member varibles of the config server.   
    for (std::vector<std::string>::iterator input = route_block.begin(); input != route_block.end(); input++)

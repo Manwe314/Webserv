@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 14:44:27 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/26 20:29:50 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/28 22:59:13 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,9 @@
 //General Defines
 #define PORT 9999
 #define BUFFER_SIZE 1024
-#define TESTING 1
+#ifndef DEBUG
+    #define DEBUG 1
+#endif
 #define REQUEST_MAX 1000
 #define MAX_EVENTS 1000
 #define TIMEOUT_SEC 2
@@ -134,5 +136,6 @@ bool isValidHttpMethod(std::string& method);
 bool isInvalidHttpMethod(std::string& method);
 bool isAllowed(const std::vector<std::string>& allowed_methods, std::string &method);
 bool isValidCgiFile( std::string const & file );
+bool isAllPaired(std::vector<std::string> array);
 
 #endif

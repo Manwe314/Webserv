@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/24 21:44:05 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/25 02:02:28 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/28 22:53:07 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -139,7 +139,6 @@ ServerRoutesConfig ServerConfig::initServerWideConfig(std::vector<std::string> s
 	*/
     while (true)
     {
-        //printVector(server_block);
         it = std::find(server_block.begin(), server_block.end(), "location");
         //If no more "location's are found then all of them have been removed. Thus, we are done. 
         if (it == server_block.end())
@@ -167,10 +166,9 @@ ServerRoutesConfig ServerConfig::initServerWideConfig(std::vector<std::string> s
     	To make sure of this, a pair of "{ }" are looked for inside the server brackets.
 		If any are found there was a missmatch. 
 	*/
-    brackets = encapsule(server_block, "{", "}", 1);
+
     
-    
-    if (brackets.second != -1)
+    if (!isAllPaired(server_block))
         throw BracketPairMissMatch("Error in " + _server_name + " Brackets are missmatched");
     return (ServerRoutesConfig(server_block, ""));
 }
@@ -239,7 +237,7 @@ ServerConfig::ServerConfig(std::vector<std::string> server_block) : _pairs(initH
                                                                       _serverwide_config(initServerWideConfig(server_block)),\
                                                                        _route_configs(initRouteConfigs(server_block))
 {
-    if (TESTING)
+    if (DEBUG)
     {
         std::cout << "Server: " << _server_name << " Config Created!" << std::endl;
     }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 16:12:04 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/28 15:52:46 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/06/28 22:56:31 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ Server::~Server()
 
 Server::Server()
 {
-    if (TESTING)
+    if (DEBUG)
         std::cout << "Default Server Constructor" << std::endl;
 }
 
@@ -201,7 +201,7 @@ std::string	Server::parseChunkedMessage( int client_fd )
         
         pos += 2; // Move past the \r\n
     }
-	std::cout << BLUE << headers + parsed_body << DEFAULT << std::endl;
+	//std::cout << BLUE << headers + parsed_body << DEFAULT << std::endl;
 	return (headers + parsed_body);
 }
 
@@ -291,10 +291,13 @@ void Server::receive(int client_fd)
 	{
 		_requests[client_fd] += std::string(buffer);
 	}
-	std::cout << YELLOW << "\n~~~~~~~~~~~~~message~~~~~~~~~~~~~" << DEFAULT <<std::endl;
-	std::cout << _requests[client_fd] << std::endl;
-	std::cout << _chunked[client_fd] << std::endl;
-	std::cout << YELLOW << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << DEFAULT << std::endl;
+	if (DEBUG)
+	{
+		std::cout << YELLOW << "\n~~~~~~~~~~~~~message~~~~~~~~~~~~~" << DEFAULT <<std::endl;
+		std::cout << _requests[client_fd] << std::endl;
+		std::cout << _chunked[client_fd] << std::endl;
+		std::cout << YELLOW << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << DEFAULT << std::endl;
+	}
 }
 
 void Server::process(int client_fd, char **envp)
@@ -314,10 +317,12 @@ void Server::process(int client_fd, char **envp)
 		config = determineServer(_requests[client_fd]);
 		Response response(_requests[client_fd], config, _pair, envp);
 		
-		//std::cout << MAGENTA << "THE RESPONSE object:\n" << response << DEFAULT << std::endl;
+		if (DEBUG)
+			std::cout << MAGENTA << "THE RESPONSE object:\n" << response << DEFAULT << std::endl;
 		std::string responseio = response.process();
 		_responses.insert(std::make_pair(client_fd, responseio));
-		std::cout << CYAN << "THE RESPONSE msg:\n" << responseio << DEFAULT << std::endl;
+		if (DEBUG)
+			std::cout << CYAN << "THE RESPONSE msg:\n" << responseio << DEFAULT << std::endl;
 	}
 	// else
 	// {

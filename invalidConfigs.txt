@@ -1,0 +1,139 @@
+#server 
+#
+#    server_name chunki
+#    listen localhost:8444
+#    index index.html
+#    location / {
+#
+#		root ./wsite
+#    }
+#    location  {  }
+#}
+
+#server {
+#
+#    server_name chunki
+#    listen localhost:8444
+#    index index.html
+#    location / 
+#
+#		root ./wsite
+#    }
+#    location  {  }
+#}
+
+#server {
+#
+#    server_name chunki
+#    listen localhost:8444
+#    index index.html
+#    location / {
+#
+#		root ./wsite
+#    
+#    location  {  }
+#}
+
+#server 
+#
+#    server_name chunki
+#    listen localhost:8444
+#    index index.html
+#    location / 
+#
+#		root ./wsite
+#    
+#    location  
+
+#server {
+#
+#    server_name chunki
+#    listen localhost:8444
+#    index index.html
+#    location / {
+#
+#		root ./wsite
+#    
+#    location  {  
+
+
+#server {
+#
+#    server_name chunki
+#    listen localhost:8444
+#    index index.html
+#    location / {
+#
+#		root ./wsite
+#    }
+#    location   }
+
+#server {
+#
+#    server_name chunki
+#    listen localhost:8444
+#    index index.html
+#    location / {
+#
+#		root ./wsite
+#    }
+#    location  {}   }
+
+#server { { {  { { } } { } } } }
+
+#server {
+#
+#    server_name chunki
+#    listen localhost:8444
+#    index index.html
+#    location / {
+#
+#		root ./wsite
+#        location  
+#        {
+#            locatio { }
+#
+#          }
+#    }
+#}
+
+#server {
+#
+#    server_name chunki
+#    listen localhost:8444
+#    index index.html
+#    location / {
+#
+#		root ./wsite
+#       location  {
+#        location {
+#         }
+#    }
+#}
+
+#server {
+#
+#    server_name chunki
+#    listen localhost:8444
+#    index index.html
+#    location / {
+#
+#		root ./wsite
+#      location  {
+#            location }
+#        
+#    }
+#}
+
+#server {
+#
+#    server_name chunki
+#    listen localhost:8444
+#    index index.html
+#    location / {
+#
+#        location { location { } }
+#		root ./wsite
+#       location  {  location {  location { } }
+#    }
+#}

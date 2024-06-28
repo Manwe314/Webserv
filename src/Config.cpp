@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Config.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: brettleclerc <brettleclerc@student.42.f    +#+  +:+       +#+        */
+/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 21:53:46 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/25 11:18:42 by brettlecler      ###   ########.fr       */
+/*   Updated: 2024/06/28 22:53:07 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,6 +66,8 @@ std::vector<ServerConfig> Config::initServerConfigs(std::string path_to_config)
         else
             offset =  std::distance(split_file.begin(), ++it);
     }
+    if (server_configs.empty())
+        throw BracketPairMissMatch("No Server Config could be compleated");
     return (server_configs);
 }
 
@@ -91,7 +93,7 @@ ServerConfig Config::getServerConfigByName(std::string name) const
 
 Config::Config(std::string path_to_config) : _server_configurations(initServerConfigs(path_to_config))
 {
-    if (TESTING)
+    if (DEBUG)
         std::cout << "Config completed without any issues" << std::endl;
 }
 

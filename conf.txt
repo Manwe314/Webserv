@@ -127,7 +127,5 @@ server
     listen localhost:8444
     index index.html
     location /
-    {
 		root ./wsite
-    }
 }

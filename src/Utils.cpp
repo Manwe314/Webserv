@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 18:42:38 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/26 20:29:57 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/28 22:52:34 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -181,11 +181,10 @@ std::pair<int, int> encapsule(std::vector<std::string> array, std::string a, std
         //If the level is 0, the pair has been found.
         i++;
     }
-    //If 'a' IS found but 'b' is NOT, then a pair of end iterators are returned.
+    //If 'a' IS found but 'b' is NOT.
     if (i == (int)array.size() && array[i] != b)
         return (std::make_pair(start, end));
     end = i;
-    //std::cout << *end << "  ending at " << std::distance(array.begin(), end) << std::endl;
     return (std::make_pair(start, end));
 }
 
@@ -570,6 +569,27 @@ int pathStatus(const std::string& path)
             status = UNKNOWN;
     }
     return (status);
+}
+
+bool isAllPaired(std::vector<std::string> array)
+{
+    std::pair<int, int> brackets;
+
+    brackets = encapsule(array, "{", "}");
+    while (brackets.second != -1)
+    {
+        array.erase(array.begin() + brackets.second);
+        array.erase(array.begin() + brackets.first);
+        brackets = encapsule(array, "{", "}");
+    }
+    
+    for (std::vector<std::string>::iterator it = array.begin(); it != array.end(); it++)
+    {
+        if ((*it).compare("{") == 0 || (*it).compare("}") == 0)
+            return (false);
+    }
+    
+    return (true);
 }
 
 /*
