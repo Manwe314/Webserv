@@ -3,6 +3,8 @@
 import socket
 import time
 
+# POST SAMPLE
+
 def send_chunk(connection, data):
     chunk_size = f"{len(data):X}\r\n"
     full_message = chunk_size + data + "\r\n"
@@ -19,7 +21,7 @@ def send_chunked_request():
 
     # Initial headers and the first chunk
     initial_headers = (
-        "POST /wsite HTTP/1.1\r\n"
+        "POST /chunking_data.txt HTTP/1.1\r\n"
         "Host: localhost:8444\r\n"
         "Accept-Encoding: identity\r\n"
         "Transfer-Encoding: chunked\r\n"
