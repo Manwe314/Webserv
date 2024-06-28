@@ -6,7 +6,7 @@
 /*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 16:12:04 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/27 18:08:18 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/06/28 15:52:46 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,96 +131,78 @@ bool	Server::isChunkedMessage( std::string const & buffer )
 	return (false);
 }
 
+/*
+	Changed the parsing from a split-based parsing
+	to a classic iteration parsing, since I wanted to add the \n characters
+	to the body and the split fn was doing too good a job.
+*/
 std::string	Server::parseChunkedMessage( int client_fd )
 {
-	std::string					raw_message;
-	std::string					body = "";
-	std::vector<std::string>	vector_messages;
-	std::string::size_type		pos;
+	std::string				raw_data;
+	std::string				headers;
+	std::string				parsed_body = "";
+	std::string::size_type	pos, chunk_size_pos;
+	long					chunk_size;
+	char					*endptr;
 
-	raw_message = _chunked[client_fd];
-	pos = raw_message.find_first_of("\r\n\r\n");
+	raw_data = _chunked[client_fd];
+	//Determine header part
+	pos = raw_data.find("\r\n\r\n");
 	if (pos == std::string::npos)
 		throw TransferEncodingError("Invalid chunk size format: header separation not present");
-	pos += 2;
-	raw_message = raw_message.substr(pos, raw_message.length() - pos);
-	vector_messages = split(raw_message, "\r\n");
-	for (size_t i = 0; i < vector_messages.size(); i++)
-	{
-		if (i % 2 == 0)
-		{
-			size_t	chunk_size = std::atoi(vector_messages[i].c_str());
-			if (i + 1 < vector_messages.size() && chunk_size != vector_messages[i + 1].length())
-				throw TransferEncodingError("Invalid chunk size format, wrong chunk length(s)");
-			else if (i + 1 >= vector_messages.size() && chunk_size != 0)
-				throw TransferEncodingError("Invalid chunk size format: not ending properly");
-		}
-		else
-			body += vector_messages[i];
+	//Move past the \r\n\r\n
+	pos += 4;
+	try {
+		headers = raw_data.substr(0, pos);
+		raw_data = raw_data.substr(pos);
 	}
-		
-	return (body);
-}
+	catch (const std::out_of_range& e)
+	{
+		throw TransferEncodingError("Invalid chunk size format: wrong header and body format");
+	}
+	// Start parsing the raw body
+	pos = 0;
+	while (true)
+    {
+        // Find the position of the next \r\n
+        chunk_size_pos = raw_data.find("\r\n", pos);
+        if (chunk_size_pos == std::string::npos)
 
-/*
-	The receive function will read into the buffer.
-	The buffer will be turned into std::string
-	and be appended to the _requests string value of the matching client_fd.
-	
-	The send function clears the matching _request value.
-	This is why we append to it so a request can be built up through multiple calls.
-*/
-void Server::receive(int client_fd)
-{
-    char buffer[BUFFER_SIZE] = {0};
-	std::string	raw_buffer;
-    int ret;
+            throw TransferEncodingError("Invalid chunk size format: missing CRLF after chunk size");
 
-	while(true)
-	{
-		ret = recv(client_fd, buffer, BUFFER_SIZE, 0);
-		if (ret < 0)
-			throw ClientConnectionError("Read error: Connection closed in the server named: " + _name);
-		if (ret == 0)
-			break;
-		raw_buffer += std::string(buffer);
-	}
-	//add connection keepalive or close option;
-	// if (ret == 0 || ret == -1)
-	// {
-	// 	std::cout << MAGENTA << "Buffer read by recv: " << buffer << DEFAULT << std::endl;
-	// 	this->close(client_fd); //close the fd if a recv error occured.
-	// 	if (ret == 0)
-	// 		throw ClientConnectionError("Connection was closed by the client, in " + _name);
-	// 	else
-	// 		throw ClientConnectionError("Read error: Connection closed in the server named: " + _name);
-	// }
-	if (_chunked.find(client_fd) != _chunked.end() || isChunkedMessage(std::string(buffer)))
-	{
-		if (_chunked.find(client_fd) == _chunked.end())
-			_chunked.insert(std::make_pair(client_fd, std::string(buffer)));
+        // Extract the chunk size string
+        std::string chunk_size_str = raw_data.substr(pos, chunk_size_pos - pos);
+        
+        // Convert the chunk size string to a long integer
+        chunk_size = strtol(chunk_size_str.c_str(), &endptr, 10); // Base 10 for decimal conversion
+
+        // Check for conversion errors
+        if (*endptr != '\0' || endptr == chunk_size_str.c_str() || chunk_size < 0)
+            throw TransferEncodingError("Invalid chunk size format: non-numeric or negative chunk size");
+
+        pos = chunk_size_pos + 2; // Move past the \r\n
+
+        if (chunk_size == 0)
+            break; // Last chunk (0) found, exit the loop
+
+        // Ensure there's enough data for the chunk and the following \r\n
+        if (pos + chunk_size + 2 > raw_data.size())
+            throw TransferEncodingError("Invalid chunk size format: not enough data for declared chunk size");
+
+        // Append the chunk to the parsed body
+        parsed_body += raw_data.substr(pos, chunk_size);
+        pos += chunk_size;
+
+        // Ensure the chunk is followed by \r\n
+        if (raw_data.substr(pos, 2) != "\r\n")
+            throw TransferEncodingError("Invalid chunk size format: chunk not properly terminated");
 		else
-			_chunked[client_fd] += buffer;
-		if (std::string(buffer).find("0\r\n\r\n") != std::string::npos)
-		{
-			try
-			{
-				_requests[client_fd] = parseChunkedMessage(client_fd);
-			}
-			catch(TransferEncodingError & e)
-			{
-				std::cerr << e.what() << std::endl;
-			}
-			_chunked.erase(client_fd);
-		}
-	}
-	else
-	{
-		_requests[client_fd] += std::string(buffer);
-	}
-	std::cout << YELLOW << "\n~~~~~~~~~~~~~message~~~~~~~~~~~~~" << DEFAULT <<std::endl;
-	std::cout << std::string(buffer) << std::endl;
-	std::cout << YELLOW << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << DEFAULT << std::endl;
+			parsed_body += "\r\n"; //Add the \r\n to the body for a cleaner format
+        
+        pos += 2; // Move past the \r\n
+    }
+	std::cout << BLUE << headers + parsed_body << DEFAULT << std::endl;
+	return (headers + parsed_body);
 }
 
 ServerConfig Server::determineServer(std::string request)
@@ -247,22 +229,101 @@ ServerConfig Server::determineServer(std::string request)
     return (_config);
 }
 
+/*
+	The receive function will read into the buffer.
+	The buffer will be turned into std::string
+	and be appended to the _requests string value of the matching client_fd.
+	
+	The send function clears the matching _request value.
+	This is why we append to it so a request can be built up through multiple calls.
+*/
+void Server::receive(int client_fd)
+{
+    char buffer[BUFFER_SIZE] = {0};
+	std::string	raw_buffer;
+    int ret;
+	/*
+		The below commented loop is a possible solution to connection keep-alive
+	*/
+
+	// while(true)
+	// {
+	// 	ret = recv(client_fd, buffer, BUFFER_SIZE, 0);
+	// 	if (ret < 0)
+	// 		throw ClientConnectionError("Read error: Connection closed in the server named: " + _name);
+	// 	if (ret == 0)
+	// 		break;
+	// 	raw_buffer += std::string(buffer);
+	// }
+
+	ret = recv(client_fd, buffer, BUFFER_SIZE, 0);
+	if (ret == 0 || ret == -1)
+	{
+		this->close(client_fd); //close the fd if a recv error occured.
+		if (ret == 0)
+			throw ClientConnectionError("Connection was closed by the client, in " + _name);
+		else
+			throw ClientConnectionError("Read error: Connection closed in the server named: " + _name);
+	}
+	if (_chunked.find(client_fd) != _chunked.end() || isChunkedMessage(std::string(buffer)))
+	{
+		if (_chunked.find(client_fd) == _chunked.end())
+			_chunked.insert(std::make_pair(client_fd, std::string(buffer)));
+		else
+			_chunked[client_fd] += buffer;
+		if (std::string(buffer).find("0\r\n\r\n") != std::string::npos)
+		{
+			try
+			{
+				_requests[client_fd] = parseChunkedMessage(client_fd);
+			}
+			catch(TransferEncodingError & e)
+			{
+				std::cerr << e.what() << std::endl;
+				this->close(client_fd); //closing the fd if there was an encoding error
+				_chunked.erase(client_fd);
+				throw ClientConnectionError("Error while receiving chunked data in the server named: " + _name);
+			}
+			_chunked.erase(client_fd);
+		}
+	}
+	else
+	{
+		_requests[client_fd] += std::string(buffer);
+	}
+	std::cout << YELLOW << "\n~~~~~~~~~~~~~message~~~~~~~~~~~~~" << DEFAULT <<std::endl;
+	std::cout << _requests[client_fd] << std::endl;
+	std::cout << _chunked[client_fd] << std::endl;
+	std::cout << YELLOW << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << DEFAULT << std::endl;
+}
+
 void Server::process(int client_fd, char **envp)
 {
     ServerConfig config;
+	std::map<int, std::string>::iterator it;
+	/*
+		For some reason, the client_fd always gets added to the _request map
+		So I have to add the second condition (similar to that of send fn).
+		Commenting the else part allows the chunking messages to work properly
+		But keeping it commented in case we have other issues popping up
+	*/
 
-	if (_requests.find(client_fd) == _requests.end())
+	it = _requests.find(client_fd);
+    if (it != _requests.end() && (*it).second != "")
 	{
-		_responses.insert(std::make_pair(client_fd, ""));
-		return ;
+		config = determineServer(_requests[client_fd]);
+		Response response(_requests[client_fd], config, _pair, envp);
+		
+		//std::cout << MAGENTA << "THE RESPONSE object:\n" << response << DEFAULT << std::endl;
+		std::string responseio = response.process();
+		_responses.insert(std::make_pair(client_fd, responseio));
+		std::cout << CYAN << "THE RESPONSE msg:\n" << responseio << DEFAULT << std::endl;
 	}
-    config = determineServer(_requests[client_fd]);
-    Response response(_requests[client_fd], config, _pair, envp);
-    
-	std::cout << MAGENTA << "THE RESPONSE object:\n" << response << DEFAULT << std::endl;
-	std::string responseio = response.process();
-	_responses.insert(std::make_pair(client_fd, responseio));
-    //std::cout << CYAN << "THE RESPONSE msg:\n" << responseio << DEFAULT << std::endl;
+	// else
+	// {
+	// 	_responses.insert(std::make_pair(client_fd, ""));
+	// 	return ;
+	// }
 }
 
 //The send function sends the processed data by matching client_fd to _responses map.
@@ -272,7 +333,7 @@ void Server::send(int client_fd)
     std::map<int, std::string>::iterator it;
     int ret;
 
-    it = _responses.find(client_fd);
+	it = _responses.find(client_fd);
     if (it != _responses.end() && (*it).second != "")
     {
         std::cout << LAVENDER << "SENDING DATA" << DEFAULT << std::endl;

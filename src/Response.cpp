@@ -6,7 +6,7 @@
 /*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/08 23:27:16 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/27 18:06:49 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/06/28 11:35:31 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ Response::Response(std::string request, ServerConfig config, t_host_port pair, c
 {
     size_t i;
     _status_code = -1; //if the status code is -1 after this constructor finishes that means no errors were encountered.
-    if (request.empty())
+	if (request.empty())
         _status_code = 400;
     _server_config = config;
     /*
