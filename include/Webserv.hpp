@@ -57,8 +57,9 @@
 #define REQUEST_MAX 1000
 #define MAX_EVENTS 1000
 #define TIMEOUT_SEC 2
-#define DEFAULT_ERROR "/home/manwe/42/commonCoreS2/webserv/error_pages"
+#define DEFAULT_ERROR "./error_pages"
 #define SAFE_MODE 1
+#define MAX_BODY_SIZE 15000000
 
 //Colours for readbility
 #define DEFAULT "\033[0m"

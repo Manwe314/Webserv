@@ -24,7 +24,8 @@ enum Rule{
 	INDEX,
    ERROR_PAGE,
    ALIAS,
-   AUTOINDEX
+   AUTOINDEX,
+   CLIENT_MAX_BODY_SIZE
 };
 
 bool ServerRoutesConfig::isRule(std::string input)
@@ -121,14 +122,17 @@ std::vector<std::string>& route_block, std::vector<std::string>::const_iterator 
       if ((*input).compare("off") == 0)
          _autoindex = 0;
       break;
-   
+   case CLIENT_MAX_BODY_SIZE:
+      input++;
+      _max_body_size = static_cast<size_t>(std::atoi((*input).c_str()));
+      break ;
    default:
       break;
    }
    
 }
 
-ServerRoutesConfig::ServerRoutesConfig(std::vector<std::string> route_block, std::string location) : _index_files(), _allowed_methods(), _sub_routes(), _error_pages(), _autoindex(-1)
+ServerRoutesConfig::ServerRoutesConfig(std::vector<std::string> route_block, std::string location) : _index_files(), _allowed_methods(), _sub_routes(), _error_pages(), _autoindex(-1), _max_body_size(MAX_BODY_SIZE)
 {
    //the config file is split with a charset (space tab newline). must read info out from a vector like that here.
    //route block is whatever is inside "{ }" after the location is defined.
@@ -172,6 +176,8 @@ void ServerRoutesConfig::inherit(ServerRoutesConfig parent)
       _alias = parent.getAlias();
    if (_autoindex != parent.getAutoindex() && parent.getAutoindex() != -1)
       _autoindex = parent.getAutoindex();
+   if (_max_body_size == MAX_BODY_SIZE)
+      _max_body_size = parent.getMaxBodySize();
    
 }
 
@@ -303,6 +309,7 @@ ServerRoutesConfig& ServerRoutesConfig::operator=(const ServerRoutesConfig& rhs)
    _error_pages = rhs.getErrorPages();
    _alias = rhs.getAlias();
    _autoindex = rhs.getAutoindex();
+   _max_body_size = rhs.getMaxBodySize();
    return (*this);
 }
 
@@ -342,6 +349,10 @@ std::string ServerRoutesConfig::getAlias() const
 int ServerRoutesConfig::getAutoindex() const
 {
    return (_autoindex);
+}
+size_t ServerRoutesConfig::getMaxBodySize() const
+{
+   return (_max_body_size);
 }
 
 
@@ -406,5 +417,7 @@ std::ostream& operator<<(std::ostream& obj, ServerRoutesConfig const &conf)
       obj << "True";
    else
       obj << "False";
+   obj << "\nclient max body size: ";
+   obj << sizetToString(conf.getMaxBodySize());
    return (obj);
 }

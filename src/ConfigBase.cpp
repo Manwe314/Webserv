@@ -23,6 +23,7 @@ static std::vector<std::string> init_rules()
     rules.push_back("error_page");
     rules.push_back("alias");
     rules.push_back("autoindex");
+    rules.push_back("client_max_body_size");
     
     return (rules);
 }
@@ -73,6 +74,7 @@ static std::map<int, std::string> init_reason_phrases()
     reason_phrases.insert(std::make_pair(403, "Forbidden"));
     reason_phrases.insert(std::make_pair(404, "Not Found"));
     reason_phrases.insert(std::make_pair(405, "Method Not Allowed"));
+    reason_phrases.insert(std::make_pair(413, "Payload Too Large"));
     reason_phrases.insert(std::make_pair(409, "Conflict"));
     reason_phrases.insert(std::make_pair(500, "Internal Server Error"));
     reason_phrases.insert(std::make_pair(501, "Not Implemented"));

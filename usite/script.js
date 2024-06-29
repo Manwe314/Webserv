@@ -44,7 +44,7 @@ function uploadFile(file) {
     formData.append('file', file);
 
     fetch(url, {
-        method: 'POST',
+        method: 'PUT',
         body: formData
     })
     .then(response => {
