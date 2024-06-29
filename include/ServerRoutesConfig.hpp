@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 17:09:31 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/21 16:02:04 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/29 17:07:00 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,8 @@ private:
     int _autoindex;
     //max client body size in bytes.
     size_t _max_body_size;
+    //a pair to save the status code and redirection destination
+    std::pair<int, std::string> _redirect;
     
     //A function that helps with initilization
     void readRule(std::vector<std::string>::iterator input, std::vector<std::string>& route_block, std::vector<std::string>::const_iterator rule);
@@ -86,6 +88,7 @@ public:
     std::string getAlias() const;
     int getAutoindex() const;
     size_t getMaxBodySize() const;
+    std::pair<int, std::string> getRedirect() const;
 };
 std::ostream& operator<<(std::ostream& obj, ServerRoutesConfig const &conf);
 

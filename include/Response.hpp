@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/08 23:20:55 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/27 18:07:50 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/06/29 17:28:18 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ private:
 	std::string processPOST();
     std::string statusLineProcess();
     std::string handleErrorResponse();
-    std::string headersProcess(std::string body, std::string path, bool is_cgi);
+    std::string headersProcess(std::string body, std::string path, bool is_cgi, std::string redir);
     std::string serviceGetResource(ServerRoutesConfig config, std::string uri);
 	char ** appendToCharArray(char** array, int size, const char* new_element);
 	void	validCgiContentHeader(std::string response);

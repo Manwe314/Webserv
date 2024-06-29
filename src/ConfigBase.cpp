@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigBase.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: brettleclerc <brettleclerc@student.42.f    +#+  +:+       +#+        */
+/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/17 19:02:50 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/25 11:19:04 by brettlecler      ###   ########.fr       */
+/*   Updated: 2024/06/29 15:40:15 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ static std::vector<std::string> init_rules()
     rules.push_back("alias");
     rules.push_back("autoindex");
     rules.push_back("client_max_body_size");
+    rules.push_back("return");
     
     return (rules);
 }
@@ -70,6 +71,8 @@ static std::map<int, std::string> init_reason_phrases()
     reason_phrases.insert(std::make_pair(200, "OK"));
     reason_phrases.insert(std::make_pair(201, "Created"));
     reason_phrases.insert(std::make_pair(204, "No Content"));
+    reason_phrases.insert(std::make_pair(301, "Moved Permanently"));
+    reason_phrases.insert(std::make_pair(307, "Temporary Redirect"));
     reason_phrases.insert(std::make_pair(400, "Bad Request"));
     reason_phrases.insert(std::make_pair(403, "Forbidden"));
     reason_phrases.insert(std::make_pair(404, "Not Found"));

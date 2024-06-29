@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 18:29:19 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/28 22:12:51 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/29 17:09:42 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,8 @@ enum Rule{
    ERROR_PAGE,
    ALIAS,
    AUTOINDEX,
-   CLIENT_MAX_BODY_SIZE
+   CLIENT_MAX_BODY_SIZE,
+   RETURN
 };
 
 bool ServerRoutesConfig::isRule(std::string input)
@@ -126,13 +127,16 @@ std::vector<std::string>& route_block, std::vector<std::string>::const_iterator 
       input++;
       _max_body_size = static_cast<size_t>(std::atoi((*input).c_str()));
       break ;
+   case RETURN:
+      _redirect = std::make_pair(std::atoi((*(++input)).c_str()), (*(++input)));
+      break;
    default:
       break;
    }
    
 }
 
-ServerRoutesConfig::ServerRoutesConfig(std::vector<std::string> route_block, std::string location) : _index_files(), _allowed_methods(), _sub_routes(), _error_pages(), _autoindex(-1), _max_body_size(MAX_BODY_SIZE)
+ServerRoutesConfig::ServerRoutesConfig(std::vector<std::string> route_block, std::string location) : _index_files(), _allowed_methods(), _sub_routes(), _error_pages(), _autoindex(-1), _max_body_size(MAX_BODY_SIZE), _redirect()
 {
    //the config file is split with a charset (space tab newline). must read info out from a vector like that here.
    //route block is whatever is inside "{ }" after the location is defined.
@@ -310,6 +314,7 @@ ServerRoutesConfig& ServerRoutesConfig::operator=(const ServerRoutesConfig& rhs)
    _alias = rhs.getAlias();
    _autoindex = rhs.getAutoindex();
    _max_body_size = rhs.getMaxBodySize();
+   _redirect = rhs.getRedirect();
    return (*this);
 }
 
@@ -354,6 +359,10 @@ size_t ServerRoutesConfig::getMaxBodySize() const
 {
    return (_max_body_size);
 }
+std::pair<int, std::string> ServerRoutesConfig::getRedirect() const
+{
+   return (_redirect);
+}
 
 
 std::ostream& operator<<(std::ostream& obj, ServerRoutesConfig const &conf)
@@ -361,6 +370,7 @@ std::ostream& operator<<(std::ostream& obj, ServerRoutesConfig const &conf)
    std::vector<std::string> help;
    std::vector<ServerRoutesConfig> aid;
    std::map<int, std::string> companion;
+   std::pair<int, std::string> compadre;
    
    obj << "Location: ";
    obj << conf.getLocation();
@@ -419,5 +429,13 @@ std::ostream& operator<<(std::ostream& obj, ServerRoutesConfig const &conf)
       obj << "False";
    obj << "\nclient max body size: ";
    obj << sizetToString(conf.getMaxBodySize());
+   compadre = conf.getRedirect();
+   if (!compadre.second.empty())
+   {
+      obj << "\nRedirection: ";
+      obj << compadre.first;
+      obj << " - ";
+      obj << compadre.second;
+   }
    return (obj);
 }
