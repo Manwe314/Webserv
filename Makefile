@@ -6,7 +6,7 @@
 #    By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/06/23 16:24:43 by lkukhale          #+#    #+#              #
-#    Updated: 2024/06/28 23:00:14 by lkukhale         ###   ########.fr        #
+#    Updated: 2024/06/30 17:03:33 by lkukhale         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,7 +19,7 @@ SRC = ${addsuffix .cpp, ./src/main ./src/Server ./src/Utils ./src/Config ./src/C
 HEADERS = -I ./include/
 CC = c++
 RM = rm -f
-CPPFLAGS = -Wall -Wextra -Werror -g -DDEBUG=0 -std=c++98 
+CPPFLAGS = -Wall -Wextra -Werror -g -std=c++98 #-DDEBUG=0  
 OBJ = ${SRC:.cpp=.o}
 
 

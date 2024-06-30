@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 18:29:19 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/29 17:09:42 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/30 17:01:46 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,7 @@ std::vector<std::string>& route_block, std::vector<std::string>::const_iterator 
 {
    //since the _rules vector of ConfigBase class is a constant pre defined vector we can just get the index of the rule we have found
    int rule_id = std::distance(ConfigBase::_rules.begin(), rule);
+   int code;
    std::vector<std::string> buffer;
    std::vector<int> status_codes;
    std::pair<int, int> brackets;
@@ -128,7 +129,10 @@ std::vector<std::string>& route_block, std::vector<std::string>::const_iterator 
       _max_body_size = static_cast<size_t>(std::atoi((*input).c_str()));
       break ;
    case RETURN:
-      _redirect = std::make_pair(std::atoi((*(++input)).c_str()), (*(++input)));
+      input++;
+      code = std::atoi((*input).c_str());
+      input++;
+      _redirect = std::make_pair(code, *input);
       break;
    default:
       break;

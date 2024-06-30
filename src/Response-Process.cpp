@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 16:59:31 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/29 17:31:30 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/30 17:02:02 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,33 @@ std::string Response::default404()
     response += "\r\n";
     response += "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n<title>404 Not Found Default.</title>\n<style>\nbody { font-family: Arial, sans-serif; text-align: center; padding: 50px; }\nh1 { font-size: 50px; }\np { font-size: 20px; }\n</style>\n</head>\n<body>\n<h1>404 Not Found</h1>\n<p>The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.</p>\n</body>\n</html>";
     return (response);
+}
+
+std::string Response::default3XX(std::string redir)
+{
+    std::string response;
+    std::string headers;
+    std::string body;
+
+    if (_status_code / 100 != 3)
+    {
+        _status_code = 500;
+        return (handleErrorResponse());
+    }
+    
+    if (_status_code == 301)
+        body = "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n<title>301 Moved Permanently</title>\n</head>\n<body>\n<h1>301 Moved Permanently</h1>\n<p>The resource has been permanently moved to a new location.</p>\n</body>\n</html>";
+    else if (_status_code == 307)
+        body = "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n<title>307 Temporary Redirect</title>\n</head>\n<body>\n<h1>307 Temporary Redirect</h1>\n<p>The resource has been temporarily moved to a new location.</p>\n</body>\n</html>";
+    else
+    {
+        _status_code = 501;
+        return (handleErrorResponse());
+    }
+    response = statusLineProcess();
+    headers = headersProcess(body, "index.html", false, redir);
+    response += headers + "\r\n" + body;
+    return (response);    
 }
 
 //this function builds and returns the headers feild of a http response
@@ -320,6 +347,11 @@ std::string Response::processPOST()
 	try
     {
         config = matchSubRoute(_request_URI);
+        if (!config.getRedirect().second.empty())
+        {
+            _status_code = config.getRedirect().first;
+            return (default3XX(config.getRedirect().second));
+        }
 		path = makeFullPath(config, _request_URI);
         if (!isAllowed(config.getMethods() ,_method))
         {
@@ -372,6 +404,11 @@ std::string Response::processGET()
     try
     {
         config = matchSubRoute(_request_URI);
+        if (!config.getRedirect().second.empty())
+        {
+            _status_code = config.getRedirect().first;
+            return (default3XX(config.getRedirect().second));
+        }
 		path = makeFullPath(config, _request_URI);
         if (!isAllowed(config.getMethods() ,_method))
         {
@@ -423,6 +460,11 @@ std::string Response::processDELETE()
     try
     {
         config = matchSubRoute(_request_URI);
+        if (!config.getRedirect().second.empty())
+        {
+            _status_code = config.getRedirect().first;
+            return (default3XX(config.getRedirect().second));
+        }
         path = makeFullPath(config, _request_URI);
         if (!isAllowed(config.getMethods(), _method))
         {
@@ -501,6 +543,11 @@ std::string Response::processPUT()
     try
     {
         config = matchSubRoute(_request_URI);
+        if (!config.getRedirect().second.empty())
+        {
+            _status_code = config.getRedirect().first;
+            return (default3XX(config.getRedirect().second));
+        }
         path = makeFullPath(config, _request_URI);
         if (!isAllowed(config.getMethods(), _method))
         {

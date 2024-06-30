@@ -8,6 +8,14 @@ server
     {
         root ./wsite
     }
+    location /redirect
+    {
+        return 307 http://localhost:8000/wsite
+    }
+    location /wsite
+    {
+        alias ./wsite
+    }
 }
 
 
@@ -50,7 +58,10 @@ server
     listen localhost:8444
     index index.html
     location /
+    {
+
 		root ./wsite
+    }
 }
 server 
 {

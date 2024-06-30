@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/08 23:20:55 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/29 17:28:18 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/06/30 16:21:49 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,7 @@ public:
     
     std::string process();
     std::string default404();
+    std::string default3XX(std::string redir);
     ServerRoutesConfig matchSubRoute(std::string uri);
     std::string makeFullPath(ServerRoutesConfig config, std::string uri);
 	bool	isChunkMessage() const;
