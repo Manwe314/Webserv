@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 16:12:04 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/28 22:56:31 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/07/01 21:43:45 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -240,22 +240,8 @@ ServerConfig Server::determineServer(std::string request)
 void Server::receive(int client_fd)
 {
     char buffer[BUFFER_SIZE] = {0};
-	std::string	raw_buffer;
     int ret;
-	/*
-		The below commented loop is a possible solution to connection keep-alive
-	*/
-
-	// while(true)
-	// {
-	// 	ret = recv(client_fd, buffer, BUFFER_SIZE, 0);
-	// 	if (ret < 0)
-	// 		throw ClientConnectionError("Read error: Connection closed in the server named: " + _name);
-	// 	if (ret == 0)
-	// 		break;
-	// 	raw_buffer += std::string(buffer);
-	// }
-
+	
 	ret = recv(client_fd, buffer, BUFFER_SIZE, 0);
 	if (ret == 0 || ret == -1)
 	{
@@ -265,13 +251,13 @@ void Server::receive(int client_fd)
 		else
 			throw ClientConnectionError("Read error: Connection closed in the server named: " + _name);
 	}
-	if (_chunked.find(client_fd) != _chunked.end() || isChunkedMessage(std::string(buffer)))
+	if (_chunked.find(client_fd) != _chunked.end() || isChunkedMessage(std::string(buffer, ret)))
 	{
 		if (_chunked.find(client_fd) == _chunked.end())
-			_chunked.insert(std::make_pair(client_fd, std::string(buffer)));
+			_chunked.insert(std::make_pair(client_fd, std::string(buffer, ret)));
 		else
 			_chunked[client_fd] += buffer;
-		if (std::string(buffer).find("0\r\n\r\n") != std::string::npos)
+		if (std::string(buffer, ret).find("0\r\n\r\n") != std::string::npos)
 		{
 			try
 			{
@@ -289,13 +275,13 @@ void Server::receive(int client_fd)
 	}
 	else
 	{
-		_requests[client_fd] += std::string(buffer);
+		_requests[client_fd] += std::string(buffer, ret);
 	}
 	if (DEBUG)
 	{
 		std::cout << YELLOW << "\n~~~~~~~~~~~~~message~~~~~~~~~~~~~" << DEFAULT <<std::endl;
 		std::cout << _requests[client_fd] << std::endl;
-		std::cout << _chunked[client_fd] << std::endl;
+		//std::cout << _chunked[client_fd] << std::endl;
 		std::cout << YELLOW << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << DEFAULT << std::endl;
 	}
 }
@@ -341,7 +327,8 @@ void Server::send(int client_fd)
 	it = _responses.find(client_fd);
     if (it != _responses.end() && (*it).second != "")
     {
-        std::cout << LAVENDER << "SENDING DATA" << DEFAULT << std::endl;
+		if (DEBUG)
+        	std::cout << LAVENDER << "SENDING DATA" << DEFAULT << std::endl;
         to_send = (*it).second;
         ret = ::send(client_fd, to_send.c_str(), to_send.size(), 0);
         if (ret == -1)

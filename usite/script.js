@@ -39,13 +39,15 @@ function updateStatus() {
 }
 
 function uploadFile(file) {
-    const url = 'http://localhost:8222/uploads/myfile';
-    const formData = new FormData();
-    formData.append('file', file);
+    const url = `http://localhost:8222/saves/${encodeURIComponent(file.name)}`;
 
     fetch(url, {
-        method: 'PUT',
-        body: formData
+        method: 'POST',
+        headers: {
+            'Content-Type': file.type,
+            'Content-Disposition': `attachment; filename="${file.name}"`
+        },
+        body: file
     })
     .then(response => {
         if (response.ok) {

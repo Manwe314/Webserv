@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 18:42:38 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/28 22:52:34 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/07/01 21:42:43 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -408,6 +408,7 @@ std::string listDirectoryContents(std::string uri, t_host_port pair)
     
     return (body.str());
 }
+
 
 char    *ft_strdup(char const *s1)
 {

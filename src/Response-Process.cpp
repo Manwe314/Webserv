@@ -6,7 +6,7 @@
 /*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 16:59:31 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/30 17:02:02 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/07/01 19:36:19 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -245,7 +245,6 @@ std::string Response::handleErrorResponse()
     }
     catch(const CouldNotOpenFile& e)
     {
-        std::cout << GREEN << _status_code << DEFAULT << std::endl;
         error_response = default404();
     }
     return error_response;
@@ -528,6 +527,12 @@ static bool hasUnimplementedContent(std::map<std::string, std::string> headers)
     it = headers.find("content-range");
     if (it != headers.end())
         return (true);
+    it = headers.find("content-type");
+    if (it != headers.end())
+    {
+        if ((*it).second.find("multipart") != std::string::npos)
+            return (true);
+    }
     return (false);
     
 }
@@ -576,7 +581,7 @@ std::string Response::processPUT()
         }
         if (pathStatus(path) == IS_FILE)
         {
-            std::ofstream file(path.c_str(), std::ios::out);
+            std::ofstream file(path.c_str(), std::ios::out | std::ios::binary);
             if (!file)
             {
                 _status_code = 403;
@@ -588,7 +593,7 @@ std::string Response::processPUT()
         }
         else
         {
-            std::ofstream file(path.c_str(), std::ios::out);
+            std::ofstream file(path.c_str(), std::ios::out | std::ios::binary);
             if (!file)
             {
                 _status_code = 500;

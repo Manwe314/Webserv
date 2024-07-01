@@ -35,9 +35,9 @@ server
     server_name sniki
     listen localhost:8222
     index index.html
-    location /usite
+    location /
     {
-        alias ./psite
+        root ./usite
     }
 }
 
