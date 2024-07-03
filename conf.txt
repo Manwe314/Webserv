@@ -59,8 +59,8 @@ server
     index index.html
     location /
     {
-
-		root ./wsite
+        autoindex on
+		root ./dir
     }
 }
 server 
@@ -70,7 +70,18 @@ server
     index index.html
     location /
     {
-        alias ./psite/saves
-        client_max_body_size 800
+        alias ./uploads
+        client_max_body_size 49
+    }
+}
+
+server 
+{
+    server_name tricki
+    listen localhost:8666
+    index index.html
+    location /
+    {
+        alias ./
     }
 }
