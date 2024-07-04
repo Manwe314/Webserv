@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 18:42:38 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/07/01 21:42:43 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/07/04 15:25:48 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,6 +118,8 @@ bool isValidCgiFile( std::string const & file )
 		return true; // PHP script
 	else if (file.length() >= 4 && !file.compare(file.length() - 3, 3, ".py"))
 		return true; // Python script
+	else if (file.length() >= 5 && !file.compare(file.length() - 4, 4, ".bla"))
+		return true; // 42 school tester script extension
 	return false; // Unsupported script type
 }
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Webserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 14:44:27 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/07/01 21:42:22 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/07/04 15:14:53 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,7 @@
 #define MAX_EVENTS 1000
 #define TIMEOUT_SEC 2
 #define DEFAULT_ERROR "./error_pages"
+#define DEFAULT_CONFIG "./conf.txt"
 #define SAFE_MODE 1
 #define MAX_BODY_SIZE 15000000
 

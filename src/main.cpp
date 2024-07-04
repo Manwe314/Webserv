@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 14:52:28 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/28 22:40:37 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/07/04 15:15:22 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,15 +20,23 @@ int main(int argc, char *argv[], char **envp)
 {
     ConfigBase base;
 
-    if (argc != 2)
+	std::string	path;
+
+    if (argc > 2)
     {
         std::cout << "please only provide one file" << std::endl;
         return 0;
     }
-    
+    else
+	{
+		if (argc == 2)
+			path = std::string(argv[1]);
+		else
+			path = DEFAULT_CONFIG;
+	}
     try
     {
-        Config configuration(argv[1]);
+        Config configuration(path);
 		//printConfig(configuration);
         Cluster cluster(configuration, envp);
         cluster.run();

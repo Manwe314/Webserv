@@ -6,7 +6,7 @@
 /*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/30 09:46:55 by bleclerc          #+#    #+#             */
-/*   Updated: 2024/06/26 10:56:38 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/07/04 15:42:31 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,11 +129,10 @@ void	Cgi::executeScript( std::string const & file)
 		close(pfd[1]);
 		if (_extension == 1) // PHP script
 		{
-			char *args[] = {const_cast<char *>(interpreter.c_str()),\
-			const_cast<char *>(file.c_str()), NULL};
+			char *args[] = {const_cast<char *>(interpreter.c_str()), const_cast<char *>(file.c_str()), NULL};
 			execve(interpreter.c_str(), args, _envp);
 		}
-		else
+		else // Python script
 		{
 			char *args[] = {const_cast<char *>(file.c_str()), NULL};
 			execve(file.c_str(), args, _envp);

@@ -39,7 +39,7 @@ function updateStatus() {
 }
 
 function uploadFile(file) {
-    const url = `http://localhost:8222/saves/${encodeURIComponent(file.name)}`;
+    const url = `http://localhost:8222/uploads/${encodeURIComponent(file.name)}`;
 
     fetch(url, {
         method: 'POST',
