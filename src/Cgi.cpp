@@ -6,23 +6,24 @@
 /*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/30 09:46:55 by bleclerc          #+#    #+#             */
-/*   Updated: 2024/07/04 15:42:31 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/07/04 16:33:59 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/Cgi.hpp"
 
-Cgi::Cgi( std::string & file, char **envp ) : _file(file), _envp(envp)
-{
+Cgi::Cgi( std::string & file, char **envp, std::string const & body ) : _file(file), _envp(envp), is_post(true)
+{	
 	//	Checks if file is accessible and executable
 	if (access(_file.c_str(), X_OK) != 0)
 		throw CgiExecutionError(_file + " not accessible or executable");
-
+	if (body == "")
+		is_post = false;
 	_extension = determineExtension(file);
 	if (!_extension)
 		throw CgiExecutionError(_file + " unsupported script format");
 	else
-		executeScript(_file);
+		executeScript(_file, body);
 }
 
 /*
@@ -97,19 +98,48 @@ bool	Cgi::readfile(int read_fd)
 	return true;
 }
 
+void	Cgi::ft_execve( std::string const & file, std::string const & body )
+{
+	if (!is_post) //GET call, so no arguments passed to execve apart from interpreter and file
+	{
+		if (_extension == 1) // PHP script
+		{
+			char *args[] = {const_cast<char *>(_interpreter.c_str()), const_cast<char *>(file.c_str()), NULL};
+			execve(_interpreter.c_str(), args, _envp);
+		}
+		else // Python script
+		{
+			char *args[] = {const_cast<char *>(file.c_str()), NULL};
+			execve(file.c_str(), args, _envp);
+		}
+	}
+	else //POST call, here we add the body content as a argument to execve
+	{
+		if (_extension == 1) // PHP script
+		{
+			char *args[] = {const_cast<char *>(_interpreter.c_str()), const_cast<char *>(file.c_str()), const_cast<char *>(body.c_str()), NULL};
+			execve(_interpreter.c_str(), args, _envp);
+		}
+		else // Python script
+		{
+			char *args[] = {const_cast<char *>(file.c_str()), const_cast<char *>(body.c_str()), NULL};
+			execve(file.c_str(), args, _envp);
+		}
+	}
+}
+
 // Function to execute a script and capture its output
-void	Cgi::executeScript( std::string const & file)
+void	Cgi::executeScript( std::string const & file, std::string const & body )
 {
 	int			pfd[2], status;
 	pid_t		pid;
-	std::string	interpreter;
 
 	// Determine the interpreter based on the script type
 	if (_extension == 1) // PHP script
 	{
-		interpreter = retrievePhpCgiInterpreter();
+		_interpreter = retrievePhpCgiInterpreter();
 		//std::cout << interpreter << std::endl;
-		if (interpreter.empty())
+		if (_interpreter.empty())
 			throw CgiExecutionError("php-cgi not found");
 	}
 	if (pipe(pfd) == -1)
@@ -127,16 +157,7 @@ void	Cgi::executeScript( std::string const & file)
 		if (dup2(pfd[1], STDOUT_FILENO) == -1)
 			throw CgiExecutionError("dup2 or close fn issue");
 		close(pfd[1]);
-		if (_extension == 1) // PHP script
-		{
-			char *args[] = {const_cast<char *>(interpreter.c_str()), const_cast<char *>(file.c_str()), NULL};
-			execve(interpreter.c_str(), args, _envp);
-		}
-		else // Python script
-		{
-			char *args[] = {const_cast<char *>(file.c_str()), NULL};
-			execve(file.c_str(), args, _envp);
-		}
+		ft_execve(file, body);
 		exit(EXIT_FAILURE);
 	}
 	close(pfd[1]);

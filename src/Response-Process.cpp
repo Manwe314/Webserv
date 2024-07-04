@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response-Process.cpp                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 16:59:31 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/07/01 19:36:19 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/07/04 16:17:01 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -364,7 +364,7 @@ std::string Response::processPOST()
                 _status_code =413;
                 return (handleErrorResponse());
             }
-			Cgi cgi(path, _envp);
+			Cgi cgi(path, _envp, _body);
 			body = cgi.getCgiResult();
 			_status_code = 200;
 			status_line = statusLineProcess();
@@ -416,7 +416,7 @@ std::string Response::processGET()
         }
 		if (isValidCgiFile(path))
 		{
-			Cgi cgi(path, _envp);
+			Cgi cgi(path, _envp, "");
 			body = cgi.getCgiResult();
 			_status_code = 200;
 			status_line = statusLineProcess();

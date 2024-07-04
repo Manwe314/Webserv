@@ -13,7 +13,7 @@ def send_chunk(connection, data):
 def send_chunked_request():
     # Replace with your server's address and port
     server_address = 'localhost'
-    server_port = 8444
+    server_port = 8666
 
     # Create a socket connection to the server
     connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -22,7 +22,7 @@ def send_chunked_request():
     # Headers and the first chunk
     headers = (
         "GET /chunking_data.txt HTTP/1.1\r\n"
-        "Host: localhost:8444\r\n"
+        "Host: localhost:8666\r\n"
         "Accept-Encoding: identity\r\n"
         "Transfer-Encoding: chunked\r\n"
         "Content-Type: text/plain\r\n\r\n"

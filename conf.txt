@@ -4,17 +4,19 @@ server
     server_name spiki
     listen localhost:8000
     index index.html
-    location / 
+	error_page 404 /custom_err/404.html
+    root ./tests/wsite
+	location / 
     {
-        root ./wsite
+        root ./tests/wsite
     }
     location /redirect
     {
-        return 307 http://localhost:8000/wsite
+        return 307 http://localhost:8000/tests/wsite/index.html
     }
-    location /wsite
+    location /tests/wsite
     {
-        alias ./wsite
+        alias ./tests/wsite
     }
 }
 
@@ -26,7 +28,7 @@ server
     index index.html
     location / 
     {
-        root ./psite
+        root ./tests/psite
     }
 }
 
@@ -37,7 +39,7 @@ server
     index index.html
     location /
     {
-        root ./usite
+        root ./tests/usite
     }
 }
 
@@ -48,21 +50,22 @@ server
     index index.html
     location /
     {
-        root ./dsite
+        root ./tests/dsite
     }
 }
 
 server
 {
-    server_name chunki
+    server_name dunki
     listen localhost:8444
-    index index.html
+    #index index.html
     location /
     {
         autoindex on
-		root ./dir
+		root ./tests/dir
     }
 }
+
 server 
 {
     server_name niki
@@ -70,18 +73,29 @@ server
     index index.html
     location /
     {
-        alias ./uploads
+        alias ./tests/uploads
         client_max_body_size 49
     }
 }
 
-server 
+server
 {
-    server_name tricki
+    server_name chunki
     listen localhost:8666
-    index index.html
+    index chunk_get.py chunk_post.py
     location /
     {
-        alias ./
+		root ./tests/chunking
+    }
+}
+
+server
+{
+    server_name cgunki
+    listen localhost:8777
+    index chunk_get.py chunk_post.py
+    location /
+    {
+		root ./tests/cgi
     }
 }
