@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 18:42:38 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/07/04 16:11:54 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/07/04 21:35:29 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -361,17 +361,24 @@ std::string lastModifiedTime(std::string path)
     return (time.str()); 
 }
 
-static std::string generateListElement(std::string uri, t_host_port pair, std::string name)
+static std::string generateListElement(std::string uri, t_host_port pair, std::string name, std::string root)
 {
     std::stringstream element;
     std::string path;
 
     path = uri + "/" + name;
 
+    if (!root.empty())
+    {
+        if (countMatchingChars(uri, root) > 1 && countMatchingChars(uri, root) == (int)root.size())
+            uri.erase(0, countMatchingChars(uri, root));
+    }
     if (uri[0] == '.')
         uri.erase(0, 1);
     element << "\t\t<p><a href=\"http://";
     element << pair;
+    if (uri[0] != '/')
+        element << "/";
     element << uri;
     element << name + "\">" + name + "</a>";
     element << "\t\t\t\t";
@@ -380,7 +387,7 @@ static std::string generateListElement(std::string uri, t_host_port pair, std::s
     return (element.str());
 }
 
-std::string listDirectoryContents(std::string uri, t_host_port pair)
+std::string listDirectoryContents(std::string uri, t_host_port pair, std::string root)
 {
     std::vector<std::string> content;
     DIR* dir = opendir(uri.c_str());
@@ -404,7 +411,7 @@ std::string listDirectoryContents(std::string uri, t_host_port pair)
     body << "<ul>\n";
     for (size_t i = 0; i < content.size(); i++)
     {
-        body << "<li>" << generateListElement(uri, pair, content[i]) << "</li>\n";
+        body << "<li>" << generateListElement(uri, pair, content[i], root) << "</li>\n";
     }
     body << "</ul>\n</body>\n</html>\n";
     

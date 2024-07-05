@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response-Process.cpp                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 16:59:31 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/07/04 16:17:01 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/07/04 21:44:10 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,7 +142,7 @@ ServerRoutesConfig Response::matchSubRoute(std::string uri)
     {
         match = _server_config.findRootSubRoute();
         //if root route is not found send 404 not found.
-        if (match == NULL)
+        if (match == NULL)   
             throw NoMatchFound("404");
         //since root location can never actualy be nested it should always be considered as highest level route (right after the server) and it must inherit the directives of the server
         (*match).inherit(_server_config.getServerWideConfig());
@@ -277,7 +277,7 @@ std::string Response::serviceGetResource(ServerRoutesConfig config, std::string 
         {
             if (config.getAutoindex() == 1)
             {
-                body = listDirectoryContents(uri, _pair);
+                body = listDirectoryContents(uri, _pair, config.getRoot());
                 if (body.empty())
                     throw NoMatchFound("403");
                 _path = uri;

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Webserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 14:44:27 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/07/04 15:14:53 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/07/04 21:28:56 by lkukhale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,7 +101,7 @@ std::string readFile(std::string full_name);
 std::string lastModifiedTime(std::string path);
 std::string readBinaryFile(const std::string &path);
 std::vector<std::string> split(std::string string, char delim);
-std::string listDirectoryContents(std::string uri, t_host_port pair);
+std::string listDirectoryContents(std::string uri, t_host_port pair, std::string root);
 std::vector<std::string> split(std::string string, std::string delim);
 void eraseRange(std::vector<std::string>& array, int start, int end, int flag = 0);
 int countMatchingChars(std::string first, std::string second, int pos = 0, int flag = 0);

@@ -58,7 +58,6 @@ server
 {
     server_name dunki
     listen localhost:8444
-    #index index.html
     location /
     {
         autoindex on
@@ -97,5 +96,28 @@ server
     location /
     {
 		root ./tests/cgi
+    }
+}
+
+server
+{
+    server_name default
+    listen localhost:8888
+    listen localhost:8999
+    index index.html
+    location / 
+    {
+        root ./tests/dsite
+    }
+}
+
+server
+{
+    server_name localhost:8888
+    listen localhost:8888
+    index index.html
+    location / 
+    {
+        root ./tests/psite
     }
 }
