@@ -92,7 +92,7 @@ server
 {
     server_name cgunki
     listen localhost:8777
-    index chunk_get.py chunk_post.py
+    index simple_cgi.php cgi_queries.py create_file.php
     location /
     {
 		root ./tests/cgi

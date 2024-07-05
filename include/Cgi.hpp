@@ -6,7 +6,7 @@
 /*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/30 09:47:34 by bleclerc          #+#    #+#             */
-/*   Updated: 2024/07/04 16:30:11 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/07/05 14:18:57 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,13 +40,12 @@ class Cgi
 	std::string	retrievePhpCgiInterpreter();
 	std::vector<std::string>	extractEnvPath();
 	bool	readfile(int read_fd);
-	void	ft_execve( std::string const & file, std::string const & body );
-	void	executeScript( std::string const & file, std::string const & body );
+	void	executeScript( std::string const & file );
 
 	int			_extension;
 	std::string	_file;
 	std::string _result;
 	char		**_envp;
-	bool		is_post;
 	std::string	_interpreter;
+	std::string _body_variable;
 };

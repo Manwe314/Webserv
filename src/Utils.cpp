@@ -3,15 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   Utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 18:42:38 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/07/04 21:35:29 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/07/05 14:21:26 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Webserv.hpp"
 #include "Config.hpp"
+#include "Response.hpp"
 
 /*
 	Function to split a string based on a single char or a charset (multiple chars),
@@ -441,6 +442,31 @@ char    *ft_strdup(char const *s1)
     return (copy);
 }
 
+char ** appendToCharArray(char** array, int size, const char* new_element) 
+{
+    int i = 0;
+    char** new_array = (char**)malloc((size + 2) * sizeof(char*));
+    
+    if (new_array == NULL) 
+    {
+        throw NoMatchFound("500");
+    }
+    while (i < size)
+    {
+        new_array[i] = ft_strdup(array[i]);
+        i++;
+    }
+    new_array[i] = ft_strdup(new_element);
+    if (new_array[i] == NULL)
+    {
+        free(new_array[i + 1]);
+        freeCsplit(new_array);
+        throw NoMatchFound("500");
+    }
+    new_array[i + 1] = NULL;
+
+    return (new_array);
+}
 
 int cArraySize(char **array)
 {

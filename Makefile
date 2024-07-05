@@ -6,7 +6,7 @@
 #    By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/06/23 16:24:43 by lkukhale          #+#    #+#              #
-#    Updated: 2024/07/04 16:44:13 by bleclerc         ###   ########.fr        #
+#    Updated: 2024/07/05 16:12:19 by bleclerc         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,7 +19,7 @@ SRC = ${addsuffix .cpp, ./src/main ./src/Server ./src/Utils ./src/Config ./src/C
 HEADERS = -I ./include/
 CC = c++
 RM = rm -f
-CPPFLAGS = -Wall -Wextra -Werror -g -std=c++98 #-DDEBUG=0  
+CPPFLAGS = -Wall -Wextra -Werror -g -std=c++98 -DDEBUG=0  
 OBJ = ${SRC:.cpp=.o}
 
 

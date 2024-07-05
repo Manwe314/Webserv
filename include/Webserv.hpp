@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Webserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 14:44:27 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/07/04 21:28:56 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/07/05 14:21:33 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,6 +109,7 @@ std::pair<int, int> encapsule(std::vector<std::string> array, std::string a, std
 std::string	removeComments( std::string const & config_file );
 std::string	trimSpaces( std::string string );
 void	freeCsplit(char **array);
+char ** appendToCharArray(char** array, int size, const char* new_element);
 int		cArraySize(char **array);
 char    *ft_strdup(char const *s1);
 

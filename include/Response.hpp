@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lkukhale <lkukhale@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/08 23:20:55 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/30 16:21:49 by lkukhale         ###   ########.fr       */
+/*   Updated: 2024/07/05 14:09:50 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,8 +40,6 @@ private:
 	std::string	_query;
     t_host_port _pair;
 	char		**_envp;
-	bool		_chunk_message;
-	bool		_chunk_completed;
 
     void	parseRequestLine(std::string request_line);
     void	parseMessageHeaders(std::string message_headers);
@@ -55,7 +53,6 @@ private:
     std::string handleErrorResponse();
     std::string headersProcess(std::string body, std::string path, bool is_cgi, std::string redir);
     std::string serviceGetResource(ServerRoutesConfig config, std::string uri);
-	char ** appendToCharArray(char** array, int size, const char* new_element);
 	void	validCgiContentHeader(std::string response);
 public:
     Response(std::string request, ServerConfig config, t_host_port pair, char **envp);
@@ -66,8 +63,6 @@ public:
     std::string default3XX(std::string redir);
     ServerRoutesConfig matchSubRoute(std::string uri);
     std::string makeFullPath(ServerRoutesConfig config, std::string uri);
-	bool	isChunkMessage() const;
-	bool	isChunkProcessComplete() const;
 
     std::map<std::string, std::string> getHeaders() const;
     ServerConfig getServerConfig() const;

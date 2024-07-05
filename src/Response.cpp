@@ -6,7 +6,7 @@
 /*   By: bleclerc <bleclerc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/08 23:27:16 by lkukhale          #+#    #+#             */
-/*   Updated: 2024/06/28 11:35:31 by bleclerc         ###   ########.fr       */
+/*   Updated: 2024/07/05 14:10:34 by bleclerc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 */
 
 Response::Response(std::string request, ServerConfig config, t_host_port pair, char **envp) : \
-			_headers(), _pair(pair), _envp(envp), _chunk_message(false), _chunk_completed(false)
+			_headers(), _pair(pair), _envp(envp)
 {
     size_t i;
     _status_code = -1; //if the status code is -1 after this constructor finishes that means no errors were encountered.
@@ -187,34 +187,6 @@ void Response::parseMessageHeaders(std::string message_headers)
     }   
 }
 
-char ** Response::appendToCharArray(char** array, int size, const char* new_element) 
-{
-    int i = 0;
-    char** new_array = (char**)malloc((size + 2) * sizeof(char*));
-    
-    if (new_array == NULL) 
-    {
-        throw NoMatchFound("500");
-    }
-
-    
-    while (i < size)
-    {
-        new_array[i] = ft_strdup(array[i]);
-        i++;
-    }
-    new_array[i] = ft_strdup(new_element);
-    if (new_array[i] == NULL)
-    {
-        free(new_array[i + 1]);
-        freeCsplit(new_array);
-        throw NoMatchFound("500");
-    }
-    new_array[i + 1] = NULL;
-
-    return (new_array);
-}
-
 /*
 	This function parses the request line of the message
 	by convection space, new line and carrage return
@@ -344,16 +316,6 @@ int Response::getStatusCode() const
 std::string Response::getQuery() const
 {
 	return (_query);
-}
-
-bool	Response::isChunkMessage() const
-{
-	return _chunk_message;	
-}
-
-bool	Response::isChunkProcessComplete() const
-{
-	return _chunk_completed;	
 }
 
 const char * NoMatchFound::what() const throw()
